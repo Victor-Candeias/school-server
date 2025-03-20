@@ -26,12 +26,15 @@ from utils import utilities  # General utilities
 
 # Importing the SchoolLevel model from the models module
 from models.schoollevel import SchoolLevel
+from models.user import User
+
+from config import USERS_COLLECTION, DATA_LEVEL_COLLECTION
 
 # Create a new router for data-related endpoints
 data_router = APIRouter()
 
 # Endpoint: Get all users
-@data_router.get("/users")
+@data_router.get("/users", response_model=User)
 def get_users():
     """
     Retrieve all users from the database.
@@ -45,28 +48,28 @@ def get_users():
     """
     try:
         # Retrieve users from the database
-        users = database.get_user()
+        users = database.find(USERS_COLLECTION)
 
         # If no users are found, raise an HTTPException with a 400 status code
         if not users:
-            raise HTTPException(status_code=400, detail="Users not found")
+            return JSONResponse(status_code=400, content="Users not found")
 
         # Log the number of users found for tracking purposes
-        database.add_log("get_users()", f"Found {len(users)} users")
+        utilities.add_log_to_db("get_users()", f"Found {len(users)} users")
 
         # Use list comprehension to create a simplified list of user data (name and role)
-        result = [{"name": user['name'], "role": user['role']} for user in users]
+        result = [{"email": user['email'], "name": user['name'], "role": user['role']} for user in users]
 
         # Return the list of users as a JSON response with a 200 OK status code
         return JSONResponse(content={"users": result}, status_code=200)
 
     except Exception as e:
         # Log the error and raise an HTTPException with a 500 status code
-        database.add_log("get_users()", f"Get users error: {e}", True)
-        raise HTTPException(status_code=500, detail="Internal server error")
+        utilities.add_log_to_db("get_users()", f"Get users error: {e}", True)
+        return JSONResponse(status_code=500, content="Internal server error")
 
 # Endpoint: Get all school levels
-@data_router.get("/level")
+@data_router.get("/level", response_model=SchoolLevel)
 def get_levels():
     """
     Retrieve all school levels from the database.
@@ -80,14 +83,14 @@ def get_levels():
     """
     try:
         # Retrieve school levels from the database
-        levels = database.get_level()
+        levels = database.find(DATA_LEVEL_COLLECTION)
 
         # If no levels are found, raise an HTTPException with a 400 status code
         if not levels:
-            raise HTTPException(status_code=400, detail="Levels not found")
+            return JSONResponse(status_code=400, content="Levels not found!!!")
 
         # Log the number of levels found for tracking purposes
-        database.add_log("get_levels()", f"Found {len(levels)} levels")
+        utilities.add_log_to_db("get_levels()", f"Found {len(levels)} levels")
 
         # Use list comprehension to create a simplified list of school level data
         result = [{"level": level['schoolYear']} for level in levels]
@@ -97,5 +100,5 @@ def get_levels():
 
     except Exception as e:
         # Log the error and raise an HTTPException with a 500 status code
-        database.add_log("get_levels()", f"Get levels error: {e}", True)
-        raise HTTPException(status_code=500, detail="Internal server error")
+        utilities.add_log_to_db("get_levels()", f"Get levels error: {e}", True)
+        return JSONResponse(status_code=500, content="Internal server error")

@@ -379,3 +379,261 @@
 2025-03-18 13:27:10,724 - INFO - _init_db();mongo_database=school
 2025-03-18 13:27:10,754 - INFO - _init_db();MongoDB connected successfully.
 2025-03-18 13:27:10,754 - INFO - Initialize Database
+2025-03-18 14:14:20,840 - INFO - Logging setup successfully.
+2025-03-18 14:16:15,662 - INFO - Logging setup successfully.
+2025-03-18 14:16:40,504 - INFO - Logging setup successfully.
+2025-03-18 14:16:40,661 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:16:40,661 - INFO - _init_db();mongo_database=school
+2025-03-18 14:16:40,696 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:16:40,696 - INFO - Initialize Database
+2025-03-18 14:16:40,706 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:17:26,968 - INFO - Logging setup successfully.
+2025-03-18 14:17:27,072 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:17:27,072 - INFO - _init_db();mongo_database=school
+2025-03-18 14:17:27,085 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:17:27,086 - INFO - Initialize Database
+2025-03-18 14:17:27,089 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:17:27,669 - INFO - Logging setup successfully.
+2025-03-18 14:17:27,786 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:17:27,786 - INFO - _init_db();mongo_database=school
+2025-03-18 14:17:27,863 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:17:27,863 - INFO - Initialize Database
+2025-03-18 14:17:27,870 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:20:58,458 - INFO - Logging setup successfully.
+2025-03-18 14:20:58,562 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:20:58,562 - INFO - _init_db();mongo_database=school
+2025-03-18 14:20:58,584 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:20:58,584 - INFO - Initialize Database
+2025-03-18 14:20:58,587 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:20:59,127 - INFO - Logging setup successfully.
+2025-03-18 14:20:59,219 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:20:59,219 - INFO - _init_db();mongo_database=school
+2025-03-18 14:20:59,232 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:20:59,232 - INFO - Initialize Database
+2025-03-18 14:20:59,235 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:21:29,162 - INFO - Logging setup successfully.
+2025-03-18 14:21:30,732 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:21:30,732 - INFO - _init_db();mongo_database=school
+2025-03-18 14:21:30,996 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:21:30,996 - INFO - Initialize Database
+2025-03-18 14:21:34,651 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:23:40,429 - INFO - Logging setup successfully.
+2025-03-18 14:24:20,604 - INFO - Logging setup successfully.
+2025-03-18 14:24:21,904 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:24:21,904 - INFO - _init_db();mongo_database=school
+2025-03-18 14:24:21,958 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:24:21,958 - INFO - Initialize Database
+2025-03-18 14:24:21,965 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:25:52,462 - INFO - Logging setup successfully.
+2025-03-18 14:25:59,129 - INFO - Logging setup successfully.
+2025-03-18 14:25:59,247 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:25:59,247 - INFO - _init_db();mongo_database=school
+2025-03-18 14:25:59,271 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:25:59,271 - INFO - Initialize Database
+2025-03-18 14:25:59,275 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:26:04,201 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:26:04,202 - INFO - _init_db();mongo_database=school
+2025-03-18 14:26:04,278 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:26:04,278 - INFO - Initialize Database
+2025-03-18 14:26:04,289 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:28:31,113 - INFO - Logging setup successfully.
+2025-03-18 14:28:31,237 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:28:31,238 - INFO - _init_db();mongo_database=school
+2025-03-18 14:28:31,251 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:28:31,251 - INFO - Initialize Database
+2025-03-18 14:28:31,256 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:28:56,468 - INFO - Logging setup successfully.
+2025-03-18 14:28:58,272 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:28:58,273 - INFO - _init_db();mongo_database=school
+2025-03-18 14:28:58,310 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:28:58,310 - INFO - Initialize Database
+2025-03-18 14:28:58,321 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:30:00,954 - INFO - Logging setup successfully.
+2025-03-18 14:30:01,068 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:30:01,068 - INFO - _init_db();mongo_database=school
+2025-03-18 14:30:01,080 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:30:01,080 - INFO - Initialize Database
+2025-03-18 14:30:01,084 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:32:46,302 - INFO - Logging setup successfully.
+2025-03-18 14:32:46,395 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:32:46,395 - INFO - _init_db();mongo_database=school
+2025-03-18 14:32:46,415 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:32:46,415 - INFO - Initialize Database
+2025-03-18 14:32:46,421 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:32:46,954 - INFO - Logging setup successfully.
+2025-03-18 14:32:47,056 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:32:47,056 - INFO - _init_db();mongo_database=school
+2025-03-18 14:32:47,068 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:32:47,068 - INFO - Initialize Database
+2025-03-18 14:32:47,072 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:34:51,120 - INFO - Logging setup successfully.
+2025-03-18 14:34:51,211 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:34:51,211 - INFO - _init_db();mongo_database=school
+2025-03-18 14:34:51,231 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:34:51,231 - INFO - Initialize Database
+2025-03-18 14:34:51,235 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:34:51,723 - INFO - Logging setup successfully.
+2025-03-18 14:34:51,841 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:34:51,842 - INFO - _init_db();mongo_database=school
+2025-03-18 14:34:51,864 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:34:51,864 - INFO - Initialize Database
+2025-03-18 14:34:51,868 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:35:01,733 - INFO - Logging setup successfully.
+2025-03-18 14:35:01,842 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:35:01,842 - INFO - _init_db();mongo_database=school
+2025-03-18 14:35:01,865 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:35:01,865 - INFO - Initialize Database
+2025-03-18 14:35:01,868 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:37:43,519 - INFO - Logging setup successfully.
+2025-03-18 14:37:43,662 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:37:43,662 - INFO - _init_db();mongo_database=school
+2025-03-18 14:37:43,777 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:37:43,777 - INFO - Initialize Database
+2025-03-18 14:37:43,800 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:38:18,900 - INFO - Logging setup successfully.
+2025-03-18 14:38:20,309 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:38:20,309 - INFO - _init_db();mongo_database=school
+2025-03-18 14:38:20,508 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:38:20,508 - INFO - Initialize Database
+2025-03-18 14:38:20,546 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:39:17,275 - INFO - Logging setup successfully.
+2025-03-18 14:39:17,400 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:39:17,400 - INFO - _init_db();mongo_database=school
+2025-03-18 14:39:17,423 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:39:17,423 - INFO - Initialize Database
+2025-03-18 14:39:17,430 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:44:17,282 - INFO - Logging setup successfully.
+2025-03-18 14:44:20,134 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:44:20,134 - INFO - _init_db();mongo_database=school
+2025-03-18 14:44:20,226 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:44:20,226 - INFO - Initialize Database
+2025-03-18 14:44:20,260 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:45:12,313 - INFO - Logging setup successfully.
+2025-03-18 14:45:14,509 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:45:14,509 - INFO - _init_db();mongo_database=school
+2025-03-18 14:45:14,570 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:45:14,570 - INFO - Initialize Database
+2025-03-18 14:45:14,609 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:57:53,805 - INFO - Logging setup successfully.
+2025-03-18 14:57:55,250 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:57:55,250 - INFO - _init_db();mongo_database=school
+2025-03-18 14:57:55,633 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:57:55,634 - INFO - Initialize Database
+2025-03-18 14:57:55,657 - INFO - Utils initialized with encryption settings.
+2025-03-18 14:59:39,405 - INFO - Logging setup successfully.
+2025-03-18 14:59:41,421 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 14:59:41,421 - INFO - _init_db();mongo_database=school
+2025-03-18 14:59:41,474 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 14:59:41,474 - INFO - Initialize Database
+2025-03-18 14:59:41,514 - INFO - Utils initialized with encryption settings.
+2025-03-18 15:11:03,362 - INFO - Logging setup successfully.
+2025-03-18 15:11:06,647 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 15:11:06,648 - INFO - _init_db();mongo_database=school
+2025-03-18 15:11:06,949 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 15:11:06,950 - INFO - Initialize Database
+2025-03-18 15:11:06,988 - INFO - Utils initialized with encryption settings.
+2025-03-18 15:16:42,039 - INFO - Logging setup successfully.
+2025-03-18 15:16:44,434 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 15:16:44,434 - INFO - _init_db();mongo_database=school
+2025-03-18 15:16:44,496 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 15:16:44,496 - INFO - Initialize Database
+2025-03-18 15:16:44,539 - INFO - Utils initialized with encryption settings.
+2025-03-18 15:16:58,869 - INFO - find();Found 0 documents in users
+2025-03-18 15:17:05,298 - INFO - hash_password();Password hashed successfully.
+2025-03-18 15:17:17,091 - INFO - insert();Inserted into users: 67d98e7dc98cb458b8515b9d
+2025-03-18 15:17:20,969 - INFO - insert();Inserted into logs: 67d98e80c98cb458b8515b9e
+2025-03-18 15:20:22,264 - INFO - Logging setup successfully.
+2025-03-18 15:20:24,203 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 15:20:24,203 - INFO - _init_db();mongo_database=school
+2025-03-18 15:20:24,255 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 15:20:24,255 - INFO - Initialize Database
+2025-03-18 15:20:24,291 - INFO - Utils initialized with encryption settings.
+2025-03-18 15:20:38,754 - INFO - Logging setup successfully.
+2025-03-18 15:20:41,140 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 15:20:41,141 - INFO - _init_db();mongo_database=school
+2025-03-18 15:20:41,247 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 15:20:41,248 - INFO - Initialize Database
+2025-03-18 15:20:41,287 - INFO - Utils initialized with encryption settings.
+2025-03-18 15:22:45,255 - INFO - Logging setup successfully.
+2025-03-18 15:22:46,690 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 15:22:46,690 - INFO - _init_db();mongo_database=school
+2025-03-18 15:22:46,740 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 15:22:46,741 - INFO - Initialize Database
+2025-03-18 15:22:46,788 - INFO - Utils initialized with encryption settings.
+2025-03-18 15:49:27,422 - INFO - Logging setup successfully.
+2025-03-18 15:50:10,971 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 15:50:10,972 - INFO - _init_db();mongo_database=school
+2025-03-18 15:50:11,608 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 15:50:11,609 - INFO - Initialize Database
+2025-03-18 15:50:11,703 - INFO - Utils initialized with encryption settings.
+2025-03-18 15:51:52,916 - INFO - Logging setup successfully.
+2025-03-18 15:51:55,442 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 15:51:55,443 - INFO - _init_db();mongo_database=school
+2025-03-18 15:51:55,509 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 15:51:55,509 - INFO - Initialize Database
+2025-03-18 15:51:55,556 - INFO - Utils initialized with encryption settings.
+2025-03-18 22:33:32,941 - INFO - find();Found 6 documents in schoolYears
+2025-03-18 22:33:32,945 - INFO - insert();Inserted into logs: 67d9f4bcb60fe64d0fc37fac
+2025-03-18 22:33:45,963 - INFO - find();Found 1 documents in users
+2025-03-18 22:33:45,965 - INFO - insert();Inserted into logs: 67d9f4c9b60fe64d0fc37fad
+2025-03-18 22:35:36,332 - INFO - find();Found 1 documents in users
+2025-03-18 22:35:36,333 - INFO - insert();Inserted into logs: 67d9f538b60fe64d0fc37fae
+2025-03-18 22:36:29,300 - INFO - find();Found 1 documents in users
+2025-03-18 22:36:29,303 - INFO - insert();Inserted into logs: 67d9f56db60fe64d0fc37faf
+2025-03-18 22:37:57,178 - INFO - find();Found 0 documents in classes
+2025-03-18 22:38:27,584 - INFO - insert();Inserted into logsError: 67d9f5e3b60fe64d0fc37fb0
+2025-03-18 22:43:27,280 - INFO - Logging setup successfully.
+2025-03-18 22:43:29,095 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 22:43:29,095 - INFO - _init_db();mongo_database=school
+2025-03-18 22:43:29,330 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 22:43:29,330 - INFO - Initialize Database
+2025-03-18 22:43:29,351 - INFO - Utils initialized with encryption settings.
+2025-03-18 22:43:56,907 - INFO - find();Found 0 documents in classes
+2025-03-18 22:44:39,156 - INFO - find();Found 1 documents in users
+2025-03-18 22:44:44,119 - INFO - insert();Inserted into logs: 67d9f75c4226ceb281647f46
+2025-03-18 23:51:23,956 - INFO - Logging setup successfully.
+2025-03-18 23:51:26,447 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 23:51:26,447 - INFO - _init_db();mongo_database=school
+2025-03-18 23:51:26,729 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 23:51:26,729 - INFO - Initialize Database
+2025-03-18 23:51:26,747 - INFO - Utils initialized with encryption settings.
+2025-03-18 23:52:07,010 - INFO - insert();Inserted into logsError: 67da0726587eb0943f5e7595
+2025-03-18 23:53:37,648 - INFO - insert();Inserted into logsError: 67da0781587eb0943f5e7596
+2025-03-18 23:53:57,160 - INFO - Logging setup successfully.
+2025-03-18 23:53:57,380 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 23:53:57,380 - INFO - _init_db();mongo_database=school
+2025-03-18 23:53:57,410 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 23:53:57,410 - INFO - Initialize Database
+2025-03-18 23:53:57,425 - INFO - Utils initialized with encryption settings.
+2025-03-18 23:54:40,954 - INFO - find();Found 0 documents in classes
+2025-03-18 23:54:56,210 - INFO - insert();Inserted into logsError: 67da07d0d8084812fe003c4c
+2025-03-18 23:55:45,092 - INFO - Logging setup successfully.
+2025-03-18 23:55:45,307 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 23:55:45,307 - INFO - _init_db();mongo_database=school
+2025-03-18 23:55:45,339 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 23:55:45,339 - INFO - Initialize Database
+2025-03-18 23:55:45,358 - INFO - Utils initialized with encryption settings.
+2025-03-18 23:55:58,580 - INFO - find();Found 0 documents in classes
+2025-03-18 23:56:15,886 - INFO - insert();Inserted into logsError: 67da081face6d0dd9e3b0c02
+2025-03-18 23:57:46,388 - INFO - Logging setup successfully.
+2025-03-18 23:57:46,640 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 23:57:46,640 - INFO - _init_db();mongo_database=school
+2025-03-18 23:57:46,676 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 23:57:46,676 - INFO - Initialize Database
+2025-03-18 23:57:46,696 - INFO - Utils initialized with encryption settings.
+2025-03-18 23:57:57,521 - INFO - find();Found 0 documents in classes
+2025-03-18 23:57:59,509 - INFO - find();Found 0 documents in classes
+2025-03-18 23:58:30,646 - INFO - insert();Inserted into logsError: 67da08a6cbfabfd8e9ebe169
+2025-03-18 23:58:36,359 - INFO - find();Found 0 documents in classes
+2025-03-18 23:59:15,690 - INFO - find();Found 0 documents in classes
+2025-03-18 23:59:31,463 - INFO - insert();Inserted into logsError: 67da08e3cbfabfd8e9ebe16a
+2025-03-18 23:59:58,773 - INFO - Logging setup successfully.
+2025-03-18 23:59:59,010 - INFO - _init_db();mongo_uri=mongodb://localhost:27017
+2025-03-18 23:59:59,010 - INFO - _init_db();mongo_database=school
+2025-03-18 23:59:59,040 - INFO - _init_db();MongoDB connected successfully.
+2025-03-18 23:59:59,040 - INFO - Initialize Database
+2025-03-18 23:59:59,056 - INFO - Utils initialized with encryption settings.
+2025-03-19 00:01:20,511 - INFO - find();Found 0 documents in classes
+2025-03-19 00:01:24,241 - INFO - find();Found 0 documents in classes
+2025-03-19 00:03:31,923 - ERROR - insert();Error inserting into classes: document must be an instance of dict, bson.son.SON, bson.raw_bson.RawBSONDocument, or a type that inherits from collections.MutableMapping
+2025-03-19 00:03:31,926 - INFO - insert();Inserted into logsError: 67da09d3bebd7cbda2753675

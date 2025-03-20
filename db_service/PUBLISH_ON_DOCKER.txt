@@ -1,0 +1,61 @@
+4. Build and Run the Docker Image
+Using Docker:
+1. Build the Docker image:
+
+docker build -t fastapi-app .
+
+2. Run the container:
+docker run -d -p 8000:8000 --name fastapi-container fastapi-app
+
+Using Docker Compose:
+1. Start the services:
+docker-compose up --build
+
+2. Access the API at: http://localhost:8000
+docker-compose up --build
+
+5. Verify the API
+Once the container is running, you can test your API using tools like curl, Postman, or your browser. For example:
+curl http://localhost:8000/db/insert
+
+Notes:
+Ensure your .env file is included in the Docker image or the environment variables are passed in the docker-compose.yml file.
+If you use docker-compose.yml, it will automatically start a MongoDB container alongside your FastAPI app.
+
+**************************************************************
+
+3. Validate Environment Variables in the Container
+After starting the containers, you can validate that the environment variables are correctly passed to the app container.
+
+1.Start the containers:
+docker-compose up --build
+
+2. Access the app container:
+docker exec -it <container_name> sh
+
+Replace <container_name> with the name of your app container (e.g., db_service_app_1).
+3. Check the environment variables inside the container:
+
+echo $MONGO_DB_CONNECTION_STRING
+echo $DATABASE_NAME
+echo $HOST
+echo $PORT
+
+You should see the values from your .env file.
+
+5. Test the Application
+Once the containers are running, test your FastAPI application to ensure it can connect to MongoDB using the environment variables. For example:
+
+Access the API at http://localhost:8000.
+Use tools like curl or Postman to test the endpoints.
+
+6. Debugging Tips
+If the environment variables are not working:
+
+Check the logs of the app container:
+docker logs <container_name>
+
+Ensure the .env file is in the same directory as docker-compose.yml.
+Verify that the .env file is not excluded by .dockerignore or .gitignore.
+
+This process ensures that your .env file or environment variables are correctly passed to the Docker container.

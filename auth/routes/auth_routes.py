@@ -118,3 +118,38 @@ def login(user: UserLogin):
 
         # Return a 500 Internal Server Error response with a generic error message
         return JSONResponse(status_code=500, content="Internal server error")
+
+# Endpoint: Get all users
+@auth_router.get("/users", response_model=User)
+def get_users():
+    """
+    Retrieve all users from the database.
+
+    This endpoint fetches all users from the database. If users are found, it returns
+    a list of user details (name and role). If no users are found or an error occurs,
+    it returns an appropriate error message.
+
+    Returns:
+        JSONResponse: A response containing the list of users or an error message.
+    """
+    try:
+        # Retrieve users from the database
+        users = database.find(USERS_COLLECTION)
+
+        # If no users are found, raise an HTTPException with a 400 status code
+        if not users:
+            return JSONResponse(status_code=400, content="Users not found")
+
+        # Log the number of users found for tracking purposes
+        utilities.add_log_to_db("get_users()", f"Found {len(users)} users")
+
+        # Use list comprehension to create a simplified list of user data (name and role)
+        result = [{"email": user['email'], "name": user['name'], "role": user['role']} for user in users]
+
+        # Return the list of users as a JSON response with a 200 OK status code
+        return JSONResponse(content={"users": result}, status_code=200)
+
+    except Exception as e:
+        # Log the error and raise an HTTPException with a 500 status code
+        utilities.add_log_to_db("get_users()", f"Get users error: {e}", True)
+        return JSONResponse(status_code=500, content="Internal server error")
