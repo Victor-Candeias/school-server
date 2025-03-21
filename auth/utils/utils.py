@@ -34,10 +34,10 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 import jwt
 from dotenv import load_dotenv
-from bson import ObjectId
+# from bson import ObjectId
 from utils.logging import logging
 from datetime import datetime
-from utils.database import database
+# from utils.database import database
 
 # Importing the User model from the models module
 from models.user import User
@@ -63,7 +63,7 @@ class Utils:
         self.IV_LENGTH = 16  # AES uses a 16-byte IV
         logging.info("Utils initialized with encryption settings.")
 
-    def create_token(self, user):
+    def create_token(self, userId: str, username: str):
         """
         Creates a JSON Web Token (JWT) for the given user.
         
@@ -75,12 +75,12 @@ class Utils:
         """
         try:
             payload = {
-                'id': user[0]['_id'],  # MongoDB user ID
-                'username': user[0]['name']  # Username
+                'id': userId,  # MongoDB user ID
+                'username': username  # Username
             }
             secret_key = os.getenv("ENCRYPTION_KEY")  # Retrieve the secret key from environment variables
             token = jwt.encode(payload, secret_key, algorithm="HS256")  # Sign the JWT using HMAC and SHA-256
-            logging.info(f"Token created for user: {user[0]['name']}")
+            logging.info(f"Token created for user: {username}")
             return token
         except Exception as e:
             logging.error(f"create_token();Error creating token: {e}")
@@ -216,12 +216,12 @@ class Utils:
             logging.error(f"validate_password();Error validating password: {e}")
             return False
         
-    def add_log_to_db(self, method, log, error=False):
-        logData = {
-                        "method": method,
-                        "log": log,
-                        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            }
+    # def add_log_to_db(self, method, log, error=False):
+    #     logData = {
+    #                     "method": method,
+    #                     "log": log,
+    #                     "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    #         }
         
-        collection = LOGS_COLLECTION if not error else LOGS_ERROR_COLLECTION
-        result = database.insert(collection, logData)
+    #     collection = LOGS_COLLECTION if not error else LOGS_ERROR_COLLECTION
+    #     result = database.insert(collection, logData)

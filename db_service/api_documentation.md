@@ -13,6 +13,8 @@ This document provides an overview of the REST API endpoints for the FastAPI app
 
 ## Endpoints
 
+<div style="border: 1px solid red; border-radius: 5px; padding: 10px;">
+
 ### 1. **Insert Document**
 - **URL**: `/db/insert`
 - **Method**: `POST`
@@ -43,13 +45,18 @@ curl -X POST "http://127.0.0.1:8000/db/insert" \
 }
 ```
 
+</div>
+
 ---
+
+<div style="border: 1px solid red; border-radius: 5px; padding: 10px;">
 
 ### 2. **Find Documents**
 - **URL: /db/find**
 - **Method: POST**
 - **Description: Retrieves documents from a specified MongoDB collection based on a query.**
 
+**Find by query**
 #### Request Body:
 ```json
 {
@@ -67,6 +74,28 @@ curl -X POST "http://127.0.0.1:8000/db/find" \
 -d "{\"collection\": \"test_collection\", \"query\": {\"name\": \"test_document\"}}"
 ```
 
+#### Response Body:
+```json
+{
+  "collection": "test_collection"
+}
+```
+
+**Find all**
+#### Request Body:
+```json
+{
+  "collection": "test_collection"
+}
+```
+
+#### Example curl Command:
+```bash
+curl -X POST "http://127.0.0.1:8000/db/find" \
+-H "Content-Type: application/json" \
+-d "{\"collection\": \"test_collection\"}"
+```
+
 #### Response:
 ```json
 {
@@ -78,30 +107,66 @@ curl -X POST "http://127.0.0.1:8000/db/find" \
   ]
 }
 ```
+</div>
+
 ---
 
-### 3. **Update Document**
+<div style="border: 1px solid red; border-radius: 5px; padding: 10px;">
+
+### 3. **Find Documents by id**
+- **URL: /db/findbyid**
+- **Method: POST**
+- **Description: Retrieves documents from a specified MongoDB collection based on a query.**
+
+**Find by id**
+#### Request Body:
+```json
+{
+  "collection": "test_collection",
+  "id": "test_document"
+}
+```
+
+#### Example curl Command:
+**Find by id**
+```bash
+curl -X POST "http://127.0.0.1:8000/db/find" \
+-H "Content-Type: application/json" \
+-d "{\"collection\": \"test_collection\", \"query\": {\"name\": \"test_document\", \"id\": \"123133131312\"}}"
+```
+
+#### Response:
+```json
+{
+  "documents": [
+    {
+      "_id": "mocked_id",
+      "name": "test_document"
+    }
+  ]
+}
+```
+
+</div>
+
+---
+
+<div style="border: 1px solid red; border-radius: 5px; padding: 10px;">
+
+### 4. **Update Document**
 - **URL: /db/update**
 - **Method: PUT**
 - **Description: Updates documents in a specified MongoDB collection based on a query.**
 
 #### Request Body:
+
+**Update by query**
 ```json
 {
   "collection": "test_collection",
   "query": {
     "name": "test_document"
   },
-  "data": {
-    "name": "updated_document"
-  }
-}
-```
-
-```json
-{
-  "collection": "test_collection",
-  "id": "242344234234",
   "data": {
     "name": "updated_document"
   }
@@ -115,6 +180,17 @@ curl -X PUT "http://127.0.0.1:8000/db/update" \
 -d "{\"collection\": \"test_collection\", \"query\": { \"name\": \"test_document\"}, \"data\": {\"name\": \"updated_document2\"}}"
 ```
 
+**Update by id**
+```json
+{
+  "collection": "test_collection",
+  "id": "242344234234",
+  "data": {
+    "name": "updated_document"
+  }
+}
+```
+#### Example curl Command:
 ```bash
 curl -X PUT "http://127.0.0.1:8000/db/update" \
 -H "Content-Type: application/json" \
@@ -129,14 +205,20 @@ curl -X PUT "http://127.0.0.1:8000/db/update" \
 }
 ```
 
+</div>
+
 ---
 
-### 4. **Delete Document**
+<div style="border: 1px solid red; border-radius: 5px; padding: 10px;">
+
+### 5. **Delete Document**
 - **URL: /db/delete**
 - **Method: DELETE**
 - **Description: Deletes documents from a specified MongoDB collection based on a query.**
 
 #### Request Body:
+
+**Delete by query**
 ```json
 {
   "collection": "test_collection",
@@ -145,14 +227,6 @@ curl -X PUT "http://127.0.0.1:8000/db/update" \
   }
 }
 ```
-
-```json
-{
-  "collection": "test_collection",
-  "id": "1232341423"
-}
-```
-
 #### Example curl Command:
 ```bash
 curl -X DELETE "http://127.0.0.1:8000/db/delete" \
@@ -160,6 +234,14 @@ curl -X DELETE "http://127.0.0.1:8000/db/delete" \
 -d "{\"collection\": \"test_collection\", \"query\": {\"name\": \"updated_document2\"}}"
 ```
 
+**Delete by id**
+```json
+{
+  "collection": "test_collection",
+  "id": "1232341423"
+}
+```
+#### Example curl Command:
 ```bash
 curl -X DELETE "http://127.0.0.1:8000/db/delete" \
 -H "Content-Type: application/json" \
@@ -173,8 +255,13 @@ curl -X DELETE "http://127.0.0.1:8000/db/delete" \
   "deleted_count": 1
 }
 ```
+</div>
 
-### 5. **Environment Variables**
+---
+
+<div style="border: 1px solid red; border-radius: 5px; padding: 10px;">
+
+### 6. **Environment Variables**
 The application uses the following environment variables:
 
 ## Environment Variables
@@ -216,3 +303,4 @@ docker logs <container_name>
 
 - **License**
 **This project is licensed under the MIT License.**
+</div>

@@ -48,6 +48,19 @@ def test_find_documents():
     assert response.status_code == 200
     assert response.json() == {"documents": [{"_id": "mocked_id", "name": "test"}]}
 
+def test_find_all_documents():
+    """
+    Test the /find route for retrieving documents.
+    """
+    response = client.post(
+        "/db/find",
+        json={
+            "collection": "test_collection",
+        }
+    )
+    assert response.status_code == 200
+    assert response.json() == {"documents": [{"_id": "mocked_id", "name": "test"}]}
+
 def test_update_document():
     """
     Test the /update route for updating a document.

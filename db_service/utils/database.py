@@ -3,7 +3,6 @@ import os  # For accessing environment variables
 from pymongo import MongoClient  # MongoDB client for database operations
 from bson.objectid import ObjectId  # For working with MongoDB ObjectId
 from utils.logging import logging  # Custom logging utility
-from datetime import datetime, timezone  # For handling timestamps
 
 class Database:
     """
@@ -50,11 +49,14 @@ class Database:
         Insert a document into the specified collection.
 
         Args:
-            collection_name (str): The name of the collection.
+            collection_name (str): The name of the MongoDB collection.
             data (dict): The document to insert.
 
         Returns:
             str: The ID of the inserted document.
+
+        Raises:
+            Exception: If an error occurs during the insertion process.
         """
         try:
             collection = self.db[collection_name]
@@ -65,20 +67,29 @@ class Database:
             logging.error(f"insert();Error inserting into {collection_name}: {e}")
             raise
 
-    def find(self, collection_name: str, filter: dict = {}):
+    def find(self, collection_name: str, id: str = '', filter: dict = {}):
         """
         Retrieve documents from the specified collection.
 
         Args:
-            collection_name (str): The name of the collection.
-            filter (dict): The filter criteria for the query.
+            collection_name (str): The name of the MongoDB collection.
+            id (str, optional): The ID of the document to retrieve. Defaults to an empty string.
+            filter (dict, optional): The filter criteria for the query. Defaults to an empty dictionary.
 
         Returns:
             list: A list of matching documents.
+
+        Raises:
+            Exception: If an error occurs during the retrieval process.
         """
         try:
             collection = self.db[collection_name]
+            
+            if id:
+                filter = {"_id": ObjectId(id)}
+
             result = list(collection.find(filter))  # Find documents matching the filter
+
             logging.info(f"find();Found {len(result)} documents in {collection_name}")
             return [self.serialize_data(doc) for doc in result]  # Serialize the results
         except Exception as e:
@@ -87,20 +98,24 @@ class Database:
 
     def update(self, collection_name: str, id: str, filter: dict, data: dict):
         """
-        Update a document in the specified collection by its ID.
+        Update a document in the specified collection.
 
         Args:
-            collection_name (str): The name of the collection.
-            document_id (str): The ID of the document to update.
+            collection_name (str): The name of the MongoDB collection.
+            id (str): The ID of the document to update.
+            filter (dict): The filter criteria for selecting documents to update.
             data (dict): The new data to update the document with.
 
         Returns:
-            dict: The updated document.
+            dict: The updated document, or None if no document was updated.
+
+        Raises:
+            Exception: If an error occurs during the update process.
         """
         try:
             collection = self.db[collection_name]
 
-            if (filter == {}):
+            if not filter:
                 result = collection.find_one_and_update(
                     {"_id": ObjectId(id)}, {"$set": data}, return_document=True
                 )
@@ -115,25 +130,28 @@ class Database:
             logging.error(f"update();Error updating document in {collection_name}: {e}")
             return None
 
-    def delete(self, collection_name: str, document_id: str, filter: dict,):
+    def delete(self, collection_name: str, document_id: str, filter: dict):
         """
-        Delete a document from the specified collection by its ID.
+        Delete a document from the specified collection.
 
         Args:
-            collection_name (str): The name of the collection.
+            collection_name (str): The name of the MongoDB collection.
             document_id (str): The ID of the document to delete.
+            filter (dict): The filter criteria for selecting documents to delete.
 
         Returns:
             int: The number of documents deleted.
+
+        Raises:
+            Exception: If an error occurs during the deletion process.
         """
         try:
             collection = self.db[collection_name]
-            if (filter == {}):
+            if not filter:
                 result = collection.delete_one({"_id": ObjectId(document_id)})  # Delete the document
             else:
                 result = collection.delete_one(filter)  # Delete the document
             
-            # result = collection.delete_one({"_id": ObjectId(document_id)})  # Delete the document
             logging.info(f"delete();Deleted {result.deleted_count} document(s) from {collection_name}")
             return result.deleted_count  # Return the count of deleted documents
         except Exception as e:
@@ -167,6 +185,9 @@ class Database:
 
         Returns:
             int: The next unique ID.
+
+        Raises:
+            Exception: If an error occurs during the ID generation process.
         """
         try:
             # Retrieve the last document sorted by "id" in descending order

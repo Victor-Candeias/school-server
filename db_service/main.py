@@ -1,9 +1,7 @@
 import os  # Import the os module to interact with environment variables
 from fastapi import FastAPI  # Import FastAPI to create the application instance
 from routes.db_routes import router  # Import the router from the db_routes module
-
-# Import environment variable loader
-from dotenv import load_dotenv  # Load environment variables from a .env file
+from dotenv import load_dotenv  # Import dotenv to load environment variables from a .env file
 
 # Load environment variables from the .env file at startup
 # This allows sensitive information (e.g., database credentials) to be stored securely
@@ -43,8 +41,7 @@ if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))  # Default port is 8000
 
     # Print the host and port for debugging purposes
-    print(host)
-    print(port)
+    print(f"Starting server on {host}:{port}")
 
     # Start the Uvicorn server to run the FastAPI application
     # The server will listen on the specified host and port
