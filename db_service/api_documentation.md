@@ -13,7 +13,7 @@ This document provides an overview of the REST API endpoints for the FastAPI app
 
 ## Endpoints
 
-<div style="border: 1px solid red; border-radius: 5px; padding: 10px;">
+<div style="background: lightgray; border: 1px solid red; border-radius: 5px; padding: 10px;">
 
 ### 1. **Insert Document**
 - **URL**: `/db/insert`
