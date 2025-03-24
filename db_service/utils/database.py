@@ -3,6 +3,7 @@ import os  # For accessing environment variables
 from pymongo import MongoClient  # MongoDB client for database operations
 from bson.objectid import ObjectId  # For working with MongoDB ObjectId
 from utils.logging import logging  # Custom logging utility
+from datetime import datetime
 
 class Database:
     """
@@ -199,6 +200,44 @@ class Database:
             return 1  # Return 1 if the collection is empty
         except Exception as e:
             raise Exception(f"Error generating next ID for collection {collection_name}: {e}")
+
+    def log_to_mongodb(self, log_collection: str, level: str, message: str, extra: dict = None):
+        """
+        Log a message to a specified MongoDB collection.
+
+        Args:
+            log_collection (str): The name of the MongoDB collection to store logs.
+            level (str): The log level (e.g., "INFO", "ERROR", "DEBUG").
+            message (str): The log message.
+            extra (dict, optional): Additional metadata to include in the log entry.
+
+        Returns:
+            str: The ID of the inserted log entry.
+
+        Raises:
+            Exception: If an error occurs during the logging process.
+        """
+        try:
+            # Prepare the log entry
+            log_entry = {
+                "level": level,
+                "message": message,
+                "timestamp": datetime.utcnow(),  # Use UTC time for consistency
+            }
+
+            # Add extra metadata if provided
+            if extra:
+                log_entry["extra"] = extra
+
+            # Insert the log entry into the specified collection
+            collection = self.db[log_collection]
+            result = collection.insert_one(log_entry)
+
+            logging.info(f"log_to_mongodb();Logged to {log_collection}: {result.inserted_id}")
+            return str(result.inserted_id)  # Return the ID of the inserted log entry
+        except Exception as e:
+            logging.error(f"log_to_mongodb();Error logging to {log_collection}: {e}")
+            raise
 
 # Create a singleton instance of the Database class for use in the application
 database = Database()

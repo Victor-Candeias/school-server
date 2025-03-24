@@ -2,6 +2,7 @@ import logging
 from dotenv import load_dotenv  # Load environment variables from a .env file
 from fastapi import APIRouter, HTTPException, Request  # Import FastAPI utilities for routing and error handling
 from utils.database import database  # Database handling utilities
+from utils.logging import logging  # Custom logging utility
 from pydantic import BaseModel
 
 # Load environment variables from the .env file
@@ -181,6 +182,84 @@ async def delete_document(request: Request):
         deleted_count = database.delete(collection, id, query)
 
         return {"message": "Document deleted", "deleted_count": deleted_count}
+    except Exception as e:
+        # Raise an HTTP 500 error if an exception occurs
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/log")
+async def log(request: Request):
+    """
+    Insert a document into a specified MongoDB collection.
+
+    Args:
+        request (Request): The raw JSON body of the request, containing the collection name and data.
+
+    Returns:
+        dict: A success message and the ID of the inserted document.
+
+    Raises:
+        HTTPException: If the collection name or data is missing, or if an error occurs during the insertion process.
+    {
+    "collection": "logs",
+    "source": "example_app",
+    "logtype": "db/file",
+    "level": "INFO",
+    "message": "This is a test log entry.",
+    "timestamp": "2025-03-21T12:34:56.789Z",
+    "extra": {
+        "module": "example_module",
+        "user": "test_user"
+        }
+    }   
+    """
+    try:
+        # Parse the JSON body from the request
+        body = await request.json()
+        collection = body.get("collection")  # Extract the collection name
+        source = body.get("source")  # Extract the document data
+        logtype = body.get("logtype")  # Extract the document data
+        logLevel = body.get("level")  # Extract the document data
+
+        if not collection or not source or not logtype or not logLevel:
+            raise HTTPException(status_code=400, detail="Both 'collection' and 'source' and 'logtype' and 'logLevel' are required.")
+
+        logging.info(f"insert_document();collection={collection}")
+        logging.info(f"insert_document();source={source}")
+        logging.info(f"insert_document();logtype={logtype}")
+
+        message = f"{body.get("timestamp")};{body.get("source")};{body.get("message")}"
+
+        # checks if the logtype is db or file
+        if logtype == 'db':
+            # Call the Database class's insert method to insert the document
+            inserted_id = database.log_to_mongodb(collection, logLevel, message, body.get("extra"))
+
+            return {"message": "Document inserted", "id": inserted_id}
+        else:
+            # cahnge message
+            message = f"{message};extra={body.get('extra')}"
+            # Call the Database class's insert method to insert the document
+            match logLevel:
+                case "INFO":
+                    logging.info(f"insert_document();{message}")
+
+                case "ERROR":
+                    logging.error(f"insert_document();{message}")   
+
+                case "WARNING":
+                    logging.warning(f"insert_document();{message}") 
+
+                case "DEBUG":
+                    logging.debug(f"insert_document();{message}")
+
+                case "CRITICAL":
+                    logging.critical(f"insert_document();{message}")    
+
+                case _:  # default
+                    logging.info(f"insert_document();{message}")
+
+            return {"message": "Document inserted in log file"}
+    
     except Exception as e:
         # Raise an HTTP 500 error if an exception occurs
         raise HTTPException(status_code=500, detail=str(e))
