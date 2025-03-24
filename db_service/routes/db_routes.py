@@ -1,4 +1,7 @@
+from datetime import datetime
 import logging
+import os
+from pathlib import Path
 from dotenv import load_dotenv  # Load environment variables from a .env file
 from fastapi import APIRouter, HTTPException, Request  # Import FastAPI utilities for routing and error handling
 from utils.database import database  # Database handling utilities
@@ -198,19 +201,7 @@ async def log(request: Request):
         dict: A success message and the ID of the inserted document.
 
     Raises:
-        HTTPException: If the collection name or data is missing, or if an error occurs during the insertion process.
-    {
-    "collection": "logs",
-    "source": "example_app",
-    "logtype": "db/file",
-    "level": "INFO",
-    "message": "This is a test log entry.",
-    "timestamp": "2025-03-21T12:34:56.789Z",
-    "extra": {
-        "module": "example_module",
-        "user": "test_user"
-        }
-    }   
+        HTTPException: If the collection name or data is missing, or if an error occurs during the insertion process. 
     """
     try:
         # Parse the JSON body from the request
@@ -219,6 +210,9 @@ async def log(request: Request):
         source = body.get("source")  # Extract the document data
         logtype = body.get("logtype")  # Extract the document data
         logLevel = body.get("level")  # Extract the document data
+        log_file_name = body.get("log_file_name", "default.log")  # Optional log file name
+
+        # "timestamp": "2025-03-21T12:34:56.789Z",
 
         if not collection or not source or not logtype or not logLevel:
             raise HTTPException(status_code=400, detail="Both 'collection' and 'source' and 'logtype' and 'logLevel' are required.")
@@ -236,6 +230,9 @@ async def log(request: Request):
 
             return {"message": "Document inserted", "id": inserted_id}
         else:
+            # Change the log file dynamically
+            change_log_file(log_file_name)
+            
             # cahnge message
             message = f"{message};extra={body.get('extra')}"
             # Call the Database class's insert method to insert the document
@@ -263,3 +260,39 @@ async def log(request: Request):
     except Exception as e:
         # Raise an HTTP 500 error if an exception occurs
         raise HTTPException(status_code=500, detail=str(e))
+    
+def change_log_file(log_file_name: str):
+    """
+    Change the log file dynamically at runtime.
+
+    Args:
+        log_file_name (str): The new log file name.
+    """
+    # Define the log directory path
+    log_directory = os.path.join(Path.cwd(), 'log')
+
+    # Ensure the log directory exists. If not, create it.
+    os.makedirs(log_directory, exist_ok=True)
+    
+    # Add a timestamp to the log file name
+    log_file_name = datetime.now().strftime('%Y%m%d') + '_' + log_file_name
+
+    # Check if the file name has an extension
+    if not os.path.splitext(log_file_name)[1]:  # The second element is the extension
+        log_file_name += ".log"  # Add a default extension if none exists
+
+    # Define the full log file path
+    log_file_path = os.path.join(log_directory, log_file_name)
+
+    # Remove all existing handlers
+    for handler in logging.root.handlers[:]:
+        logging.root.removeHandler(handler)
+
+    # Add a new FileHandler with the new log file path
+    logging.basicConfig(
+        filename=log_file_path,
+        filemode='a',  # Append mode
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        level=logging.INFO
+    )
+    

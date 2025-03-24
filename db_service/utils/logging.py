@@ -8,6 +8,7 @@ Features:
     - Automatically creates a log directory if it doesn't exist.
     - Generates a log file with the current date in its name.
     - Configures logging to append messages to the log file.
+    - Allows changing the log file name dynamically at runtime.
     - Handles exceptions during the logging setup process.
 
 Dependencies:
@@ -22,30 +23,43 @@ import os  # Import os for working with file paths and directories
 from pathlib import Path  # Import Path to easily manage paths in a platform-independent way
 from datetime import datetime  # Import datetime to generate timestamps for log files
 
-try:
-    # Define the log directory path by joining the current working directory with a 'log' folder
-    log_directory = os.path.join(Path.cwd(), 'log')
+def setup_logging(log_file_name=None):
+    """
+    Set up the logging configuration.
 
-    # Ensure the log directory exists. If not, it will be created.
-    os.makedirs(log_directory, exist_ok=True)  # 'exist_ok=True' ensures no error if the directory already exists
+    Args:
+        log_file_name (str, optional): The name of the log file. If not provided, a default name
+                                       based on the current date will be used.
+    """
+    try:
+        # Define the log directory path by joining the current working directory with a 'log' folder
+        log_directory = os.path.join(Path.cwd(), 'log')
 
-    # Generate the log file name based on the current date (format: YYYYMMDD_log.log)
-    log_file_name = datetime.now().strftime('%Y%m%d') + '_log.log'
+        # Ensure the log directory exists. If not, it will be created.
+        os.makedirs(log_directory, exist_ok=True)
 
-    # Define the full log file path by joining the log directory with the generated log file name
-    log_file_path = os.path.join(log_directory, log_file_name)
+        # Use the provided log file name or generate a default one
+        if not log_file_name:
+            log_file_name = datetime.now().strftime('%Y%m%d') + '_Default.log'
 
-    # Set up the logging configuration
-    logging.basicConfig(
-        filename=log_file_path,  # Log file location
-        filemode='a',  # File mode: 'a' for append, 'w' to overwrite the file on each run
-        format='%(asctime)s - %(levelname)s - %(message)s',  # Log message format: includes timestamp, log level, and the message
-        level=logging.INFO  # Log level: INFO (can also be DEBUG, WARNING, ERROR, CRITICAL)
-    )
+        # Define the full log file path by joining the log directory with the log file name
+        log_file_path = os.path.join(log_directory, log_file_name)
 
-    # Log that logging has been set up successfully
-    logging.info("Logging setup successfully.")
-    
-except Exception as e:
-    # Handle any exceptions that occur during the setup process and print an error message
-    print(f"Failed to set up logging: {e}")
+        # Remove existing handlers to allow reconfiguration
+        for handler in logging.root.handlers[:]:
+            logging.root.removeHandler(handler)
+
+        # Set up the logging configuration
+        logging.basicConfig(
+            filename=log_file_path,  # Log file location
+            filemode='a',  # File mode: 'a' for append, 'w' to overwrite the file on each run
+            format='%(asctime)s - %(levelname)s - %(message)s',  # Log message format
+            level=logging.INFO  # Log level: INFO (can also be DEBUG, WARNING, ERROR, CRITICAL)
+        )
+
+        # Log that logging has been set up successfully
+        logging.info(f"Logging setup successfully. Log file: {log_file_path}")
+
+    except Exception as e:
+        # Handle any exceptions that occur during the setup process and print an error message
+        print(f"Failed to set up logging: {e}")

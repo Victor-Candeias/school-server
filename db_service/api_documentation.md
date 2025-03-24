@@ -16,7 +16,7 @@ This document provides an overview of the REST API endpoints for the FastAPI app
 <div style="background: lightgray; border: 1px solid red; border-radius: 5px; padding: 10px;">
 
 ### 1. **Insert Document**
-- **URL**: `/db/insert`
+- **URL**: `/db-api/insert`
 - **Method**: `POST`
 - **Description**: Inserts a document into a specified MongoDB collection.
 
@@ -32,7 +32,7 @@ This document provides an overview of the REST API endpoints for the FastAPI app
 
 #### Example curl Command:
 ```bash
-curl -X POST "http://127.0.0.1:8000/db/insert" \
+curl -X POST "http://127.0.0.1:8000/db-api/insert" \
 -H "Content-Type: application/json" \
 -d "{\"collection\": \"test_collection\", \"data\": {\"name\": \"test_document\"}}"
 ```
@@ -52,7 +52,7 @@ curl -X POST "http://127.0.0.1:8000/db/insert" \
 <div style="border: 1px solid red; border-radius: 5px; padding: 10px;">
 
 ### 2. **Find Documents**
-- **URL: /db/find**
+- **URL: /db-api/find**
 - **Method: POST**
 - **Description: Retrieves documents from a specified MongoDB collection based on a query.**
 
@@ -69,7 +69,7 @@ curl -X POST "http://127.0.0.1:8000/db/insert" \
 
 #### Example curl Command:
 ```bash
-curl -X POST "http://127.0.0.1:8000/db/find" \
+curl -X POST "http://127.0.0.1:8000/db-api/find" \
 -H "Content-Type: application/json" \
 -d "{\"collection\": \"test_collection\", \"query\": {\"name\": \"test_document\"}}"
 ```
@@ -91,7 +91,7 @@ curl -X POST "http://127.0.0.1:8000/db/find" \
 
 #### Example curl Command:
 ```bash
-curl -X POST "http://127.0.0.1:8000/db/find" \
+curl -X POST "http://127.0.0.1:8000/db-api/find" \
 -H "Content-Type: application/json" \
 -d "{\"collection\": \"test_collection\"}"
 ```
@@ -114,7 +114,7 @@ curl -X POST "http://127.0.0.1:8000/db/find" \
 <div style="border: 1px solid red; border-radius: 5px; padding: 10px;">
 
 ### 3. **Find Documents by id**
-- **URL: /db/findbyid**
+- **URL: /db-api/findbyid**
 - **Method: POST**
 - **Description: Retrieves documents from a specified MongoDB collection based on a query.**
 
@@ -130,7 +130,7 @@ curl -X POST "http://127.0.0.1:8000/db/find" \
 #### Example curl Command:
 **Find by id**
 ```bash
-curl -X POST "http://127.0.0.1:8000/db/find" \
+curl -X POST "http://127.0.0.1:8000/db-api/find" \
 -H "Content-Type: application/json" \
 -d "{\"collection\": \"test_collection\", \"query\": {\"name\": \"test_document\", \"id\": \"123133131312\"}}"
 ```
@@ -154,7 +154,7 @@ curl -X POST "http://127.0.0.1:8000/db/find" \
 <div style="border: 1px solid red; border-radius: 5px; padding: 10px;">
 
 ### 4. **Update Document**
-- **URL: /db/update**
+- **URL: /db-api/update**
 - **Method: PUT**
 - **Description: Updates documents in a specified MongoDB collection based on a query.**
 
@@ -175,7 +175,7 @@ curl -X POST "http://127.0.0.1:8000/db/find" \
 
 #### Example curl Command:
 ```bash
-curl -X PUT "http://127.0.0.1:8000/db/update" \
+curl -X PUT "http://127.0.0.1:8000/db-api/update" \
 -H "Content-Type: application/json" \
 -d "{\"collection\": \"test_collection\", \"query\": { \"name\": \"test_document\"}, \"data\": {\"name\": \"updated_document2\"}}"
 ```
@@ -192,7 +192,7 @@ curl -X PUT "http://127.0.0.1:8000/db/update" \
 ```
 #### Example curl Command:
 ```bash
-curl -X PUT "http://127.0.0.1:8000/db/update" \
+curl -X PUT "http://127.0.0.1:8000/db-api/update" \
 -H "Content-Type: application/json" \
 -d "{\"collection\": \"test_collection\", \"id\": \"67dc2de410c0831da60c10ca\", \"data\": {\"name\": \"updated_document2\"}}"
 ```
@@ -212,7 +212,7 @@ curl -X PUT "http://127.0.0.1:8000/db/update" \
 <div style="border: 1px solid red; border-radius: 5px; padding: 10px;">
 
 ### 5. **Delete Document**
-- **URL: /db/delete**
+- **URL: /db-api/delete**
 - **Method: DELETE**
 - **Description: Deletes documents from a specified MongoDB collection based on a query.**
 
@@ -229,7 +229,7 @@ curl -X PUT "http://127.0.0.1:8000/db/update" \
 ```
 #### Example curl Command:
 ```bash
-curl -X DELETE "http://127.0.0.1:8000/db/delete" \
+curl -X DELETE "http://127.0.0.1:8000/db-api/delete" \
 -H "Content-Type: application/json" \
 -d "{\"collection\": \"test_collection\", \"query\": {\"name\": \"updated_document2\"}}"
 ```
@@ -243,7 +243,7 @@ curl -X DELETE "http://127.0.0.1:8000/db/delete" \
 ```
 #### Example curl Command:
 ```bash
-curl -X DELETE "http://127.0.0.1:8000/db/delete" \
+curl -X DELETE "http://127.0.0.1:8000/db-api/delete" \
 -H "Content-Type: application/json" \
 -d "{\"collection\": \"test_collection\", \"id\": \"67dc316d29a78376709a148d\"}"
 ```
@@ -261,7 +261,72 @@ curl -X DELETE "http://127.0.0.1:8000/db/delete" \
 
 <div style="border: 1px solid red; border-radius: 5px; padding: 10px;">
 
-### 6. **Environment Variables**
+### 6. **Log to file or BD**
+- **URL: /db-api/log**
+- **Method: POST**
+- **Description: Write loga information in a specified MongoDB collection or to a log file.**
+
+#### Request Body:
+
+**Delete by query**
+```json
+  {
+  "collection": "logs",
+  "source": "example_app",
+  "logtype": "db/file",
+  "level": "INFO",
+  "message": "This is a test log entry.",
+  "log_file_name": "log_name.log",
+  "extra": {
+      "module": "example_module",
+      "user": "test_user"
+      }
+  } 
+```
+
+### Required Attributes:
+  - **collection**:  # (string) The name of the MongoDB collection where the log will be stored.
+
+  - **source**:      # (string) The source or origin of the log (e.g., application name or module).
+
+  - **logtype**:     # (string) Specifies whether the log should be written to the database ('db') or a file ('file').
+
+  - **level**:       # (string) The log level (e.g., 'INFO', 'ERROR', 'DEBUG', 'WARNING', 'CRITICAL').
+
+  - **message**:     # (string) The actual log message to be recorded.
+
+### Optional Attributes:
+  - **log_file_name**:  # (string) The name of the log file (used only if logtype is 'file'). Defaults to 'default.log' if not provided.
+
+  - **extra**:          # (object) Additional metadata or context to include in the log entry (e.g., user information, module details).
+
+#### Example curl Command to mongodb:
+```bash
+curl -X POST "http://127.0.0.1:8000/db-api/log" \
+-H "Content-Type: application/json" \
+-d "{\"collection\":\"logs\",\"source\":\"example_app\",\"logtype\":\"db\",\"level\":\"INFO\",\"message\":\"This is a test log entry.\",\"extra\":{\"module\":\"example_module\",\"user\":\"test_user\"}}"
+```
+
+#### Example curl Command to file:
+```bash
+curl -X POST "http://127.0.0.1:8000/db-api/log" \
+-H "Content-Type: application/json" \
+-d "{\"collection\":\"logs\",\"source\":\"example_app\",\"logtype\":\"file\",\"level\":\"INFO\",\"message\":\"This is a test log entry.\",\"log_file_name\":\"log_name.log\",\"extra\":{\"module\":\"example_module\",\"user\":\"test_user\"}}"
+```
+
+#### Response:
+```json
+{
+  "message": "Document inserted in log file"
+}
+```
+</div>
+
+---
+
+<div style="border: 1px solid red; border-radius: 5px; padding: 10px;">
+
+### 7. **Environment Variables**
 The application uses the following environment variables:
 
 ## Environment Variables
@@ -269,7 +334,7 @@ The application uses the following environment variables:
 | Variable Name                  | Description                        | Default Value           |
 | ------------------------------ | ---------------------------------- | ----------------------- |
 | `MONGO_DB_CONNECTION_STRING`    | MongoDB connection string         | `mongodb://mongo:27017` |
-| `DATABASE_NAME`                 | Name of the MongoDB database      | `school`                |
+| `DATABASE_NAME`                 | Name of the MongoDB database      | `dbname`                |
 | `HOST`                          | Host for the FastAPI server       | `127.0.0.1`            |
 | `PORT`                          | Port for the FastAPI server       | `8000`                 |
 

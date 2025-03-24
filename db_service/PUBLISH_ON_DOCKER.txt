@@ -16,7 +16,7 @@ docker-compose up --build
 
 5. Verify the API
 Once the container is running, you can test your API using tools like curl, Postman, or your browser. For example:
-curl http://localhost:8000/db/insert
+curl http://localhost:8000/MongoDBService/insert
 
 Notes:
 Ensure your .env file is included in the Docker image or the environment variables are passed in the docker-compose.yml file.

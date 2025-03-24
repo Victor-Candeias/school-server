@@ -13,7 +13,7 @@ app = FastAPI()
 # Register the database routes with the application
 # - `prefix="/db"`: All routes in the router will be prefixed with `/db`
 # - `tags=["Database"]`: Tags are used for grouping routes in the API documentation
-app.include_router(router, prefix="/db", tags=["Database"])
+app.include_router(router, prefix="/db-api", tags=["Database"])
 
 # Entry point for the FastAPI application
 if __name__ == "__main__":
@@ -47,6 +47,4 @@ if __name__ == "__main__":
     # The server will listen on the specified host and port
     # `reload=False` disables automatic reloading (useful for production)
     uvicorn.run("main:app", host=host, port=port, reload=False)
-
-    # Uncomment the following line to enable SSL (HTTPS) with a key and certificate
-    # uvicorn.run("main:app", host="127.0.0.1", port=8001, reload=True, ssl_keyfile="key.pem", ssl_certfile="cert.pem")
+    
