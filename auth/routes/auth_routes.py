@@ -79,8 +79,14 @@ async def register(request: Request):
             "query": {"email": body.get("email")}  # Query to check if the user exists
         }
 
+        # log the request
+        await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="register", message=params)
+
         # Check if the user already exists in the database via the REST API
         response = await api_client.find(endpoint="find", payload=params)
+
+        # log the request
+        await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="register", message=response)
 
         # If the user exists, return a 400 response
         if response.get("documents"):
@@ -107,6 +113,9 @@ async def register(request: Request):
         }
         insert_response = await api_client.insert(endpoint="insert", payload=insert_params)
 
+        # log the request
+        await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="register", message=insert_response)
+
         # Extract the created user ID from the response
         created_user = insert_response.get("id", "unknown")
 
@@ -122,7 +131,6 @@ async def register(request: Request):
     except Exception as e:
         # Handle unexpected errors
         return JSONResponse(status_code=500, content={"message": "Internal server error"})
-
 
 # -------------------------------
 # Endpoint: Login a user
@@ -232,7 +240,6 @@ async def get_users(request: Request):
         # check if the body has the id key
         elif body.get("id"):
             payload = {"collection": USERS_COLLECTION, "query": {"id": body.get("id")}}
-
 
         if id:
             ## Query the database via the REST API

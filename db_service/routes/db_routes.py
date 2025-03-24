@@ -210,9 +210,6 @@ async def log(request: Request):
         source = body.get("source")  # Extract the document data
         logtype = body.get("logtype")  # Extract the document data
         logLevel = body.get("level")  # Extract the document data
-        log_file_name = body.get("log_file_name", "default.log")  # Optional log file name
-
-        # "timestamp": "2025-03-21T12:34:56.789Z",
 
         if not collection or not source or not logtype or not logLevel:
             raise HTTPException(status_code=400, detail="Both 'collection' and 'source' and 'logtype' and 'logLevel' are required.")
@@ -220,8 +217,9 @@ async def log(request: Request):
         logging.info(f"insert_document();collection={collection}")
         logging.info(f"insert_document();source={source}")
         logging.info(f"insert_document();logtype={logtype}")
+        logging.info(f"insert_document();logLevel={logLevel}")
 
-        message = f"{body.get("timestamp")};{body.get("source")};{body.get("message")}"
+        message = f"{datetime.now().strftime('%Y%m%d')};{source};{body.get("message")}"
 
         # checks if the logtype is db or file
         if logtype == 'db':
@@ -230,11 +228,15 @@ async def log(request: Request):
 
             return {"message": "Document inserted", "id": inserted_id}
         else:
+            # Optional log file name
+            log_file_name = body.get("log_file_name", "default.log")
+
             # Change the log file dynamically
             change_log_file(log_file_name)
             
             # cahnge message
             message = f"{message};extra={body.get('extra')}"
+
             # Call the Database class's insert method to insert the document
             match logLevel:
                 case "INFO":
@@ -271,11 +273,15 @@ def change_log_file(log_file_name: str):
     # Define the log directory path
     log_directory = os.path.join(Path.cwd(), 'log')
 
+    logging.info(f"change_log_file();log_directory={log_directory}")
+
     # Ensure the log directory exists. If not, create it.
     os.makedirs(log_directory, exist_ok=True)
     
     # Add a timestamp to the log file name
     log_file_name = datetime.now().strftime('%Y%m%d') + '_' + log_file_name
+
+    logging.info(f"change_log_file();log_file_name={log_file_name}")
 
     # Check if the file name has an extension
     if not os.path.splitext(log_file_name)[1]:  # The second element is the extension
@@ -283,6 +289,8 @@ def change_log_file(log_file_name: str):
 
     # Define the full log file path
     log_file_path = os.path.join(log_directory, log_file_name)
+
+    logging.info(f"change_log_file();log_file_path={log_file_path}")
 
     # Remove all existing handlers
     for handler in logging.root.handlers[:]:

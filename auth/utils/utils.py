@@ -35,6 +35,7 @@ from cryptography.hazmat.backends import default_backend
 import jwt
 from dotenv import load_dotenv
 # from bson import ObjectId
+from utils.bd_client import BDClient
 from utils.logging import logging
 from datetime import datetime
 # from utils.database import database
@@ -216,12 +217,18 @@ class Utils:
             logging.error(f"validate_password();Error validating password: {e}")
             return False
         
-    # def add_log_to_db(self, method, log, error=False):
-    #     logData = {
-    #                     "method": method,
-    #                     "log": log,
-    #                     "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    #         }
+    async def add_log_to_db(self, api_client: BDClient, source: str, method: str, message: str, error: bool=False):
+        logData = {
+                    "collection": "logs",
+                    "source": "auth_api",
+                    "logtype": "db",
+                    "level": "ERROR" if error else "INFO",
+                    "message": message,
+                    "extra": {
+                        "module": method,
+                        }
+                    }
         
-    #     collection = LOGS_COLLECTION if not error else LOGS_ERROR_COLLECTION
-    #     result = database.insert(collection, logData)
+        # Check if the user already exists in the database via the REST API
+        await api_client.find(endpoint="log", payload=logData)
+        

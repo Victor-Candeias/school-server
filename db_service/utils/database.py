@@ -222,7 +222,6 @@ class Database:
             log_entry = {
                 "level": level,
                 "message": message,
-                "timestamp": datetime.utcnow(),  # Use UTC time for consistency
             }
 
             # Add extra metadata if provided
