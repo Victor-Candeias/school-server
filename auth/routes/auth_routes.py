@@ -28,23 +28,13 @@ from utils import utilities  # General utilities
 from models.user import User
 from models.userlogin import UserLogin
 
-from config import USERS_COLLECTION
-
-# Import environment variable loader
-from dotenv import load_dotenv
-
-# Load environment variables from the .env file at startup
-# This allows sensitive information (e.g., database credentials) to be stored securely
-load_dotenv()
+from utils.config import USERS_COLLECTION, BD_BASE_URL
 
 # Create a new router for authentication-related endpoints
 auth_router = APIRouter()
 
-# Base URL for the database API
-bdUrl = os.getenv("BD_BASE_URL") 
-
 # Instantiate the API client
-api_client = BDClient(bdUrl)
+api_client = BDClient(BD_BASE_URL)
 
 # -------------------------------
 # Endpoint: Register a new user

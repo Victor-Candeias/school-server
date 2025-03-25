@@ -33,17 +33,12 @@ from bcrypt import checkpw, gensalt, hashpw
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 import jwt
-from dotenv import load_dotenv
 from utils.bd_client import BDClient
 from datetime import datetime
+from utils.config import ENCRYPTION_KEY
 
 # Importing the User model from the models module
 from models.user import User
-
-from config import LOGS_COLLECTION, LOGS_ERROR_COLLECTION
-
-# Load environment variables from the .env file
-load_dotenv()
 
 class Utils:
     """
@@ -57,7 +52,7 @@ class Utils:
         - ENCRYPTION_KEY: 32-byte encryption key derived from an environment variable.
         - IV_LENGTH: Length of the initialization vector (IV) for AES encryption.
         """
-        self.ENCRYPTION_KEY = hashlib.sha256(os.getenv("ENCRYPTION_KEY").encode()).digest()[:32]  # Generate a 32-byte encryption key
+        self.ENCRYPTION_KEY = hashlib.sha256(ENCRYPTION_KEY.encode()).digest()[:32]  # Generate a 32-byte encryption key
         self.IV_LENGTH = 16  # AES uses a 16-byte IV
         logging.info("Utils initialized with encryption settings.")
 
@@ -76,7 +71,7 @@ class Utils:
                 'id': userId,  # MongoDB user ID
                 'username': username  # Username
             }
-            secret_key = os.getenv("ENCRYPTION_KEY")  # Retrieve the secret key from environment variables
+            secret_key = ENCRYPTION_KEY  # Retrieve the secret key from environment variables
             token = jwt.encode(payload, secret_key, algorithm="HS256")  # Sign the JWT using HMAC and SHA-256
             logging.info(f"Token created for user: {username}")
             return token
@@ -99,7 +94,7 @@ class Utils:
             return None
 
         try:
-            secret_key = os.getenv("ENCRYPTION_KEY")  # Retrieve the secret key from environment variables
+            secret_key = ENCRYPTION_KEY  # Retrieve the secret key from environment variables
             userToken = jwt.decode(token, secret_key, algorithms=['HS256'])  # Decode and verify the token
             logging.info("Token verified successfully.")
             return userToken
