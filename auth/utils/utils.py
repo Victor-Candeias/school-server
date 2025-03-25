@@ -34,11 +34,8 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 import jwt
 from dotenv import load_dotenv
-# from bson import ObjectId
 from utils.bd_client import BDClient
-from utils.logging import logging
 from datetime import datetime
-# from utils.database import database
 
 # Importing the User model from the models module
 from models.user import User

@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 # Load environment variables from the .env file
 # This ensures sensitive information (e.g., database credentials) is securely loaded
-load_dotenv()
+# load_dotenv()
 
 # Create a FastAPI router instance for defining API routes
 router = APIRouter()

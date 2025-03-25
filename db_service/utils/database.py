@@ -4,6 +4,7 @@ from pymongo import MongoClient  # MongoDB client for database operations
 from bson.objectid import ObjectId  # For working with MongoDB ObjectId
 from utils.logging import logging  # Custom logging utility
 from datetime import datetime
+from utils.config import MONGO_DATABASE, MONGO_URI
 
 class Database:
     """
@@ -30,20 +31,17 @@ class Database:
         Initialize the database connection using the MongoDB URI and database name 
         from environment variables. Log the connection status and select the required collections.
         """
-        mongo_uri = os.getenv("MONGO_DB_CONNECTION_STRING")  # MongoDB connection string
-        mongo_database = os.getenv("DATABASE_NAME")  # Database name
-
         # Log the connection details (excluding sensitive information)
-        logging.info(f"_init_db();mongo_uri={mongo_uri}")
-        logging.info(f"_init_db();mongo_database={mongo_database}")
+        logging.info(f"_init_db();mongo_uri={MONGO_URI}")
+        logging.info(f"_init_db();mongo_database={MONGO_DATABASE}")
 
         # Connect to MongoDB and verify the connection
-        self.client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
+        self.client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
         self.client.admin.command('ping')  # Ping the server to ensure it's reachable
         logging.info("_init_db();MongoDB connected successfully.")
 
         # Select the database
-        self.db = self.client[str(mongo_database)]
+        self.db = self.client[str(MONGO_DATABASE)]
 
     def insert(self, collection_name: str, data: dict):
         """
@@ -229,7 +227,8 @@ class Database:
                 log_entry["extra"] = extra
 
             # Insert the log entry into the specified collection
-            collection = self.db[log_collection]
+            collection = self.db[str(log_collection)]
+
             result = collection.insert_one(log_entry)
 
             logging.info(f"log_to_mongodb();Logged to {log_collection}: {result.inserted_id}")

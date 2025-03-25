@@ -22,7 +22,6 @@ from fastapi.responses import JSONResponse
 from utils.bd_client import BDClient  # API client for database interactions
 
 # Import custom utility modules
-from utils.logging import logging  # Logging utilities
 from utils import utilities  # General utilities
 
 # Importing the User model from the models module
@@ -90,9 +89,10 @@ async def register(request: Request):
 
         # If the user exists, return a 400 response
         if response.get("documents"):
-            result = "User already exists!!!"
+            result = f"Users already exist={body.get('email')}"
             # Log the duplicate registration attempt
-            # utilities.add_log_to_db("register_user()", f"{result}={body.get('email')}")
+            await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="register", message=result)
+
             return JSONResponse(status_code=400, content={"message": result})
 
         # Encrypt the user's password before storing it
@@ -119,10 +119,13 @@ async def register(request: Request):
         # Extract the created user ID from the response
         created_user = insert_response.get("id", "unknown")
 
+        if created_user == "unknown":
+            return JSONResponse(status_code=404, content={"message": f"Error createing user {body.get("email")}"})
+        
         # Log the successful user registration
-        # utilities.add_log_to_db("register_user()", f"created_user={created_user}")
+        await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="register", message=f"created_user={created_user}")
 
-# Return a success response
+        # Return a success response
         return JSONResponse(
             content={"message": "User registered successfully", "user": created_user},
             status_code=201
@@ -130,7 +133,10 @@ async def register(request: Request):
 
     except Exception as e:
         # Handle unexpected errors
-        return JSONResponse(status_code=500, content={"message": "Internal server error"})
+        errMessage = f"Error message:{e}"
+        await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="register", message=errMessage)
+
+        return JSONResponse(status_code=500, content={"message": errMessage})
 
 # -------------------------------
 # Endpoint: Login a user
@@ -165,14 +171,17 @@ async def login(request: Request):
             "query": {"email": body.get("email")}  # Query to check if the user exists
         }
 
+        utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="login", message=params)
+
         # Check if the user exists in the database via the REST API
         response = await api_client.find(endpoint="find", payload=params)
 
         # If the user doesn't exist, return a 400 response
         if not response.get("documents"):
+            errMessage = response.get("documents")
             # Log the duplicate registration attempt
-            # utilities.add_log_to_db("register_user()", f"{result}={body.get('email')}")
-            return JSONResponse(status_code=400, content={"message": "User doesn't exist!!!"})
+            utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="login", message=errMessage)
+            return JSONResponse(status_code=400, content={"message": errMessage})
 
         # Retrieve the stored password from the database
         user_password = response.get("documents", [{}])[0].get("password", "unknown")
@@ -180,11 +189,9 @@ async def login(request: Request):
         # Check if the provided password matches the stored password
         passwordMatch = utilities.validate_password(user_password, body.get("password"))
 
-        # If the passwords don't match, return a 400 response
-        # database.add_log("login()", f"passwordMatch={passwordMatch}")
-        
         # If the passwords don't match, return a 400 response with an "Incorrect password" message
         if not passwordMatch:
+            utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="login", message="Incorrect password")
             return JSONResponse(status_code=400, content="Incorrect password")
 
         # Retrieve the user ID
@@ -198,8 +205,9 @@ async def login(request: Request):
     
     except Exception as e:
         # Handle unexpected errors
-        return JSONResponse(status_code=500, content="Internal server error")
-
+        errMessage = f"Error message:{e}"
+        utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="login", message=errMessage)
+        return JSONResponse(status_code=500, content=errMessage)
 
 # -------------------------------
 # Endpoint: Get all users
@@ -241,6 +249,8 @@ async def get_users(request: Request):
         elif body.get("id"):
             payload = {"collection": USERS_COLLECTION, "query": {"id": body.get("id")}}
 
+        utilities.add_log_to_db(api_client=api_client, source="get_users", method="login", message=payload)
+
         if id:
             ## Query the database via the REST API
             response = await api_client.find_by_id(endpoint="find", payload=payload)
@@ -250,13 +260,16 @@ async def get_users(request: Request):
 
         # If no users are found, return a 400 response
         if not response.get("documents"):
-            result = "Doesn't exist any users!!!"
-            # utilities.add_log_to_db("register_user()", f"{result}={body.get('email')}")
-            return JSONResponse(status_code=400, content={"message": "No users found"})
+            result = "No users found!!!"
+            utilities.add_log_to_db(api_client=api_client, source="get_users", method="login", message=result)
+            return JSONResponse(status_code=400, content={"message": result})
         
         # Return the list of users
         return JSONResponse(content={"users": response.get("documents")}, status_code=200)
 
     except Exception as e:
         # Handle unexpected errors
-        return JSONResponse(status_code=500, content="Internal server error")
+        errMessage = f"Error message:{e}"
+        utilities.add_log_to_db(api_client=api_client, source="get_users", method="login", message=errMessage)
+        return JSONResponse(status_code=500, content=errMessage)
+    

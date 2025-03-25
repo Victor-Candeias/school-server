@@ -37,14 +37,14 @@ if __name__ == "__main__":
     import uvicorn  # Import Uvicorn to run the FastAPI application
 
     # Retrieve the host and port from environment variables, with default values
-    host = os.getenv("HOST", "127.0.0.1")  # Default host is 127.0.0.1 (localhost)
-    port = int(os.getenv("PORT", 8000))  # Default port is 8000
+    HOST = os.getenv("HOST", "127.0.0.1")  # Default host is 127.0.0.1 (localhost)
+    PORT = int(os.getenv("PORT", 8000))  # Default port is 8000
 
     # Print the host and port for debugging purposes
-    print(f"Starting server on {host}:{port}")
+    print(f"Starting server on {HOST}:{PORT}")
 
     # Start the Uvicorn server to run the FastAPI application
     # The server will listen on the specified host and port
     # `reload=False` disables automatic reloading (useful for production)
-    uvicorn.run("main:app", host=host, port=port, reload=False)
+    uvicorn.run("main:app", host=HOST, port=PORT, reload=False)
     
