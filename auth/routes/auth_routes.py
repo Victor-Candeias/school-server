@@ -101,6 +101,7 @@ async def register(request: Request):
             "collection": USERS_COLLECTION,
             "data": new_user
         }
+        
         insert_response = await api_client.insert(endpoint="insert", payload=insert_params)
 
         # log the request

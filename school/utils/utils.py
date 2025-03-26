@@ -24,6 +24,7 @@ Dependencies:
     - bson: For handling MongoDB ObjectId.
 """
 
+from enum import Enum
 import os
 import re
 import logging
@@ -32,85 +33,38 @@ import hashlib
 from bcrypt import checkpw, gensalt, hashpw
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
+from fastapi import Request
+from fastapi.responses import JSONResponse
 import jwt
-from dotenv import load_dotenv
-from bson import ObjectId
+from utils.bd_client import BDClient
 from utils.logging import logging
 from datetime import datetime
-from utils.database import database
 
-# Importing the User model from the models module
-from models.user import User
+from utils.config import ENCRYPTION_KEY
 
-from config import LOGS_COLLECTION, LOGS_ERROR_COLLECTION
 
-# Load environment variables from the .env file
-load_dotenv()
-
+class LevelEnum(str, Enum):
+    SEVEN = "7"
+    EIGHT = "8"
+    NINE = "9"
+    TEN = "10"
+    ELEVEN = "11"
+    TWELVE = "12"
+    
 class Utils:
     """
     A utility class that handles various tasks such as encryption, token creation, 
     and password validation.
     """
-
     def __init__(self):
         """
         Initializes the Utils class by loading encryption settings and password complexity rules.
         - ENCRYPTION_KEY: 32-byte encryption key derived from an environment variable.
         - IV_LENGTH: Length of the initialization vector (IV) for AES encryption.
         """
-        self.ENCRYPTION_KEY = hashlib.sha256(os.getenv("ENCRYPTION_KEY").encode()).digest()[:32]  # Generate a 32-byte encryption key
+        self.ENCRYPTION_KEY = hashlib.sha256(ENCRYPTION_KEY.encode()).digest()[:32]  # Generate a 32-byte encryption key
         self.IV_LENGTH = 16  # AES uses a 16-byte IV
         logging.info("Utils initialized with encryption settings.")
-
-    def create_token(self, user):
-        """
-        Creates a JSON Web Token (JWT) for the given user.
-        
-        Args:
-            user (dict): A dictionary containing user data (e.g., ID and username).
-        
-        Returns:
-            str: The signed JWT token.
-        """
-        try:
-            payload = {
-                'id': user[0]['_id'],  # MongoDB user ID
-                'username': user[0]['name']  # Username
-            }
-            secret_key = os.getenv("ENCRYPTION_KEY")  # Retrieve the secret key from environment variables
-            token = jwt.encode(payload, secret_key, algorithm="HS256")  # Sign the JWT using HMAC and SHA-256
-            logging.info(f"Token created for user: {user[0]['name']}")
-            return token
-        except Exception as e:
-            logging.error(f"create_token();Error creating token: {e}")
-            return None
-
-    def verify_token(self, token):
-        """
-        Verifies the provided JWT token and returns the decoded payload.
-        
-        Args:
-            token (str): The JWT token to verify.
-        
-        Returns:
-            dict: Decoded token payload if valid, None otherwise.
-        """
-        if not token:
-            logging.error("verify_token();Token required")
-            return None
-
-        try:
-            secret_key = os.getenv("ENCRYPTION_KEY")  # Retrieve the secret key from environment variables
-            userToken = jwt.decode(token, secret_key, algorithms=['HS256'])  # Decode and verify the token
-            logging.info("Token verified successfully.")
-            return userToken
-        except jwt.ExpiredSignatureError as e:
-            logging.error(f"verify_token();Token has expired: {e}")
-            return None
-        except jwt.InvalidTokenError as e:
-            logging.error(f"verify_token();Invalid token: {e}")
-            return None
         
     def encrypt(self, text):
         """
@@ -175,53 +129,79 @@ class Utils:
         except Exception as e:
             logging.error(f"decrypt();Error decrypting text: {e}")
             return ""
-
-    def hash_password(self, password):
-        """
-        Hashes the provided password using bcrypt.
         
-        Args:
-            password (str): The plaintext password to hash.
-        
-        Returns:
-            str: The hashed password.
-        """
-        try:
-            hashed = hashpw(password.encode(), gensalt()).decode()
-            logging.info("hash_password();Password hashed successfully.")
-            return hashed
-        except Exception as e:
-            logging.error(f"hash_password();Error hashing password: {e}")
-            return None
-
-    def validate_password(self, stored_hash, entered_password):
-        """
-        Validates the entered password against the stored hashed password.
-        
-        Args:
-            stored_hash (str): The hashed password stored in the database.
-            entered_password (str): The plaintext password entered by the user.
-        
-        Returns:
-            bool: True if the passwords match, False otherwise.
-        """
-        try:
-            is_valid = checkpw(entered_password.encode(), stored_hash.encode())
-            if is_valid:
-                logging.info("validate_password();Password validation successful.")
-            else:
-                logging.warning("validate_password();Password validation failed.")
-            return is_valid
-        except Exception as e:
-            logging.error(f"validate_password();Error validating password: {e}")
-            return False
-        
-    def add_log_to_db(self, method, log, error=False):
+    async def add_log_to_db(self, api_client: BDClient, source: str, method: str, message: str, error: bool=False):
         logData = {
-                        "method": method,
-                        "log": log,
-                        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            }
+                    "collection": "logs",
+                    "source": "auth_api",
+                    "logtype": "db",
+                    "level": "ERROR" if error else "INFO",
+                    "message": message,
+                    "extra": {
+                        "module": method,
+                        }
+                    }
         
-        collection = LOGS_COLLECTION if not error else LOGS_ERROR_COLLECTION
-        result = database.insert(collection, logData)
+        # Check if the user already exists in the database via the REST API
+        await api_client.find(endpoint="log", payload=logData)
+
+    def returnLevels(self):
+        """
+        Returns a list of fixed level values from the LevelEnum.
+
+        This method retrieves all available values from the LevelEnum and returns them as a list.
+
+        Returns:
+            list: A list of string values representing the available levels.
+
+        Example:
+            >>> obj = SomeClass()
+            >>> obj.returnLevels()
+            ['7', '8', '9', '10', '11', '12']
+        """
+        return [level.value for level in LevelEnum]
+
+    async def add_document(self, api_client: BDClient, request: Request, collection: str, source: str, method: str):
+        try:
+            payload = await request.json()
+            
+            query_params = {"collection": collection, "query": payload}
+            await self.add_log_to_db(api_client=api_client, source=source, method=method, message=query_params)
+            
+            response = await api_client.find(endpoint="find", payload=query_params)
+            if response.get("documents"):
+                result = f"Document already exists: id={response.get('documents', [{}])[0].get('_id', 'unknown')}"
+                return JSONResponse(status_code=400, content=result)
+            
+            insert_params = {"collection": collection, "data": payload}
+            created_item = await api_client.insert(endpoint="insert", payload=insert_params)
+            created_id = created_item.get("id", "unknown")
+            
+            if created_id == "unknown":
+                return JSONResponse(status_code=404, content={"message": f"Error creating {method} {payload}"})
+            
+            return JSONResponse(content={"message": f"{method.capitalize()} added successfully", "id": created_id}, status_code=201)
+        
+        except Exception as e:
+            err_message = f"{method.capitalize()} registration error: {e}"
+            await self.add_log_to_db(api_client=api_client, source=source, method=method, message=err_message, error=True)
+            return JSONResponse(status_code=500, content=err_message)
+        
+    async def get_documents(self, api_client: BDClient, endpoint: str, request: Request, collection: str, source: str, method: str):
+        try:
+            payload = await request.json()
+            query_params = {"collection": collection, "query": payload}
+            
+            await self.add_log_to_db(api_client=api_client, source=source, method=method, message=query_params)
+            response = await api_client.find(endpoint=endpoint, payload=query_params)
+            
+            if not response.get("documents"):
+                return JSONResponse(status_code=400, content=f"Document {method.capitalize()} not found!!!")
+            
+            await self.add_log_to_db(api_client=api_client, source=source, method=method, message=f"Found {len(response.get('documents'))} {method}s!!!")
+            
+            return JSONResponse(content={method: response.get("documents")}, status_code=200)
+        
+        except Exception as e:
+            await self.add_log_to_db(api_client=api_client, source=source, method=method, message=f"Get {method} error: {e}", error=True)
+            return JSONResponse(status_code=500, content="Internal server error")

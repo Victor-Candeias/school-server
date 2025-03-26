@@ -13,19 +13,15 @@ Environment Variables:
 """
 
 # Import FastAPI framework
+import os
 from fastapi import FastAPI
-# Import HTTPS redirect middleware
-# from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 
-# Add HTTPS redirect middleware to enforce HTTPS
 app = FastAPI()
-# app.add_middleware(HTTPSRedirectMiddleware)
 
 # Import route modules
-from routes.auth_routes import auth_router
-from routes.data_routes import data_router
 from routes.class_routes import class_router
 from routes.students_routes import students_router
+from routes.school_tests_router import school_tests_router
 
 # Import environment variable loader
 from dotenv import load_dotenv
@@ -38,14 +34,6 @@ load_dotenv()
 # This creates the main app instance that will handle all incoming requests
 app = FastAPI()
 
-# Include the authentication routes
-# These routes handle user authentication, such as login and registration
-app.include_router(auth_router, prefix="/auth", tags=["auth"])
-
-# Include the data routes
-# These routes handle operations related to data management
-app.include_router(data_router, prefix="/data", tags=["data"])
-
 # Include the clases routes
 # These routes handle operations related to classes management
 app.include_router(class_router, prefix="/class", tags=["classes"])
@@ -53,6 +41,8 @@ app.include_router(class_router, prefix="/class", tags=["classes"])
 # Include the students routes
 # These routes handle operations related to students management
 app.include_router(students_router, prefix="/students", tags=["students"])
+
+app.include_router(school_tests_router, prefix="/config", tags=["configurations"])
 
 # Run the FastAPI app with Uvicorn
 if __name__ == "__main__":
@@ -64,16 +54,22 @@ if __name__ == "__main__":
 
     Uvicorn is an ASGI server that serves FastAPI applications and handles asynchronous requests.
 
-    The app will be available at: https://127.0.0.1:8001
+    The app will be available at: http://127.0.0.1:8010 (default).
 
     Arguments:
         - host (str): The IP address or hostname to bind the server to (default: 127.0.0.1).
-        - port (int): The port to bind the server to (default: 8001).
+        - port (int): The port to bind the server to (default: 8010).
         - reload (bool): Enables automatic reloading of the app on code changes (useful for development).
     """
     import uvicorn
+    
+    # Retrieve the host and port from environment variables, with default values
+    host = os.getenv("HOST", "127.0.0.1")  # Default host is 127.0.0.1 (localhost)
+    port = int(os.getenv("PORT", 8010))  # Default port is 8010
+
+    # Print the host and port for debugging purposes
+    print(f"Starting server on {host}:{port}")
 
     # Start the Uvicorn server to run the FastAPI application
-    # The server will listen on the specified host and portcls
-    uvicorn.run("main:app", host="127.0.0.1", port=8001, reload=False)
-    # uvicorn.run("main:app", host="127.0.0.1", port=8001, reload=True, ssl_keyfile="key.pem", ssl_certfile="cert.pem")
+    uvicorn.run("main:app", host=host, port=port, reload=False)
+# End of main.py
