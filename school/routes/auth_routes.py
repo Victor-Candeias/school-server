@@ -69,19 +69,19 @@ async def register(request: Request):
         }
 
         # log the request
-        await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="register", message=params)
+        # await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="register", message=params)
 
         # Check if the user already exists in the database via the REST API
         response = await api_client.find(endpoint="find", payload=params)
 
         # log the request
-        await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="register", message=response)
+        # await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="register", message=response)
 
         # If the user exists, return a 400 response
         if response.get("documents"):
             result = f"O utilizador com o email {body.get('email')} já se encontra registado!!!"
             # Log the duplicate registration attempt
-            await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="register", message=result)
+            # await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="register", message=result)
 
             return JSONResponse(status_code=400, content={"message":result})
 
@@ -105,7 +105,7 @@ async def register(request: Request):
         insert_response = await api_client.insert(endpoint="insert", payload=insert_params)
 
         # log the request
-        await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="register", message=insert_response)
+        # await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="register", message=insert_response)
 
         # Extract the created user ID from the response
         created_user = insert_response.get("id", "unknown")
@@ -114,7 +114,7 @@ async def register(request: Request):
             return JSONResponse(status_code=404, content={"message":f"Erro a registar o utilizador com o email {body.get("email")}!!!"})
         
         # Log the successful user registration
-        await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="register", message=f"created_user={created_user}")
+        # await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="register", message=f"created_user={created_user}")
 
         # Return a success response
         return JSONResponse(
@@ -162,7 +162,7 @@ async def login(request: Request, response: Response):
             "query": {"email": body.get("email")}  # Query to check if the user exists
         }
 
-        utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="login", message=params)
+        # utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="login", message=params)
 
         # Check if the user exists in the database via the REST API
         responseAdd = await api_client.find(endpoint="find", payload=params)
@@ -183,7 +183,7 @@ async def login(request: Request, response: Response):
         # If the passwords don't match, return a 400 responseAdd with an "Incorrect password" message
         if not passwordMatch:
             errMessage = f"O senha do utilizador com o email {body.get("email")} está incorreta!!!"
-            utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="login", message=errMessage)
+            # utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="login", message=errMessage)
             return JSONResponse(status_code=400, content={"message": errMessage})
 
         # Retrieve the user ID
@@ -244,7 +244,7 @@ async def get_users(request: Request):
         elif body.get("id"):
             payload = {"collection": USERS_COLLECTION, "query": {"id": body.get("id")}}
 
-        utilities.add_log_to_db(api_client=api_client, source="get_users", method="login", message=payload)
+        # utilities.add_log_to_db(api_client=api_client, source="get_users", method="login", message=payload)
 
         if id:
             ## Query the database via the REST API
@@ -256,7 +256,7 @@ async def get_users(request: Request):
         # If no users are found, return a 400 response
         if not response.get("documents"):
             result = "Não foram encontrados utilizadores registados!!!"
-            utilities.add_log_to_db(api_client=api_client, source="get_users", method="login", message=result)
+            # utilities.add_log_to_db(api_client=api_client, source="get_users", method="login", message=result)
             return JSONResponse(status_code=400, content={"message": result})
         
         # Return the list of users

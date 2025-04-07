@@ -7,12 +7,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # MongoDB collection names
-CLASSES_COLLECTION = "classes"
-STUDENTS_COLLECTION = "students"
-TESTS_COLLECTION = "schooltestes"
-STUDENT_TESTES_COLLECTION = "classtestes"
-MOMENTS_COLLECTION = "testsmoments"
-CLASS_MOMENTS_COLLECTION = "classtestsmoments"
+USERS_COLLECTION: str = "users"
+SCHOOLS_COLLECTION: str = "schools"
+YEARS_COLLECTION: str = "years"
+CLASSES_COLLECTION: str = "classes"
+STUDENTS_COLLECTION: str = "students"
+TESTS_COLLECTION: str = "schooltestes"
+STUDENT_TESTES_COLLECTION: str = "classtestes"
+MOMENTS_COLLECTION: str = "testsmoments"
+CLASS_MOMENTS_COLLECTION: str = "classtestsmoments"
 # MongoDB connection string
 
 BD_BASE_URL: str = os.getenv("BD_BASE_URL")

@@ -16,6 +16,7 @@ Environment Variables:
 # Import FastAPI framework
 import os
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 # Import route modules
 from routes.auth_routes import auth_router
@@ -30,6 +31,22 @@ load_dotenv()
 # Initialize the FastAPI application
 # This creates the main app instance that will handle all incoming requests
 app = FastAPI()
+
+# Defina as origens permitidas (pode ser específico ou "*")
+origins = [
+    "http://localhost:3000",  # Next.js em desenvolvimento
+    "http://127.0.0.1:3000",
+    "http://localhost:3001",  # Next.js em desenvolvimento
+    "http://127.0.0.1:3001",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Permite apenas essas origens
+    allow_credentials=True,  # Permite cookies
+    allow_methods=["*"],  # Permite todos os métodos (GET, POST, etc.)
+    allow_headers=["*"],  # Permite todos os headers
+)
 
 # Include the authentication routes
 # These routes handle user authentication, such as login and registration

@@ -166,12 +166,12 @@ class Utils:
             payload = await request.json()
             
             query_params = {"collection": collection, "query": payload}
-            await self.add_log_to_db(api_client=api_client, source=source, method=method, message=query_params)
+            # await self.add_log_to_db(api_client=api_client, source=source, method=method, message=query_params)
             
             response = await api_client.find(endpoint="find", payload=query_params)
             if response.get("documents"):
                 result = f"Document already exists: id={response.get('documents', [{}])[0].get('_id', 'unknown')}"
-                return JSONResponse(status_code=400, content=result)
+                return JSONResponse(status_code=400, content={"message": result})
             
             insert_params = {"collection": collection, "data": payload}
             created_item = await api_client.insert(endpoint="insert", payload=insert_params)
@@ -185,23 +185,28 @@ class Utils:
         except Exception as e:
             err_message = f"{method.capitalize()} registration error: {e}"
             await self.add_log_to_db(api_client=api_client, source=source, method=method, message=err_message, error=True)
-            return JSONResponse(status_code=500, content=err_message)
+            return JSONResponse(status_code=500, content={"message": err_message})
         
     async def get_documents(self, api_client: BDClient, endpoint: str, request: Request, collection: str, source: str, method: str):
         try:
-            payload = await request.json()
+            # Tenta obter o payload da requisição, se não for válido ou vazio, usa um dicionário vazio
+            try:
+                payload = await request.json()
+            except Exception:
+                payload = {}  
+
             query_params = {"collection": collection, "query": payload}
             
-            await self.add_log_to_db(api_client=api_client, source=source, method=method, message=query_params)
+            # await self.add_log_to_db(api_client=api_client, source=source, method=method, message=query_params)
             response = await api_client.find(endpoint=endpoint, payload=query_params)
             
             if not response.get("documents"):
                 return JSONResponse(status_code=400, content=f"Document {method.capitalize()} not found!!!")
             
-            await self.add_log_to_db(api_client=api_client, source=source, method=method, message=f"Found {len(response.get('documents'))} {method}s!!!")
+            # await self.add_log_to_db(api_client=api_client, source=source, method=method, message=f"Found {len(response.get('documents'))} {method}s!!!")
             
-            return JSONResponse(content={method: response.get("documents")}, status_code=200)
+            return JSONResponse(content=response.get("documents"), status_code=200)
         
         except Exception as e:
             await self.add_log_to_db(api_client=api_client, source=source, method=method, message=f"Get {method} error: {e}", error=True)
-            return JSONResponse(status_code=500, content="Internal server error")
+            return JSONResponse(status_code=500, content={"message": f"Get {method} error: {e}"})
