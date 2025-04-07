@@ -42,7 +42,6 @@ from datetime import datetime
 
 from utils.config import ENCRYPTION_KEY
 
-
 class LevelEnum(str, Enum):
     SEVEN = "7"
     EIGHT = "8"
@@ -143,7 +142,7 @@ class Utils:
                     }
         
         # Check if the user already exists in the database via the REST API
-        await api_client.find(endpoint="log", payload=logData)
+        await api_client.insert(endpoint="log", payload=logData)
 
     def returnLevels(self):
         """
@@ -210,3 +209,66 @@ class Utils:
         except Exception as e:
             await self.add_log_to_db(api_client=api_client, source=source, method=method, message=f"Get {method} error: {e}", error=True)
             return JSONResponse(status_code=500, content={"message": f"Get {method} error: {e}"})
+
+    def create_token(self, userId: str, username: str):
+        """
+        Creates a JSON Web Token (JWT) for the given user.
+        
+        Args:
+            user (dict): A dictionary containing user data (e.g., ID and username).
+        
+        Returns:
+            str: The signed JWT token.
+        """
+        try:
+            payload = {
+                'id': userId,  # MongoDB user ID
+                'username': username  # Username
+            }
+            secret_key = ENCRYPTION_KEY  # Retrieve the secret key from environment variables
+            token = jwt.encode(payload, secret_key, algorithm="HS256")  # Sign the JWT using HMAC and SHA-256
+            logging.info(f"Token created for user: {username}")
+            return token
+        except Exception as e:
+            logging.error(f"create_token();Error creating token: {e}")
+            return None
+        
+    def hash_password(self, password):
+        """
+        Hashes the provided password using bcrypt.
+        
+        Args:
+            password (str): The plaintext password to hash.
+        
+        Returns:
+            str: The hashed password.
+        """
+        try:
+            hashed = hashpw(password.encode(), gensalt()).decode()
+            logging.info("hash_password();Password hashed successfully.")
+            return hashed
+        except Exception as e:
+            logging.error(f"hash_password();Error hashing password: {e}")
+            return None
+        
+    def validate_password(self, stored_hash, entered_password):
+        """
+        Validates the entered password against the stored hashed password.
+        
+        Args:
+            stored_hash (str): The hashed password stored in the database.
+            entered_password (str): The plaintext password entered by the user.
+        
+        Returns:
+            bool: True if the passwords match, False otherwise.
+        """
+        try:
+            is_valid = checkpw(entered_password.encode(), stored_hash.encode())
+            if is_valid:
+                logging.info("validate_password();Password validation successful.")
+            else:
+                logging.warning("validate_password();Password validation failed.")
+            return is_valid
+        except Exception as e:
+            logging.error(f"validate_password();Error validating password: {e}")
+            return False

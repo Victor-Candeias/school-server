@@ -171,7 +171,7 @@ async def login(request: Request, response: Response):
         if not responseAdd.get("documents"):
             errMessage = f"O utilizador com o email {body.get("email")} não existe!!!"
             # Log the duplicate registration attempt
-            utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="login", message=errMessage)
+            # utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="login", message=errMessage)
             return JSONResponse(status_code=400, content={"message": errMessage})
 
         # Retrieve the stored password from the database
