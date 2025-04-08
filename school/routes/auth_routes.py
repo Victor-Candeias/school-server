@@ -189,14 +189,17 @@ async def login(request: Request, response: Response):
         # Retrieve the user ID
         user_id = responseAdd.get("documents", [{}])[0].get("_id", "unknown")
 
+        # Retrive the user email
+        user_email = body.get("email")
+
         # Generate a JWT token for the user
-        token = utilities.create_token(user_id, body.get("email"))
+        token = utilities.create_token(user_id, user_email)
         
         # get role
         role = responseAdd.get("documents", [{}])[0].get("role", "unknown")
 
         # Return the generated token
-        return JSONResponse(status_code=200, content={"message": "Login realizado com sucesso.", "token": token, "role": role})
+        return JSONResponse(status_code=200, content={"message": "Login realizado com sucesso.", "token": token, "userId": user_id, "email": user_email, "role": role})
     
     except Exception as e:
         # Handle unexpected errors

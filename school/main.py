@@ -22,6 +22,7 @@ app = FastAPI()
 # Import route modules
 from routes.auth_routes import auth_router
 from routes.schools_router import schools_router
+from routes.years_routes import years_router
 from routes.class_routes import class_router
 from routes.students_routes import students_router
 from routes.class_tests_router import school_tests_router
@@ -59,6 +60,9 @@ app.include_router(auth_router, prefix="/auth", tags=["auth"])
 
 # These routes handle operations related to classes management
 app.include_router(schools_router, prefix="/schools", tags=["schools"])
+
+# These routes handle operations related to years management
+app.include_router(years_router, prefix="/years", tags=["years"])
 
 # These routes handle operations related to classes management
 app.include_router(class_router, prefix="/class", tags=["classes"])
