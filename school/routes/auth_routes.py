@@ -27,6 +27,7 @@ from utils import utilities  # General utilities
 # Importing the User model from the models module
 from models.user import User
 from models.userlogin import UserLogin
+from models.userlogout import UserLogout
 
 from utils.config import USERS_COLLECTION, BD_BASE_URL
 
@@ -207,6 +208,19 @@ async def login(request: Request, response: Response):
         utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="login", message=errMessage)
         return JSONResponse(status_code=500, content={"message": errMessage})
 
+@auth_router.post("/logout", response_model=UserLogout)
+async def logout(request: Request, response: Response):
+    try:
+        response.delete_cookie("userID")
+    
+        # Return the generated token
+        return JSONResponse(status_code=200, content={"message": "User logout realizado com sucesso."})
+    
+    except Exception as e:
+        errMessage = f"Error message:{e}"
+        utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="login", message=errMessage)
+        return JSONResponse(status_code=500, content={"message": errMessage})
+    
 # -------------------------------
 # Endpoint: Get all users
 # -------------------------------
