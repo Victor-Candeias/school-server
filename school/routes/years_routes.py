@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 
 # Import custom utility modules
 from utils.bd_client import BDClient  # Database handling utilities
@@ -22,10 +22,10 @@ async def find_years(request: Request):
 # Endpoint: Get all users
 # curl -X GET http://127.0.0.1:8001/class/findbyid -H  "Content-Type: application/json" -d "{ \"id\": \"67e32c8bf97d9bb2e993e50d\" }"
 @years_router.post("/findbyid")
-async def findbyid_years(request: Request):
+async def findbyid_years(request: Request,  _: None = Depends(utilities.verificar_token_cookie)):
     return await utilities.get_documents(api_client=api_client, endpoint="find", request=request, collection=YEARS_COLLECTION, source="years_router", method="findbyid_years")
 
 # curl -X POST http://127.0.0.1:8001/class/add -H  "Content-Type: application/json" -d "{ \"userid\": \"67e32c8bf97d9bb2e993e50d\", \"level\": 6, \"class\": \"A\" }"
 @years_router.post("/add")
-async def add_year(request: Request):
+async def add_year(request: Request,  _: None = Depends(utilities.verificar_token_cookie)):
     return await utilities.add_document(api_client=api_client, request=request, collection=YEARS_COLLECTION, source="years_router", method="add_year")

@@ -193,14 +193,23 @@ async def login(request: Request, response: Response):
         # Retrive the user email
         user_email = body.get("email")
 
-        # Generate a JWT token for the user
-        token = utilities.create_token(user_id, user_email)
-        
         # get role
         role = responseAdd.get("documents", [{}])[0].get("role", "unknown")
 
+        # Generate a JWT token for the user
+        token = utilities.create_token(user_id, user_email)
+
+        response.set_cookie(
+            key="access_token",
+            value=token,
+            httponly=True,
+            secure=False,  # True em produção com HTTPS
+            samesite="Lax",
+            max_age=1800  # 30 min
+        )
+
         # Return the generated token
-        return JSONResponse(status_code=200, content={"message": "Login realizado com sucesso.", "token": token, "userId": user_id, "email": user_email, "role": role})
+        return JSONResponse(status_code=200, content={"message": "Login realizado com sucesso.", "userId": user_id, "email": user_email, "role": role})
     
     except Exception as e:
         # Handle unexpected errors
@@ -208,11 +217,13 @@ async def login(request: Request, response: Response):
         utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="login", message=errMessage)
         return JSONResponse(status_code=500, content={"message": errMessage})
 
+# -------------------------------
+# Endpoint: Logout a user
+# -------------------------------
 @auth_router.post("/logout", response_model=UserLogout)
 async def logout(request: Request, response: Response):
     try:
-        response.delete_cookie("userID")
-    
+        response.delete_cookie("access_token")   
         # Return the generated token
         return JSONResponse(status_code=200, content={"message": "User logout realizado com sucesso."})
     

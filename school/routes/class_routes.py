@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 
 # Import custom utility modules
 from utils.bd_client import BDClient  # Database handling utilities
@@ -15,7 +15,7 @@ api_client = BDClient(BD_BASE_URL)
 # Endpoint: Get all users
 # curl -X GET http://127.0.0.1:8001/class/find -H  "Content-Type: application/json" -d "{}"
 # curl -X GET http://127.0.0.1:8001/class/find -H  "Content-Type: application/json" -d "{ \"level\": 6, \"class\": \"A\" }"
-@class_router.get("/find")
+@class_router.post("/find")
 async def find_classes(request: Request):
     return await utilities.get_documents(api_client=api_client, endpoint="find", request=request, collection=CLASSES_COLLECTION, source="class_routes", method="find_classes")
 

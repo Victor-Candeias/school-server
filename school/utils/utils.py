@@ -30,15 +30,17 @@ import re
 import logging
 import base64
 import hashlib
+from typing import Any, Dict
 from bcrypt import checkpw, gensalt, hashpw
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
-from fastapi import Request
+from fastapi import Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
 from utils.bd_client import BDClient
 from utils.logging import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from utils.config import ENCRYPTION_KEY
 
@@ -223,16 +225,30 @@ class Utils:
         try:
             payload = {
                 'id': userId,  # MongoDB user ID
-                'username': username  # Username
+                'username': username,  # Username,
+                "exp": datetime.now(datetime.timezone.utc) + timedelta(minutes=30), # expirationDate
             }
-            secret_key = ENCRYPTION_KEY  # Retrieve the secret key from environment variables
-            token = jwt.encode(payload, secret_key, algorithm="HS256")  # Sign the JWT using HMAC and SHA-256
+
+            token = jwt.encode(payload, ENCRYPTION_KEY, algorithm="HS256")  # Sign the JWT using HMAC and SHA-256
             logging.info(f"Token created for user: {username}")
             return token
         except Exception as e:
             logging.error(f"create_token();Error creating token: {e}")
             return None
+
+    def verificar_token_cookie(request: Request) -> Dict[str, Any]:
+        token = request.cookies.get("access_token")
+        if not token:
+            raise HTTPException(status_code=401, detail="Token não encontrado")
+        try:
+            payload = jwt.decode(token, ENCRYPTION_KEY, algorithms="HS256")
+            return payload
         
+        except jwt.ExpiredSignatureError:
+            raise HTTPException(status_code=401, detail="Token expirado")
+        except jwt.InvalidTokenError:
+            raise HTTPException(status_code=401, detail="Token inválido")
+
     def hash_password(self, password):
         """
         Hashes the provided password using bcrypt.
