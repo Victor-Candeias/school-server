@@ -10,5 +10,5 @@ load_dotenv()
 USERS_COLLECTION: str = "users"
 # MongoDB connection string
 
-ENCRYPTION_KEY: str = os.getenv("ENCRYPTION_KEY")
-BD_BASE_URL: str = os.getenv("BD_BASE_URL")
+ENCRYPTION_KEY: str = os.getenv("ENCRYPTION_KEY", "")
+BD_BASE_URL: str = os.getenv("BD_BASE_URL", "") 

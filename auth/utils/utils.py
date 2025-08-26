@@ -29,8 +29,10 @@ import re
 import logging
 import base64
 import hashlib
+from typing import Optional
 from bcrypt import checkpw, gensalt, hashpw
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.backends import default_backend
 import jwt
 from utils.bd_client import BDClient
@@ -116,18 +118,19 @@ class Utils:
             str: The encrypted text, represented as a hexadecimal string with IV.
         """
         try:
-            iv = os.urandom(self.IV_LENGTH)  # Generate a random IV
-            cipher = Cipher(algorithms.AES(self.ENCRYPTION_KEY), modes.CBC(iv), backend=default_backend())  # AES-CBC cipher
+            iv = os.urandom(self.IV_LENGTH)
+            cipher = Cipher(
+                algorithms.AES(self.ENCRYPTION_KEY),
+                modes.CBC(iv),
+                backend=default_backend()
+            )
             encryptor = cipher.encryptor()
 
-            # Pad the text to be a multiple of the block size (16 bytes for AES)
-            padding_length = algorithms.AES.block_size - len(text) % algorithms.AES.block_size
-            padded_text = text + (chr(padding_length) * padding_length)
-            
-            # Perform the encryption
-            encrypted = encryptor.update(padded_text.encode('utf-8')) + encryptor.finalize()
-            
-            logging.info("Text encrypted successfully.")
+            padder = padding.PKCS7(128).padder()  # 128 bits = 16 bytes AES block size
+            padded_data = padder.update(text.encode("utf-8")) + padder.finalize()
+
+            encrypted = encryptor.update(padded_data) + encryptor.finalize()
+
             return iv.hex() + ":" + encrypted.hex()
         except Exception as e:
             logging.error(f"encrypt();Error encrypting text: {e}")
@@ -209,7 +212,7 @@ class Utils:
             logging.error(f"validate_password();Error validating password: {e}")
             return False
         
-    async def add_log_to_db(self, api_client: BDClient, source: str, method: str, message: str, error: bool=False):
+    async def add_log_to_db(self, api_client: BDClient, source: str, method: str, message: str, error: Optional[bool]=False):
         logData = {
                     "collection": "logs",
                     "source": "auth_api",
@@ -222,5 +225,5 @@ class Utils:
                     }
         
         # Check if the user already exists in the database via the REST API
-        await api_client.find(endpoint="log", payload=logData)
+        await api_client.insert(endpoint="log", payload=logData)
         

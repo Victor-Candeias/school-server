@@ -53,7 +53,7 @@ curl -X POST "http://127.0.0.1:8010/auth/register" \
 
 <div style="border: 1px solid red; border-radius: 5px; padding: 10px;">
 
-### 2. **LOgin User**
+### 2. **Login User**
 - **URL: /auth/login**
 - **Method: POST**
 - **Description: Logon the user in the app and return a token.**

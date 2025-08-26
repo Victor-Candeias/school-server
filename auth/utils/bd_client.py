@@ -33,7 +33,7 @@ class BDClient:
     def __init__(self, base_url: str):
         self.base_url = base_url
 
-    async def insert(self, endpoint: str, payload: Dict[str, Any] = None):
+    async def insert(self, endpoint: str, payload: Optional[Dict[str, Any]] = None):
         """
         Insert a new document into the database.
 
@@ -44,6 +44,9 @@ class BDClient:
         Returns:
             Dict[str, Any]: The JSON response from the API.
         """
+        if payload is None:
+            payload = {}
+
         url = f"{self.base_url}/{endpoint}"
 
         async with httpx.AsyncClient() as client:
@@ -59,7 +62,7 @@ class BDClient:
                 print(f"Error in insert(): {e}")
                 return {}
             
-    async def find(self, endpoint: str, payload: Dict[str, Any] = None):
+    async def find(self, endpoint: str, payload: Optional[Dict[str, Any]] = None):
         """
         Find documents in the database based on a query.
 
@@ -70,6 +73,9 @@ class BDClient:
         Returns:
             Dict[str, Any]: The JSON response from the API.
         """
+        if payload is None:
+            payload = {}
+        
         url = f"{self.base_url}/{endpoint}"
 
         async with httpx.AsyncClient() as client:
@@ -85,7 +91,7 @@ class BDClient:
                 print(f"Error in find(): {e}")
                 return {}
 
-    async def find_by_id(self, endpoint: str, payload: Dict[str, Any] = None):
+    async def find_by_id(self, endpoint: str, payload: Optional[Dict[str, Any]] = None):
         """
         Find a specific document in the database by its ID.
 
@@ -96,6 +102,9 @@ class BDClient:
         Returns:
             Dict[str, Any]: The JSON response from the API.
         """
+        if payload is None:
+            payload = {}
+
         url = f"{self.base_url}/{endpoint}"
 
         async with httpx.AsyncClient() as client:
@@ -111,7 +120,7 @@ class BDClient:
                 print(f"Error in find_by_id(): {e}")
                 return {}
 
-    async def update(self, endpoint: str, payload: Dict[str, Any] = None):
+    async def update(self, endpoint: str, payload: Optional[Dict[str, Any]] = None):
         """
         Update an existing document in the database.
 
@@ -122,6 +131,9 @@ class BDClient:
         Returns:
             Dict[str, Any]: The JSON response from the API.
         """
+        if payload is None:
+            payload = {}
+
         url = f"{self.base_url}/{endpoint}"
 
         async with httpx.AsyncClient() as client:
@@ -137,7 +149,7 @@ class BDClient:
                 print(f"Error in update(): {e}")
                 return {}
             
-    async def delete(self, endpoint: str, payload: Dict[str, Any] = None):
+    async def delete(self, endpoint: str, payload: Optional[Dict[str, Any]] = None):
         """
         Delete a document from the database.
 
@@ -148,6 +160,9 @@ class BDClient:
         Returns:
             Dict[str, Any]: The JSON response from the API.
         """
+        if payload is None:
+            payload = {}
+            
         url = f"{self.base_url}/{endpoint}"
 
         async with httpx.AsyncClient() as client:
