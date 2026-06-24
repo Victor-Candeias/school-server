@@ -18,5 +18,5 @@ MOMENTS_COLLECTION: str = "testsmoments"
 CLASS_MOMENTS_COLLECTION: str = "classtestsmoments"
 # MongoDB connection string
 
-BD_BASE_URL: str = os.getenv("BD_BASE_URL")
-ENCRYPTION_KEY: str = os.getenv("ENCRYPTION_KEY")
+BD_BASE_URL: str = os.getenv("BD_BASE_URL", "http://127.0.0.1:8000/db-api")
+ENCRYPTION_KEY: str = os.getenv("ENCRYPTION_KEY", "")

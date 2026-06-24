@@ -190,10 +190,11 @@ class Database:
         """
         try:
             # Retrieve the last document sorted by "id" in descending order
-            last_document = self.find(collection_name, {}).sort("id", -1).limit(1)
+            collection = self.db[collection_name]
+            last_document = collection.find_one(sort=[("id", -1)])
             
-            if last_document:
-                return last_document[0]["id"] + 1  # Increment the last ID by 1
+            if last_document and "id" in last_document:
+                return int(last_document["id"]) + 1  # Increment the last ID by 1
             
             return 1  # Return 1 if the collection is empty
         except Exception as e:

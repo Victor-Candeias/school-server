@@ -40,7 +40,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
 from utils.bd_client import BDClient
 from utils.logging import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from utils.config import ENCRYPTION_KEY
 
@@ -226,7 +226,7 @@ class Utils:
             payload = {
                 'id': userId,  # MongoDB user ID
                 'username': username,  # Username,
-                "exp": datetime.now(datetime.timezone.utc) + timedelta(minutes=30), # expirationDate
+                "exp": datetime.now(timezone.utc) + timedelta(minutes=30), # expirationDate
             }
 
             token = jwt.encode(payload, ENCRYPTION_KEY, algorithm="HS256")  # Sign the JWT using HMAC and SHA-256
@@ -236,12 +236,12 @@ class Utils:
             logging.error(f"create_token();Error creating token: {e}")
             return None
 
-    def verificar_token_cookie(request: Request) -> Dict[str, Any]:
+    def verificar_token_cookie(self, request: Request) -> Dict[str, Any]:
         token = request.cookies.get("access_token")
         if not token:
             raise HTTPException(status_code=401, detail="Token não encontrado")
         try:
-            payload = jwt.decode(token, ENCRYPTION_KEY, algorithms="HS256")
+            payload = jwt.decode(token, ENCRYPTION_KEY, algorithms=["HS256"])
             return payload
         
         except jwt.ExpiredSignatureError:

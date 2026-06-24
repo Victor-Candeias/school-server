@@ -219,7 +219,7 @@ async def log(request: Request):
         logging.info(f"insert_document();logtype={logtype}")
         logging.info(f"insert_document();logLevel={logLevel}")
 
-        message = f"{datetime.now().strftime('%Y%m%d')};{source};{body.get("message")}"
+        message = f"{datetime.now().strftime('%Y%m%d')};{source};{body.get('message')}"
 
         # checks if the logtype is db or file
         if logtype == 'db':

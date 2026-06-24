@@ -112,14 +112,14 @@ async def register(request: Request):
         created_user = insert_response.get("id", "unknown")
 
         if created_user == "unknown":
-            return JSONResponse(status_code=404, content={"message":f"Erro a registar o utilizador com o email {body.get("email")}!!!"})
+            return JSONResponse(status_code=404, content={"message":f"Erro a registar o utilizador com o email {body.get('email')}!!!"})
         
         # Log the successful user registration
         await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="register", message=f"created_user={created_user}")
 
         # Return a success response
         return JSONResponse(
-            content={"message":f"O utlizador com o email {body.get("email")} for registado com sucesso."},
+            content={"message":f"O utlizador com o email {body.get('email')} for registado com sucesso."},
             status_code=201
         )
 
@@ -170,7 +170,7 @@ async def login(request: Request, response: Response):
 
         # If the user doesn't exist, return a 400 responseAdd
         if not responseAdd.get("documents"):
-            errMessage = f"O utilizador com o email {body.get("email")} não existe!!!"
+            errMessage = f"O utilizador com o email {body.get('email')} não existe!!!"
             # Log the duplicate registration attempt
             await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="login", message=errMessage)
             return JSONResponse(status_code=400, content={"message": errMessage})
@@ -183,7 +183,7 @@ async def login(request: Request, response: Response):
 
         # If the passwords don't match, return a 400 responseAdd with an "Incorrect password" message
         if not passwordMatch:
-            errMessage = f"O senha do utilizador com o email {body.get("email")} está incorreta!!!"
+            errMessage = f"O senha do utilizador com o email {body.get('email')} está incorreta!!!"
             await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="login", message=errMessage)
             return JSONResponse(status_code=400, content={"message": errMessage})
 
@@ -208,7 +208,7 @@ async def login(request: Request, response: Response):
 # -------------------------------
 # Endpoint: Delete a user
 # -------------------------------
-@auth_router.post("/delete", response_model=UserLogin)
+@auth_router.delete("/delete", response_model=UserLogin)
 async def deleteUser(request: Request, response: Response):
     """
     Endpoint for delete user.
@@ -245,7 +245,7 @@ async def deleteUser(request: Request, response: Response):
 
         # If the user doesn't exist, return a 400 responseAdd
         if not responseAdd.get("documents"):
-            errMessage = f"O utilizador com o email {body.get("email")} não existe!!!"
+            errMessage = f"O utilizador com o email {body.get('email')} não existe!!!"
             # Log the duplicate registration attempt
             await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="delete", message=errMessage)
             return JSONResponse(status_code=400, content={"message": errMessage})
@@ -254,12 +254,12 @@ async def deleteUser(request: Request, response: Response):
 
         # If the passwords don't match, return a 400 responseAdd with an "Incorrect password" message
         if not res:
-            errMessage = f"Não foi possivel apagar o utilizador com o email {body.get("email")}!!!"
+            errMessage = f"Não foi possivel apagar o utilizador com o email {body.get('email')}!!!"
             await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="delete", message=errMessage)
             return JSONResponse(status_code=400, content={"message": errMessage})
 
         # Return the generated token
-        return JSONResponse(status_code=200, content={"message": f"O utilizador com o email {body.get("email")} foi eliminado com sucesso!!!"})
+        return JSONResponse(status_code=200, content={"message": f"O utilizador com o email {body.get('email')} foi eliminado com sucesso!!!"})
     
     except Exception as e:
         # Handle unexpected errors
@@ -291,28 +291,28 @@ async def get_users(request: Request):
         - 500: Internal server error.
     """
     try:
-        # Parse the JSON body from the request
-        body = await request.json()
+        try:
+            body = await request.json()
+        except Exception:
+            body = {}
 
         id = False
-        payload: dict = {}
+        payload: dict = {"collection": USERS_COLLECTION, "query": {}}
 
         # Determine the query based on the request body
-        if not body or body == {}:
-            payload = {"collection": USERS_COLLECTION, "query": {}}
-        # check if the body has the email key
-        elif body.get("email"):
+        if body.get("email"):
             payload = {"collection": USERS_COLLECTION, "query": {"email": body.get("email")}}
 
         # check if the body has the id key
         elif body.get("id"):
-            payload = {"collection": USERS_COLLECTION, "query": {"id": body.get("id")}}
+            payload = {"collection": USERS_COLLECTION, "id": body.get("id")}
+            id = True
 
         await utilities.add_log_to_db(api_client=api_client, source="get_users", method="login", message=json.dumps(payload))
 
         if id:
             ## Query the database via the REST API
-            response = await api_client.find_by_id(endpoint="find", payload=payload)
+            response = await api_client.find_by_id(endpoint="findbyid", payload=payload)
         else:
             # Query the database via the REST API
             response = await api_client.find(endpoint="find", payload=payload)

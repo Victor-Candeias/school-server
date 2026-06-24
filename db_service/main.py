@@ -2,10 +2,12 @@ import os  # Import the os module to interact with environment variables
 from fastapi import FastAPI  # Import FastAPI to create the application instance
 from routes.db_routes import router  # Import the router from the db_routes module
 from dotenv import load_dotenv  # Import dotenv to load environment variables from a .env file
+from utils.logging import setup_logging
 
 # Load environment variables from the .env file at startup
 # This allows sensitive information (e.g., database credentials) to be stored securely
 load_dotenv()
+setup_logging()
 
 # Create an instance of the FastAPI application
 app = FastAPI()
