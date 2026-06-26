@@ -17,9 +17,12 @@ Dependencies:
 """
 
 import json
+import base64
 import os
 from fastapi import APIRouter, Request, Response
 from fastapi.responses import JSONResponse
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from utils.bd_client import BDClient  # API client for database interactions
 
 # Import custom utility modules
@@ -36,6 +39,33 @@ auth_router = APIRouter()
 
 # Instantiate the API client
 api_client = BDClient(BD_BASE_URL)
+
+password_private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+
+
+def decrypt_request_password(body: dict):
+    encrypted_password = body.get("encryptedPassword")
+    if not encrypted_password:
+        return body.get("password")
+
+    decrypted_password = password_private_key.decrypt(
+        base64.b64decode(encrypted_password),
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None,
+        ),
+    )
+    return decrypted_password.decode("utf-8")
+
+
+@auth_router.get("/password-public-key")
+async def get_password_public_key():
+    public_key = password_private_key.public_key().public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo,
+    )
+    return JSONResponse(content={"publicKey": public_key.decode("utf-8")}, status_code=200)
 
 # -------------------------------
 # Endpoint: Register a new user
@@ -62,6 +92,10 @@ async def register(request: Request):
     try:
         # Parse the JSON body from the request
         body = await request.json()
+        password = decrypt_request_password(body)
+
+        if not password:
+            return JSONResponse(status_code=400, content={"message": "Password é obrigatória."})
 
         # Prepare the payload for the REST API
         params = {
@@ -87,7 +121,7 @@ async def register(request: Request):
             return JSONResponse(status_code=400, content={"message":result})
 
         # Encrypt the user's password before storing it
-        hashed_password = utilities.hash_password(body.get("password"))
+        hashed_password = utilities.hash_password(password)
 
         # Prepare the new user object
         new_user = {
@@ -156,6 +190,10 @@ async def login(request: Request, response: Response):
     try:
         # Parse the JSON body from the request
         body = await request.json()
+        password = decrypt_request_password(body)
+
+        if not password:
+            return JSONResponse(status_code=400, content={"message": "Password é obrigatória."})
 
         # Prepare the payload for the REST API
         params = {
@@ -179,7 +217,7 @@ async def login(request: Request, response: Response):
         user_password = responseAdd.get("documents", [{}])[0].get("password", "unknown")
 
         # Check if the provided password matches the stored password
-        passwordMatch = utilities.validate_password(user_password, body.get("password"))
+        passwordMatch = utilities.validate_password(user_password, password)
 
         # If the passwords don't match, return a 400 responseAdd with an "Incorrect password" message
         if not passwordMatch:

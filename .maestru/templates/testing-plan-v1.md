@@ -11,6 +11,12 @@ created: {{created}}
 
 # {{title}}
 
+<!-- maestru:summary -->
+<!-- Guidelines:
+- Summarize the testing plan after the template is instantiated
+-->
+<!-- /maestru:summary -->
+
 ## Scope
 
 <!-- Guidelines:
@@ -36,6 +42,12 @@ created: {{created}}
 -->
 
 ## Impacted Files
+
+<!-- Guidelines:
+- List test files and implementation files impacted by this testing plan
+- Use Action to indicate create, update, or verify
+- Use Purpose to explain why each file is included
+-->
 
 | File | Action | Purpose |
 |------|--------|---------|

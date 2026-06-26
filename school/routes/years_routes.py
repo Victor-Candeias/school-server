@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Request
+from fastapi.responses import JSONResponse
 
 # Import custom utility modules
 from utils.bd_client import BDClient  # Database handling utilities
@@ -29,3 +30,27 @@ async def findbyid_years(request: Request,  _: None = Depends(utilities.verifica
 @years_router.post("/add")
 async def add_year(request: Request,  _: None = Depends(utilities.verificar_token_cookie)):
     return await utilities.add_document(api_client=api_client, request=request, collection=YEARS_COLLECTION, source="years_router", method="add_year")
+
+
+@years_router.put("/update")
+async def update_year(request: Request, _: None = Depends(utilities.verificar_token_cookie)):
+    body = await request.json()
+    year_id = body.get("id")
+    data = body.get("data")
+
+    if not year_id or not data:
+        return JSONResponse(
+            status_code=400,
+            content={"message": "Os campos 'id' e 'data' são obrigatórios."},
+        )
+
+    response = await api_client.update(
+        endpoint="update",
+        payload={"collection": YEARS_COLLECTION, "id": year_id, "data": data},
+    )
+
+    updated_year = response.get("modified_count")
+    if not updated_year:
+        return JSONResponse(status_code=404, content={"message": "Ano letivo não encontrado."})
+
+    return JSONResponse(content=updated_year, status_code=200)

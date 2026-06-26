@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Request
+from fastapi.responses import JSONResponse
 from httpx import request
 
 # Import custom utility modules
@@ -12,6 +13,81 @@ school_tests_router = APIRouter()
 
 # Instantiate the API client
 api_client = BDClient(BD_BASE_URL)
+
+APP_SETTINGS_COLLECTION = "appsettings"
+APP_SETTINGS_KEY = "global"
+DEFAULT_APP_SETTINGS = {
+    "key": APP_SETTINGS_KEY,
+    "inactiveLogoutMinutes": 15,
+}
+
+
+def normalize_inactive_logout_minutes(value):
+    if isinstance(value, bool):
+        return DEFAULT_APP_SETTINGS["inactiveLogoutMinutes"]
+
+    try:
+        minutes = int(value)
+    except (TypeError, ValueError):
+        return DEFAULT_APP_SETTINGS["inactiveLogoutMinutes"]
+
+    return minutes if minutes > 0 else DEFAULT_APP_SETTINGS["inactiveLogoutMinutes"]
+
+
+@school_tests_router.get("/app-settings")
+async def get_app_settings(_: None = Depends(utilities.verificar_token_cookie)):
+    payload = {"collection": APP_SETTINGS_COLLECTION, "query": {"key": APP_SETTINGS_KEY}}
+    response = await api_client.find(endpoint="find", payload=payload)
+    documents = response.get("documents") or []
+
+    if not documents:
+        created = await api_client.insert(
+            endpoint="insert",
+            payload={"collection": APP_SETTINGS_COLLECTION, "data": DEFAULT_APP_SETTINGS},
+        )
+        if not created.get("id"):
+            return JSONResponse(
+                status_code=500,
+                content={"message": "Erro ao criar configurações da aplicação."},
+            )
+        return JSONResponse(content=DEFAULT_APP_SETTINGS, status_code=200)
+
+    settings = documents[0]
+    settings["inactiveLogoutMinutes"] = normalize_inactive_logout_minutes(
+        settings.get("inactiveLogoutMinutes"),
+    )
+    return JSONResponse(content=settings, status_code=200)
+
+
+@school_tests_router.put("/app-settings")
+async def update_app_settings(request: Request, _: None = Depends(utilities.verificar_token_cookie)):
+    body = await request.json()
+    inactive_logout_minutes = normalize_inactive_logout_minutes(
+        body.get("inactiveLogoutMinutes"),
+    )
+    data = {
+        "key": APP_SETTINGS_KEY,
+        "inactiveLogoutMinutes": inactive_logout_minutes,
+    }
+    payload = {
+        "collection": APP_SETTINGS_COLLECTION,
+        "query": {"key": APP_SETTINGS_KEY},
+        "data": data,
+    }
+    response = await api_client.update(endpoint="update", payload=payload)
+
+    if response.get("modified_count", 0) == 0:
+        created = await api_client.insert(
+            endpoint="insert",
+            payload={"collection": APP_SETTINGS_COLLECTION, "data": data},
+        )
+        if not created.get("id"):
+            return JSONResponse(
+                status_code=500,
+                content={"message": "Erro ao atualizar configurações da aplicação."},
+            )
+
+    return JSONResponse(content=data, status_code=200)
 
 # curl -X POST http://127.0.0.1:8001/config/addtest -H "Content-Type: application/json" -d "{\"userid\": \"67e32c8bf97d9bb2e993e50d\", \"name\": \"teste 1\", \"questions\": [{\"question\":\"1\", \"value\": \"12\"}, {\"question\":\"2\", \"value\": \"10\"}]}"
 @school_tests_router.post("/addtest")

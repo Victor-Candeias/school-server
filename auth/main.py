@@ -38,11 +38,14 @@ origins = [
     "http://127.0.0.1:3000",
     "http://localhost:3001",  # Next.js em desenvolvimento
     "http://127.0.0.1:3001",
+    "http://localhost:5173",  # Vite em desenvolvimento
+    "http://127.0.0.1:5173",
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,  # Permite apenas essas origens
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+|192\.168\.\d+\.\d+)(:\d+)?",
     allow_credentials=True,  # Permite cookies
     allow_methods=["*"],  # Permite todos os métodos (GET, POST, etc.)
     allow_headers=["*"],  # Permite todos os headers

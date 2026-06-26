@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Request
+from fastapi.responses import JSONResponse
 from httpx import request
 
 # Import custom utility modules
@@ -29,3 +30,27 @@ async def find_school_byid(request: Request):
 @schools_router.post("/add")
 async def add_school(request: Request):
     return await utilities.add_document(api_client=api_client, request=request, collection=SCHOOLS_COLLECTION, source="schools_router", method="add_school")
+
+
+@schools_router.put("/update")
+async def update_school(request: Request):
+    body = await request.json()
+    school_id = body.get("id")
+    data = body.get("data")
+
+    if not school_id or not data:
+        return JSONResponse(
+            status_code=400,
+            content={"message": "Os campos 'id' e 'data' são obrigatórios."},
+        )
+
+    response = await api_client.update(
+        endpoint="update",
+        payload={"collection": SCHOOLS_COLLECTION, "id": school_id, "data": data},
+    )
+
+    updated_school = response.get("modified_count")
+    if not updated_school:
+        return JSONResponse(status_code=404, content={"message": "Escola não encontrada."})
+
+    return JSONResponse(content=updated_school, status_code=200)

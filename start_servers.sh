@@ -3,6 +3,21 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+docker_compose() {
+    if docker info >/dev/null 2>&1; then
+        docker compose "$@"
+    else
+        sudo docker compose "$@"
+    fi
+}
+
+start_infrastructure() {
+    echo "=== A iniciar infraestrutura Docker ==="
+    cd "$SCRIPT_DIR"
+    docker_compose -f compose.yaml up -d mongodb
+    echo "=== MongoDB pronto em mongodb://localhost:27017 ==="
+}
+
 setup_service() {
     local name=$1
     local dir="$SCRIPT_DIR/$name"
@@ -23,11 +38,14 @@ start_service() {
     echo "=== A iniciar $name ==="
     cd "$dir"
     source .venv/bin/activate
-    python3 main.py &
+    HOST=0.0.0.0 python3 main.py &
     deactivate
     echo "$name iniciado (PID: $!)"
     sleep 2
 }
+
+# Iniciar dependências Docker
+start_infrastructure
 
 # Instalar dependências
 setup_service db_service
