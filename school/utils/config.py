@@ -15,7 +15,8 @@ STUDENTS_COLLECTION: str = "students"
 TESTS_COLLECTION: str = "schooltestes"
 STUDENT_TESTES_COLLECTION: str = "classtestes"
 MOMENTS_COLLECTION: str = "testsmoments"
-CLASS_MOMENTS_COLLECTION: str = "classtestsmoments"
+CLASS_MOMENTS_COLLECTION: str = "studentstestmoments"
+SEMESTER_EVALUATIONS_COLLECTION: str = "semesterstudentsevaluations"
 # MongoDB connection string
 
 BD_BASE_URL: str = os.getenv("BD_BASE_URL", "http://127.0.0.1:8000/db-api")

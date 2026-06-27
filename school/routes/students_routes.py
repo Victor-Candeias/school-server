@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Request
+from fastapi.responses import JSONResponse
 from httpx import request
 
 # Import custom utility modules
@@ -29,3 +30,50 @@ async def findbyid_class_students(request: Request):
 @students_router.post("/add")
 async def add_class_student(request: Request):
     return await utilities.add_document(api_client=api_client, request=request, collection=STUDENTS_COLLECTION, source="students_routes", method="add_class_student")
+
+
+@students_router.put("/update")
+async def update_class_student(request: Request):
+    body = await request.json()
+    student_id = body.get("id")
+    data = body.get("data")
+
+    if not student_id or not data:
+        return JSONResponse(
+            status_code=400,
+            content={"message": "Os campos 'id' e 'data' são obrigatórios."},
+        )
+
+    response = await api_client.update(
+        endpoint="update",
+        payload={"collection": STUDENTS_COLLECTION, "id": student_id, "data": data},
+    )
+
+    updated_student = response.get("modified_count")
+    if not updated_student:
+        return JSONResponse(status_code=404, content={"message": "Aluno não encontrado."})
+
+    return JSONResponse(content=updated_student, status_code=200)
+
+
+@students_router.delete("/delete")
+async def delete_class_student(request: Request):
+    body = await request.json()
+    student_id = body.get("id")
+
+    if not student_id:
+        return JSONResponse(
+            status_code=400,
+            content={"message": "O campo 'id' é obrigatório."},
+        )
+
+    response = await api_client.delete(
+        endpoint="delete",
+        payload={"collection": STUDENTS_COLLECTION, "id": student_id},
+    )
+
+    deleted_count = response.get("deleted_count", 0)
+    if not deleted_count:
+        return JSONResponse(status_code=404, content={"message": "Aluno não encontrado."})
+
+    return JSONResponse(content=deleted_count, status_code=200)

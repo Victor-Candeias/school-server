@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Request
+from fastapi.responses import JSONResponse
 
 # Import custom utility modules
 from utils.bd_client import BDClient  # Database handling utilities
@@ -29,6 +30,30 @@ async def findbyid_classes(request: Request):
 @class_router.post("/add")
 async def add_class(request: Request):
     return await utilities.add_document(api_client=api_client, request=request, collection=CLASSES_COLLECTION, source="class_routes", method="add_class")
+
+
+@class_router.put("/update")
+async def update_class(request: Request):
+    body = await request.json()
+    class_id = body.get("id")
+    data = body.get("data")
+
+    if not class_id or not data:
+        return JSONResponse(
+            status_code=400,
+            content={"message": "Os campos 'id' e 'data' são obrigatórios."},
+        )
+
+    response = await api_client.update(
+        endpoint="update",
+        payload={"collection": CLASSES_COLLECTION, "id": class_id, "data": data},
+    )
+
+    updated_class = response.get("modified_count")
+    if not updated_class:
+        return JSONResponse(status_code=404, content={"message": "Turma não encontrada."})
+
+    return JSONResponse(content=updated_class, status_code=200)
 
 # curl -X GET http://127.0.0.1:8001/class/levels -H  "Content-Type: application/json"
 @class_router.get("/levels")

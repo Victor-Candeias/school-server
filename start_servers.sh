@@ -14,7 +14,7 @@ docker_compose() {
 start_infrastructure() {
     echo "=== A iniciar infraestrutura Docker ==="
     cd "$SCRIPT_DIR"
-    docker_compose -f compose.yaml up -d mongodb
+    docker_compose -f db_service/docker-compose.yml up -d mongo
     echo "=== MongoDB pronto em mongodb://localhost:27017 ==="
 }
 
@@ -38,7 +38,11 @@ start_service() {
     echo "=== A iniciar $name ==="
     cd "$dir"
     source .venv/bin/activate
-    HOST=0.0.0.0 python3 main.py &
+    HOST=0.0.0.0 \
+    MONGO_DB_CONNECTION_STRING="${MONGO_DB_CONNECTION_STRING:-mongodb://localhost:27017}" \
+    DATABASE_NAME="${DATABASE_NAME:-school}" \
+    BD_BASE_URL="${BD_BASE_URL:-http://127.0.0.1:8000/db-api}" \
+    python3 main.py &
     deactivate
     echo "$name iniciado (PID: $!)"
     sleep 2

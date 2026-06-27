@@ -235,7 +235,15 @@ async def login(request: Request, response: Response):
         role = responseAdd.get("documents", [{}])[0].get("role", "unknown")
 
         # Return the generated token
-        return JSONResponse(status_code=200, content={"message": "Login realizado com sucesso.", "token": token, "role": role})
+        return JSONResponse(
+            status_code=200,
+            content={
+                "message": "Login realizado com sucesso.",
+                "token": token,
+                "userId": user_id,
+                "role": role,
+            },
+        )
     
     except Exception as e:
         # Handle unexpected errors
