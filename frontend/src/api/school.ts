@@ -7,6 +7,9 @@ export type AppSettings = {
   inactiveLogoutMinutes: number
   messageTimeoutSeconds: number
   percentageRanges: PercentageRange[]
+  academicPeriodType?: string
+  semesterPeriods?: unknown[]
+  trimesterPeriods?: unknown[]
 }
 
 export type PercentageRange = {
@@ -89,6 +92,17 @@ export const schoolApi = {
     apiRequest<{ id?: string; value: SchoolDocument }>(
       API_CONFIG.schoolBaseUrl,
       '/config/upsertmomentvalue',
+      {
+        method: 'PUT',
+        body: document,
+      },
+    ),
+  findStudentCalendarTasks: (query?: Record<string, unknown>) =>
+    findCollection('/config/findstudentscalendar', query),
+  addStudentCalendarTask: (document: SchoolDocument) =>
+    apiRequest<{ id?: string; value: SchoolDocument }>(
+      API_CONFIG.schoolBaseUrl,
+      '/config/addstudentscalendar',
       {
         method: 'PUT',
         body: document,

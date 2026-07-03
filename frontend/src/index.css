@@ -1,7 +1,6 @@
 :root {
-  font: 18px/145% system-ui, 'Segoe UI', Roboto, sans-serif;
-  color: #e5e7eb;
-  background: #171a23;
+  font: 18px/1.5 system-ui, 'Segoe UI', Roboto, sans-serif;
+  color: #1e293b;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -20,7 +19,11 @@ body,
   min-height: 100%;
   margin: 0;
   overflow: hidden;
-  background: #171a23;
+  background-image: url('/Background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 body {

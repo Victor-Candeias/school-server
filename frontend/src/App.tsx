@@ -1,4 +1,12 @@
 import { useEffect, useState } from 'react'
+import {
+  ResponsiveContainer,
+  BarChart, Bar, Cell, LabelList,
+  LineChart, Line,
+  AreaChart, Area,
+  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+} from 'recharts'
 import { authApi } from './api/auth'
 import { schoolApi } from './api/school'
 import type { LoginResponse } from './api/auth'
@@ -20,6 +28,7 @@ const DEFAULT_PERCENTAGE_RANGES: PercentageRange[] = [
 ]
 
 type SchoolForm = {
+  schoolId: string
   name: string
   group: string
   address: string
@@ -56,13 +65,53 @@ type EvaluationQuestionForm = {
   value: string
 }
 
+type StudentCalendarTaskForm = {
+  title: string
+  description: string
+  startTime: string
+  endTime: string
+}
+
 type ClassForm = {
-  name: string
+  classYear: string
+  classLetter: string
   directorName: string
   students: StudentForm[]
 }
 
 type DashboardSection = 'schools' | 'years' | 'classes' | 'students' | 'settings'
+type StudentsMenuOption = 0 | 1 | 2 | 3 | 4 | 5
+type ChartType = 'bar' | 'line' | 'area' | 'radar'
+type StudentCalendarWeekMode = 'work' | 'full'
+type AcademicPeriodType = 'semestres' | 'trimestres'
+
+type AcademicPeriod = {
+  id: string
+  label: string
+  startDate: string
+  endDate: string
+}
+
+const DEFAULT_ACADEMIC_PERIOD_TYPE: AcademicPeriodType = 'semestres'
+
+function buildDefaultSemesterPeriods(): AcademicPeriod[] {
+  const y = new Date().getFullYear()
+  const y1 = y + 1
+  return [
+    { id: 'sem1', label: '1.º Semestre', startDate: `${y}-09-01`, endDate: `${y1}-02-15` },
+    { id: 'sem2', label: '2.º Semestre', startDate: `${y1}-01-02`, endDate: `${y1}-06-15` },
+  ]
+}
+
+function buildDefaultTrimesterPeriods(): AcademicPeriod[] {
+  const y = new Date().getFullYear()
+  const y1 = y + 1
+  return [
+    { id: 'trim1', label: '1.º Trimestre', startDate: `${y}-09-01`,  endDate: `${y}-12-15`  },
+    { id: 'trim2', label: '2.º Trimestre', startDate: `${y1}-01-02`, endDate: `${y1}-03-15` },
+    { id: 'trim3', label: '3.º Trimestre', startDate: `${y1}-04-01`, endDate: `${y1}-06-15` },
+  ]
+}
 
 type AcademicYearOption = {
   value: string
@@ -71,7 +120,29 @@ type AcademicYearOption = {
   endYear: number
 }
 
+type StudentCalendarDay = {
+  date: Date
+  day: number
+  isCurrentMonth: boolean
+  isWeekend: boolean
+  isToday: boolean
+  key: string
+}
+
+const STUDENTS_MENU_OPTIONS: { id: StudentsMenuOption; label: string }[] = [
+  { id: 0, label: 'Calendário' },
+  { id: 1, label: 'Alunos' },
+  { id: 2, label: 'Momento de Avaliação' },
+  { id: 3, label: 'Alunos/M.Avaliação' },
+  { id: 4, label: 'Avaliações' },
+  { id: 5, label: 'Gráficos' },
+]
+
+const CALENDAR_WEEKDAYS = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
+const CALENDAR_WORK_WEEKDAY_COUNT = 5
+
 const EMPTY_SCHOOL_FORM: SchoolForm = {
+  schoolId: '',
   name: '',
   group: '',
   address: '',
@@ -85,7 +156,8 @@ const EMPTY_SCHOOL_FORM: SchoolForm = {
 }
 
 const EMPTY_CLASS_FORM: ClassForm = {
-  name: '',
+  classYear: '',
+  classLetter: '',
   directorName: '',
   students: [],
 }
@@ -112,6 +184,13 @@ const EMPTY_EVALUATION_MOMENT_FORM: EvaluationMomentForm = {
 const EMPTY_EVALUATION_QUESTION_FORM: EvaluationQuestionForm = {
   questionNumber: '',
   value: '',
+}
+
+const EMPTY_STUDENT_CALENDAR_TASK_FORM: StudentCalendarTaskForm = {
+  title: '',
+  description: '',
+  startTime: '08:00',
+  endTime: '09:00',
 }
 
 type PasswordStrength = {
@@ -221,7 +300,152 @@ function normalizeNonNegativeInteger(value: unknown, fallback: number) {
   return Number.isFinite(numericValue) && numericValue >= 0 ? Math.trunc(numericValue) : fallback
 }
 
+function getCalendarDateKey(date: Date) {
+  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
+}
+
+function getCalendarDateTime(date: Date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
+function isSameCalendarDay(leftDate: Date, rightDate: Date) {
+  return (
+    leftDate.getFullYear() === rightDate.getFullYear() &&
+    leftDate.getMonth() === rightDate.getMonth() &&
+    leftDate.getDate() === rightDate.getDate()
+  )
+}
+
+function getMondayFirstWeekdayIndex(date: Date) {
+  return (date.getDay() + 6) % 7
+}
+
+function isCalendarWeekend(date: Date) {
+  return getMondayFirstWeekdayIndex(date) >= CALENDAR_WORK_WEEKDAY_COUNT
+}
+
+function getDefaultStudentCalendarWeekMode() {
+  return isCalendarWeekend(new Date()) ? 'full' : 'work'
+}
+
+function getFirstVisibleMonthDay(year: number, month: number, showFullWeek: boolean) {
+  const date = new Date(year, month, 1)
+
+  while (!showFullWeek && getMondayFirstWeekdayIndex(date) >= CALENDAR_WORK_WEEKDAY_COUNT) {
+    date.setDate(date.getDate() + 1)
+  }
+
+  return date
+}
+
+function getLastVisibleMonthDay(year: number, month: number, showFullWeek: boolean) {
+  const date = new Date(year, month + 1, 0)
+
+  while (!showFullWeek && getMondayFirstWeekdayIndex(date) >= CALENDAR_WORK_WEEKDAY_COUNT) {
+    date.setDate(date.getDate() - 1)
+  }
+
+  return date
+}
+
+function getStudentCalendarDays(calendarDate: Date, showFullWeek: boolean): StudentCalendarDay[] {
+  const year = calendarDate.getFullYear()
+  const month = calendarDate.getMonth()
+  const visibleWeekdayCount = showFullWeek ? CALENDAR_WEEKDAYS.length : CALENDAR_WORK_WEEKDAY_COUNT
+  const firstVisibleMonthDay = getFirstVisibleMonthDay(year, month, showFullWeek)
+  const lastVisibleMonthDay = getLastVisibleMonthDay(year, month, showFullWeek)
+  const startOffset = getMondayFirstWeekdayIndex(firstVisibleMonthDay)
+  const endOffset = visibleWeekdayCount - 1 - getMondayFirstWeekdayIndex(lastVisibleMonthDay)
+  const firstGridDay = new Date(year, month, firstVisibleMonthDay.getDate() - startOffset)
+  const lastGridDay = new Date(year, month, lastVisibleMonthDay.getDate() + endOffset)
+  const today = new Date()
+  const calendarDays: StudentCalendarDay[] = []
+
+  for (
+    let weekStart = new Date(firstGridDay);
+    weekStart <= lastGridDay;
+    weekStart.setDate(weekStart.getDate() + 7)
+  ) {
+    for (let weekdayIndex = 0; weekdayIndex < visibleWeekdayCount; weekdayIndex += 1) {
+      const date = new Date(
+        weekStart.getFullYear(),
+        weekStart.getMonth(),
+        weekStart.getDate() + weekdayIndex,
+      )
+
+      calendarDays.push({
+        date,
+        day: date.getDate(),
+        isCurrentMonth: date.getMonth() === month,
+        isWeekend: isCalendarWeekend(date),
+        isToday: isSameCalendarDay(date, today),
+        key: getCalendarDateKey(date),
+      })
+    }
+  }
+
+  return calendarDays
+}
+
+function getStudentCalendarMonthLabel(calendarDate: Date) {
+  return new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(calendarDate)
+}
+
+function getStudentCalendarDayLabel(calendarDate: Date) {
+  return new Intl.DateTimeFormat('pt-PT', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  }).format(calendarDate)
+}
+
+function getCalendarTimeMinutes(value: string) {
+  const match = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(value)
+  if (!match) {
+    return null
+  }
+
+  return Number(match[1]) * 60 + Number(match[2])
+}
+
+function doCalendarTimesOverlap(
+  firstStart: string,
+  firstEnd: string,
+  secondStart: string,
+  secondEnd: string,
+) {
+  const firstStartMinutes = getCalendarTimeMinutes(firstStart)
+  const firstEndMinutes = getCalendarTimeMinutes(firstEnd)
+  const secondStartMinutes = getCalendarTimeMinutes(secondStart)
+  const secondEndMinutes = getCalendarTimeMinutes(secondEnd)
+
+  if (
+    firstStartMinutes === null ||
+    firstEndMinutes === null ||
+    secondStartMinutes === null ||
+    secondEndMinutes === null
+  ) {
+    return false
+  }
+
+  return firstStartMinutes < secondEndMinutes && secondStartMinutes < firstEndMinutes
+}
+
+function formatCalendarTimeFromMinutes(value: number) {
+  const clampedValue = Math.min(Math.max(value, 0), 23 * 60 + 59)
+  const hours = Math.floor(clampedValue / 60)
+  const minutes = clampedValue % 60
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+}
+
 function App() {
+  const [darkMode, setDarkMode] = useState<boolean>(() => localStorage.getItem('darkMode') === 'true')
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -240,6 +464,7 @@ function App() {
   const [allStudents, setAllStudents] = useState<SchoolDocument[]>([])
   const [allEvaluationMoments, setAllEvaluationMoments] = useState<SchoolDocument[]>([])
   const [allStudentMomentValues, setAllStudentMomentValues] = useState<SchoolDocument[]>([])
+  const [studentCalendarTasks, setStudentCalendarTasks] = useState<SchoolDocument[]>([])
   const [yearsError, setYearsError] = useState<string | null>(null)
   const [isLoadingYears, setIsLoadingYears] = useState(false)
   const [classesError, setClassesError] = useState<string | null>(null)
@@ -249,15 +474,27 @@ function App() {
   const [isStudentModalOpen, setIsStudentModalOpen] = useState(false)
   const [isEvaluationMomentModalOpen, setIsEvaluationMomentModalOpen] = useState(false)
   const [isEvaluationQuestionModalOpen, setIsEvaluationQuestionModalOpen] = useState(false)
+  const [isCalendarTaskModalOpen, setIsCalendarTaskModalOpen] = useState(false)
+  const [isCreatingCalendarTask, setIsCreatingCalendarTask] = useState(false)
   const [editingYearId, setEditingYearId] = useState<string | null>(null)
   const [editingClassId, setEditingClassId] = useState<string | null>(null)
   const [editingStudentId, setEditingStudentId] = useState<string | null>(null)
   const [editingEvaluationMomentId, setEditingEvaluationMomentId] = useState<string | null>(null)
   const [studentActionMenuId, setStudentActionMenuId] = useState<string | null>(null)
-  const [activeStudentsMenuOption, setActiveStudentsMenuOption] = useState(1)
+  const [activeStudentsMenuOption, setActiveStudentsMenuOption] = useState<StudentsMenuOption>(1)
+  const [studentCalendarDate, setStudentCalendarDate] = useState(() => new Date())
+  const [studentCalendarWeekMode, setStudentCalendarWeekMode] =
+    useState<StudentCalendarWeekMode>(() => getDefaultStudentCalendarWeekMode())
+  const [selectedStudentCalendarDay, setSelectedStudentCalendarDay] =
+    useState<StudentCalendarDay | null>(null)
+  const [newStudentCalendarTask, setNewStudentCalendarTask] =
+    useState<StudentCalendarTaskForm>(EMPTY_STUDENT_CALENDAR_TASK_FORM)
   const [selectedGradingMomentId, setSelectedGradingMomentId] = useState('')
   const [selectedAssessmentsSemester, setSelectedAssessmentsSemester] = useState('')
   const [assessmentCellDrafts, setAssessmentCellDrafts] = useState<Record<string, string>>({})
+  const [chartStudentId, setChartStudentId] = useState('')
+  const [chartType, setChartType] = useState<ChartType>('bar')
+  const [chartMomentId, setChartMomentId] = useState('')
   const [selectedAcademicYearDocument, setSelectedAcademicYearDocument] =
     useState<SchoolDocument | null>(null)
   const academicYearOptions = getAcademicYearOptions()
@@ -283,7 +520,26 @@ function App() {
   const [percentageRanges, setPercentageRanges] = useState<PercentageRange[]>(
     DEFAULT_PERCENTAGE_RANGES,
   )
+  const [academicPeriodType, setAcademicPeriodType] = useState<AcademicPeriodType>(
+    DEFAULT_ACADEMIC_PERIOD_TYPE,
+  )
+  const [semesterPeriods, setSemesterPeriods] = useState<AcademicPeriod[]>(buildDefaultSemesterPeriods)
+  const [trimesterPeriods, setTrimesterPeriods] = useState<AcademicPeriod[]>(buildDefaultTrimesterPeriods)
+  const [yearPeriodType, setYearPeriodType] = useState<AcademicPeriodType>(DEFAULT_ACADEMIC_PERIOD_TYPE)
   const passwordStrength = getPasswordStrength(password)
+  const isStudentCalendarFullWeek = studentCalendarWeekMode === 'full'
+  const visibleStudentCalendarWeekdays = isStudentCalendarFullWeek
+    ? CALENDAR_WEEKDAYS
+    : CALENDAR_WEEKDAYS.slice(0, CALENDAR_WORK_WEEKDAY_COUNT)
+  const studentCalendarDays = getStudentCalendarDays(studentCalendarDate, isStudentCalendarFullWeek)
+  const selectedStudentCalendarTasks = selectedStudentCalendarDay
+    ? getStudentCalendarTasksForDate(selectedStudentCalendarDay.date)
+    : []
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', darkMode)
+    localStorage.setItem('darkMode', String(darkMode))
+  }, [darkMode])
 
   useEffect(() => {
     if (!user) {
@@ -294,6 +550,7 @@ function App() {
       setAllStudents([])
       setAllEvaluationMoments([])
       setAllStudentMomentValues([])
+      setStudentCalendarTasks([])
       return
     }
 
@@ -341,6 +598,7 @@ function App() {
         setAllStudents([])
         setAllEvaluationMoments([])
         setAllStudentMomentValues([])
+        setStudentCalendarTasks([])
         setSelectedAcademicYearDocument(null)
         setSelectedClass(null)
         setActiveDashboard('schools')
@@ -397,6 +655,15 @@ function App() {
         normalizePositiveInteger(settings.messageTimeoutSeconds, DEFAULT_MESSAGE_TIMEOUT_SECONDS),
       )
       setPercentageRanges(normalizePercentageRanges(settings.percentageRanges))
+      if (settings.academicPeriodType === 'semestres' || settings.academicPeriodType === 'trimestres') {
+        setAcademicPeriodType(settings.academicPeriodType)
+      }
+      if (Array.isArray(settings.semesterPeriods) && settings.semesterPeriods.length === 2) {
+        setSemesterPeriods(settings.semesterPeriods as AcademicPeriod[])
+      }
+      if (Array.isArray(settings.trimesterPeriods) && settings.trimesterPeriods.length === 3) {
+        setTrimesterPeriods(settings.trimesterPeriods as AcademicPeriod[])
+      }
     } catch (settingsError) {
       setError(
         settingsError instanceof Error
@@ -506,6 +773,41 @@ function App() {
     }
   }
 
+  async function loadStudentCalendarTasks(schoolClass = selectedClass) {
+    if (!selectedSchool || !selectedAcademicYearDocument || !schoolClass) {
+      setStudentCalendarTasks([])
+      return
+    }
+
+    const schoolId = getSchoolId(selectedSchool)
+    const yearId = getDocumentId(selectedAcademicYearDocument)
+    const classId = getDocumentId(schoolClass)
+
+    if (!schoolId || !yearId || !classId) {
+      setStudentCalendarTasks([])
+      setClassesError('Não foi possível identificar a turma para carregar o calendário.')
+      return
+    }
+
+    try {
+      const existingTasks = await schoolApi.findStudentCalendarTasks({
+        userId: getLoggedUserId(),
+        schoolId,
+        yearId,
+        classId,
+      })
+      setStudentCalendarTasks(sortStudentCalendarTasks(existingTasks))
+    } catch (calendarError) {
+      const errorMessage =
+        calendarError instanceof Error ? calendarError.message : 'Erro ao carregar tarefas do calendário.'
+
+      setStudentCalendarTasks([])
+      if (!errorMessage.includes('HTTP 400')) {
+        setClassesError(errorMessage)
+      }
+    }
+  }
+
   async function saveAppSettings(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setIsLoadingClasses(true)
@@ -516,6 +818,9 @@ function App() {
         inactiveLogoutMinutes,
         messageTimeoutSeconds,
         percentageRanges,
+        academicPeriodType,
+        semesterPeriods,
+        trimesterPeriods,
       })
       setInactiveLogoutMinutes(
         normalizePositiveInteger(settings.inactiveLogoutMinutes, DEFAULT_INACTIVITY_LOGOUT_MINUTES),
@@ -555,6 +860,18 @@ function App() {
     )
   }
 
+  function updatePeriodDate(
+    type: 'semestres' | 'trimestres',
+    periodId: string,
+    field: 'startDate' | 'endDate',
+    value: string,
+  ) {
+    const setter = type === 'semestres' ? setSemesterPeriods : setTrimesterPeriods
+    setter((current) =>
+      current.map((p) => (p.id === periodId ? { ...p, [field]: value } : p)),
+    )
+  }
+
   async function handleCreateAcademicYear(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
@@ -583,6 +900,21 @@ function App() {
         name: option.label,
         startYear: option.startYear,
         endYear: option.endYear,
+        periodType: yearPeriodType,
+      }
+
+      // Impede duplicados: mesmo ano letivo na mesma escola
+      const duplicate = academicYears.find((y) => {
+        if (editingYearId && getDocumentId(y) === editingYearId) return false
+        return (
+          Number(y.startYear) === option.startYear &&
+          Number(y.endYear) === option.endYear
+        )
+      })
+      if (duplicate) {
+        setYearsError(`O ano letivo ${option.label} já existe para esta escola.`)
+        setIsLoadingYears(false)
+        return
       }
 
       if (editingYearId) {
@@ -621,6 +953,17 @@ function App() {
 
     try {
       const schoolPayload = getSchoolPayload()
+
+      // Impede duplicados: mesmo schoolId
+      const duplicate = schools.find((s) => {
+        if (editingSchoolId && getSchoolId(s) === editingSchoolId) return false
+        return getStringValue(s.schoolId).trim().toLowerCase() === schoolPayload.schoolId.toLowerCase()
+      })
+      if (duplicate) {
+        setSchoolsError(`Já existe uma escola com o ID "${schoolPayload.schoolId}".`)
+        setIsLoadingSchools(false)
+        return
+      }
 
       if (editingSchoolId) {
         await schoolApi.updateSchool(editingSchoolId, schoolPayload)
@@ -665,11 +1008,27 @@ function App() {
     setClassesError(null)
 
     try {
+      const className = `${newClass.classYear.trim()}.º ${newClass.classLetter.trim().toUpperCase()}`
+
+      // Impede duplicados: mesmo ano + letra no mesmo ano letivo
+      const duplicate = allClasses.find((c) => {
+        if (editingClassId && getDocumentId(c) === editingClassId) return false
+        return (
+          getStringValue(c.yearId) === yearId &&
+          getClassTitle(c).trim().toLowerCase() === className.toLowerCase()
+        )
+      })
+      if (duplicate) {
+        setClassesError(`Já existe a turma "${className}" neste ano letivo.`)
+        setIsLoadingClasses(false)
+        return
+      }
+
       if (editingClassId) {
         const currentClass = allClasses.find((schoolClass) => getDocumentId(schoolClass) === editingClassId)
         const classPayload = {
           ...currentClass,
-          name: newClass.name.trim(),
+          name: className,
           director: {
             name: newClass.directorName.trim(),
           },
@@ -683,7 +1042,6 @@ function App() {
         )
       } else {
         const userId = getLoggedUserId()
-        const className = newClass.name.trim()
         const schoolName = getSchoolTitle(selectedSchool)
         const academicYearName = getAcademicYearTitle(selectedAcademicYearDocument)
         const classPayload = {
@@ -745,6 +1103,7 @@ function App() {
 
     return {
       userId: getLoggedUserId(),
+      schoolId: newSchool.schoolId.trim(),
       name: newSchool.name.trim(),
       group: newSchool.group.trim() || undefined,
       address: {
@@ -771,7 +1130,7 @@ function App() {
     updateNewSchoolField('postalCode', formatPostalCode(value))
   }
 
-  function updateNewClassField(field: 'name' | 'directorName', value: string) {
+  function updateNewClassField(field: 'classYear' | 'classLetter' | 'directorName', value: string) {
     setNewClass((currentClass) => ({
       ...currentClass,
       [field]: value,
@@ -936,6 +1295,20 @@ function App() {
       return
     }
 
+    // Validação de número único dentro do formulário da turma
+    const newSchoolNumber = newStudent.schoolNumber.trim()
+    const duplicateInForm = newClass.students.some(
+      (s) => s.schoolNumber.trim() === newSchoolNumber,
+    )
+    // Validação contra alunos já existentes na escola
+    const duplicateInDb = allStudents.some(
+      (s) => getStringValue(s.schoolNumber).trim() === newSchoolNumber,
+    )
+    if (duplicateInForm || duplicateInDb) {
+      setClassesError(`O número de escola "${newSchoolNumber}" já está em uso.`)
+      return
+    }
+
     setNewClass((currentClass) => ({
       ...currentClass,
       students: [
@@ -943,7 +1316,7 @@ function App() {
         {
           ...newStudent,
           name: newStudent.name.trim(),
-          schoolNumber: newStudent.schoolNumber.trim(),
+          schoolNumber: newSchoolNumber,
           schoolEmail: newStudent.schoolEmail.trim(),
           guardianName: newStudent.guardianName.trim(),
           guardianPhone: newStudent.guardianPhone.trim(),
@@ -974,11 +1347,23 @@ function App() {
     setClassesError(null)
 
     try {
+      const schoolNumber = newStudent.schoolNumber.trim()
+
+      // Validação: número único na escola
+      const duplicate = allStudents.some(
+        (s) => getStringValue(s.schoolNumber).trim() === schoolNumber,
+      )
+      if (duplicate) {
+        setClassesError(`O número de escola "${schoolNumber}" já está em uso.`)
+        setIsLoadingClasses(false)
+        return
+      }
+
       await schoolApi.addStudent({
         userId: getLoggedUserId(),
         id: newStudent.id,
         name: newStudent.name.trim(),
-        schoolNumber: newStudent.schoolNumber.trim(),
+        schoolNumber,
         schoolEmail: newStudent.schoolEmail.trim(),
         guardian: {
           name: newStudent.guardianName.trim(),
@@ -1018,13 +1403,26 @@ function App() {
     setClassesError(null)
 
     try {
+      const schoolNumber = newStudent.schoolNumber.trim()
+
+      // Validação: número único excluindo o próprio aluno
+      const duplicate = allStudents.some(
+        (s) => getDocumentId(s) !== editingStudentId &&
+          getStringValue(s.schoolNumber).trim() === schoolNumber,
+      )
+      if (duplicate) {
+        setClassesError(`O número de escola "${schoolNumber}" já está em uso.`)
+        setIsLoadingClasses(false)
+        return
+      }
+
       const { _id, ...studentPayload } = currentStudent
 
       await schoolApi.updateStudent(editingStudentId, {
         ...studentPayload,
         id: newStudent.id,
         name: newStudent.name.trim(),
-        schoolNumber: newStudent.schoolNumber.trim(),
+        schoolNumber,
         schoolEmail: newStudent.schoolEmail.trim(),
         guardian: {
           name: newStudent.guardianName.trim(),
@@ -1070,12 +1468,6 @@ function App() {
     setIsCreateSchoolModalOpen(true)
   }
 
-  function openSchoolsDashboard() {
-    setSelectedSchool(null)
-    setSelectedAcademicYearDocument(null)
-    setActiveDashboard('schools')
-  }
-
   function openYearsDashboard(school: SchoolDocument) {
     setSelectedSchool(school)
     setSelectedAcademicYearDocument(null)
@@ -1085,6 +1477,7 @@ function App() {
   function openCreateYearModal() {
     setEditingYearId(null)
     setSelectedAcademicYear(academicYearOptions[0].value)
+    setYearPeriodType(academicPeriodType)
     setIsCreateYearModalOpen(true)
   }
 
@@ -1102,9 +1495,13 @@ function App() {
     }
 
     const director = getRecordValue(schoolClass.director)
+    const existingName = getClassTitle(schoolClass)
+    // Tenta separar "7.º A" → year="7", letter="A"
+    const nameMatch = existingName.match(/^(\d+)(?:\.º)?\s+(.+)$/)
     setEditingClassId(classId)
     setNewClass({
-      name: getClassTitle(schoolClass),
+      classYear: nameMatch ? nameMatch[1] : '',
+      classLetter: nameMatch ? nameMatch[2] : existingName,
       directorName: getStringValue(director.name),
       students: [],
     })
@@ -1287,12 +1684,14 @@ function App() {
 
     setEditingYearId(yearId)
     setSelectedAcademicYear(getAcademicYearTitle(year))
+    setYearPeriodType((year.periodType as AcademicPeriodType) ?? academicPeriodType)
     setIsCreateYearModalOpen(true)
   }
 
   function openClassesDashboard(year: SchoolDocument) {
     setSelectedAcademicYearDocument(year)
     setSelectedClass(null)
+    setStudentCalendarTasks([])
     setActiveDashboard('classes')
   }
 
@@ -1302,7 +1701,9 @@ function App() {
     setSelectedGradingMomentId('')
     setSelectedAssessmentsSemester('')
     setAssessmentCellDrafts({})
+    setStudentCalendarTasks([])
     setActiveDashboard('students')
+    void loadStudentCalendarTasks(schoolClass)
   }
 
   function openSettingsDashboard() {
@@ -1335,7 +1736,7 @@ function App() {
     }
 
     if (activeDashboard === 'settings') {
-      return 'Configurações gerais da aplicação.'
+      return ''
     }
 
     if (activeDashboard === 'classes' && selectedAcademicYearDocument) {
@@ -1402,6 +1803,122 @@ function App() {
         student.active !== false &&
         (student.classId === classId || student.className === className),
     )
+  }
+
+  function getStudentCalendarTaskDate(task: SchoolDocument) {
+    return getStringValue(task.date)
+  }
+
+  function getStudentCalendarTaskStartTime(task: SchoolDocument) {
+    return getStringValue(task.startTime)
+  }
+
+  function getStudentCalendarTaskEndTime(task: SchoolDocument) {
+    return getStringValue(task.endTime)
+  }
+
+  function getStudentCalendarTaskTitle(task: SchoolDocument) {
+    return getStringValue(task.title) || 'Tarefa sem título'
+  }
+
+  function sortStudentCalendarTasks(tasks: SchoolDocument[]) {
+    return [...tasks].sort((leftTask, rightTask) => {
+      const leftDate = getStudentCalendarTaskDate(leftTask)
+      const rightDate = getStudentCalendarTaskDate(rightTask)
+
+      if (leftDate !== rightDate) {
+        return leftDate.localeCompare(rightDate)
+      }
+
+      return getStudentCalendarTaskStartTime(leftTask).localeCompare(
+        getStudentCalendarTaskStartTime(rightTask),
+      )
+    })
+  }
+
+  function getStudentCalendarTasksForDate(date: Date) {
+    const dateKey = getCalendarDateTime(date)
+
+    return studentCalendarTasks.filter((task) => getStudentCalendarTaskDate(task) === dateKey)
+  }
+
+  function getNextStudentCalendarTaskForm(tasks: SchoolDocument[]): StudentCalendarTaskForm {
+    const sortedIntervals = tasks
+      .map((task) => {
+        const startMinutes = getCalendarTimeMinutes(getStudentCalendarTaskStartTime(task))
+        const endMinutes = getCalendarTimeMinutes(getStudentCalendarTaskEndTime(task))
+
+        return startMinutes === null || endMinutes === null ? null : { startMinutes, endMinutes }
+      })
+      .filter((interval): interval is { startMinutes: number; endMinutes: number } => (
+        interval !== null
+      ))
+      .sort((leftInterval, rightInterval) => leftInterval.startMinutes - rightInterval.startMinutes)
+    let nextStart = 8 * 60
+
+    for (const interval of sortedIntervals) {
+      if (nextStart + 60 <= interval.startMinutes) {
+        break
+      }
+
+      nextStart = Math.max(nextStart, interval.endMinutes)
+    }
+
+    if (nextStart + 60 > 23 * 60 + 59) {
+      nextStart = 8 * 60
+    }
+
+    return {
+      ...EMPTY_STUDENT_CALENDAR_TASK_FORM,
+      startTime: formatCalendarTimeFromMinutes(nextStart),
+      endTime: formatCalendarTimeFromMinutes(nextStart + 60),
+    }
+  }
+
+  function hasCalendarTaskTimeConflict(
+    tasks: SchoolDocument[],
+    startTime: string,
+    endTime: string,
+  ) {
+    return tasks.some((task) =>
+      doCalendarTimesOverlap(
+        startTime,
+        endTime,
+        getStudentCalendarTaskStartTime(task),
+        getStudentCalendarTaskEndTime(task),
+      ),
+    )
+  }
+
+  function openStudentCalendarTaskModal(calendarDay: StudentCalendarDay) {
+    const tasks = getStudentCalendarTasksForDate(calendarDay.date)
+
+    setSelectedStudentCalendarDay(calendarDay)
+    setNewStudentCalendarTask(getNextStudentCalendarTaskForm(tasks))
+    setIsCreatingCalendarTask(tasks.length === 0)
+    setClassesError(null)
+    setIsCalendarTaskModalOpen(true)
+  }
+
+  function closeStudentCalendarTaskModal() {
+    setIsCalendarTaskModalOpen(false)
+    setIsCreatingCalendarTask(false)
+    setSelectedStudentCalendarDay(null)
+    setNewStudentCalendarTask(EMPTY_STUDENT_CALENDAR_TASK_FORM)
+    setClassesError(null)
+  }
+
+  function openNewStudentCalendarTaskForm() {
+    setNewStudentCalendarTask(getNextStudentCalendarTaskForm(selectedStudentCalendarTasks))
+    setIsCreatingCalendarTask(true)
+    setClassesError(null)
+  }
+
+  function updateStudentCalendarTaskField(field: keyof StudentCalendarTaskForm, value: string) {
+    setNewStudentCalendarTask((currentTask) => ({
+      ...currentTask,
+      [field]: value,
+    }))
   }
 
   function getEvaluationMomentsForClass(schoolClass: SchoolDocument) {
@@ -1540,6 +2057,91 @@ function App() {
       questionNumber: question.questionNumber,
       questionValue: Number(question.value) || 0,
       value: value.trim() || '0',
+    }
+  }
+
+  async function handleSaveStudentCalendarTask(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    if (!selectedSchool || !selectedAcademicYearDocument || !selectedClass || !selectedStudentCalendarDay) {
+      setClassesError('Seleciona escola, ano letivo, turma e dia antes de gravar a tarefa.')
+      return
+    }
+
+    const schoolId = getSchoolId(selectedSchool)
+    const yearId = getDocumentId(selectedAcademicYearDocument)
+    const classId = getDocumentId(selectedClass)
+
+    if (!schoolId || !yearId || !classId) {
+      setClassesError('Não foi possível identificar todos os dados para gravar a tarefa.')
+      return
+    }
+
+    const title = newStudentCalendarTask.title.trim()
+    const description = newStudentCalendarTask.description.trim()
+    const startTime = newStudentCalendarTask.startTime
+    const endTime = newStudentCalendarTask.endTime
+    const startMinutes = getCalendarTimeMinutes(startTime)
+    const endMinutes = getCalendarTimeMinutes(endTime)
+
+    if (!title || !description) {
+      setClassesError('Preenche o título e a descrição da tarefa.')
+      return
+    }
+
+    if (startMinutes === null || endMinutes === null) {
+      setClassesError('As horas devem estar no formato HH:MM.')
+      return
+    }
+
+    if (startMinutes >= endMinutes) {
+      setClassesError('A hora de fim deve ser posterior à hora de início.')
+      return
+    }
+
+    if (hasCalendarTaskTimeConflict(selectedStudentCalendarTasks, startTime, endTime)) {
+      setClassesError('Já existe uma tarefa nesse horário.')
+      return
+    }
+
+    const payload: SchoolDocument = {
+      userId: getLoggedUserId(),
+      schoolId,
+      schoolName: getSchoolTitle(selectedSchool),
+      yearId,
+      academicYearId: yearId,
+      academicYearName: getAcademicYearTitle(selectedAcademicYearDocument),
+      classId,
+      className: getClassTitle(selectedClass),
+      date: getCalendarDateTime(selectedStudentCalendarDay.date),
+      title,
+      description,
+      startTime,
+      endTime,
+    }
+
+    setIsLoadingClasses(true)
+    setClassesError(null)
+
+    try {
+      const savedTask = await schoolApi.addStudentCalendarTask(payload)
+      const task = {
+        ...payload,
+        _id: savedTask.id,
+      }
+
+      setStudentCalendarTasks((currentTasks) => sortStudentCalendarTasks([...currentTasks, task]))
+      setIsCreatingCalendarTask(false)
+      setNewStudentCalendarTask(EMPTY_STUDENT_CALENDAR_TASK_FORM)
+      setMessage('Tarefa gravada.')
+    } catch (calendarTaskError) {
+      setClassesError(
+        calendarTaskError instanceof Error
+          ? calendarTaskError.message
+          : 'Erro ao gravar tarefa no calendário.',
+      )
+    } finally {
+      setIsLoadingClasses(false)
     }
   }
 
@@ -1720,7 +2322,7 @@ function App() {
     return false
   }
 
-  function handleStudentsMenuOptionChange(option: number) {
+  function handleStudentsMenuOptionChange(option: StudentsMenuOption) {
     if (option !== activeStudentsMenuOption && activeStudentsMenuOption === 3 && !canLeaveAssessmentMoment()) {
       return
     }
@@ -1728,12 +2330,18 @@ function App() {
     setActiveStudentsMenuOption(option)
   }
 
-  function setActiveDashboardWithAssessmentGuard(nextDashboard: DashboardSection) {
-    if (activeDashboard === 'students' && activeStudentsMenuOption === 3 && !canLeaveAssessmentMoment()) {
-      return
-    }
+  function moveStudentCalendarMonth(monthOffset: number) {
+    setStudentCalendarDate((currentDate) => (
+      new Date(currentDate.getFullYear(), currentDate.getMonth() + monthOffset, 1)
+    ))
+  }
 
-    setActiveDashboard(nextDashboard)
+  function resetStudentCalendarMonth() {
+    setStudentCalendarDate(new Date())
+  }
+
+  function toggleStudentCalendarWeekMode() {
+    setStudentCalendarWeekMode((currentMode) => (currentMode === 'work' ? 'full' : 'work'))
   }
 
   function openSettingsDashboardWithAssessmentGuard() {
@@ -1808,6 +2416,52 @@ function App() {
       (total, question) => total + (Number(getSavedStudentMomentCellValue(student, moment, question)) || 0),
       0,
     )
+  }
+
+  function getChartData(student: SchoolDocument) {
+    const moments = selectedClass ? getEvaluationMomentsForClass(selectedClass) : []
+    return moments.map((moment) => {
+      const total = getStudentSavedMomentTotal(student, moment)
+      const max = getEvaluationMomentMaxValue(moment) || 100
+      return {
+        name: getStringValue(moment.name) as string,
+        Nota: total,
+        Máximo: max,
+        '%': Math.round((total / max) * 100),
+      }
+    })
+  }
+
+  const CHART_PALETTE = [
+    '#2563eb', '#c0392b', '#16a34a', '#d97706', '#7c3aed',
+    '#0891b2', '#db2777', '#65a30d', '#ea580c', '#6d28d9',
+  ]
+
+  function getAllStudentsForMomentData(students: SchoolDocument[], moment: SchoolDocument) {
+    return students.map((student) => ({
+      name: (getStringValue(student.name) as string) || 'Aluno',
+      Nota: getStudentSavedMomentTotal(student, moment),
+      Máximo: getEvaluationMomentMaxValue(moment) || 100,
+    }))
+  }
+
+  function getChartTypeLabel(type: ChartType) {
+    const labels: Record<ChartType, string> = {
+      bar: '📊 Barras',
+      line: '📈 Linhas',
+      area: '🌊 Área',
+      radar: '🕸 Radar',
+    }
+    return labels[type]
+  }
+
+  function nextChartType() {
+    const order: ChartType[] = ['bar', 'line', 'area', 'radar']
+    setChartType((prev) => order[(order.indexOf(prev) + 1) % order.length])
+  }
+
+  function exportChartToPdf() {
+    window.print()
   }
 
   function getAssessmentsDashboardRows() {
@@ -2253,6 +2907,7 @@ function App() {
 
     return {
       name: getStringValue(school.name),
+      schoolId: getStringValue(school.schoolId),
       group: getStringValue(school.group),
       address: getStringValue(address.street),
       postalCode: getStringValue(address.postalCode),
@@ -2279,6 +2934,7 @@ function App() {
       setAllAcademicYears([])
       setAllClasses([])
       setAllStudents([])
+      setStudentCalendarTasks([])
       setSelectedAcademicYearDocument(null)
       setSelectedClass(null)
       setActiveDashboard('schools')
@@ -2344,7 +3000,9 @@ function App() {
       setAllAcademicYears([])
       setAllClasses([])
       setAllStudents([])
+      setStudentCalendarTasks([])
       setSelectedAcademicYearDocument(null)
+      setSelectedClass(null)
       setActiveDashboard('schools')
       setMessage(logoutResponse.message)
     } catch (logoutError) {
@@ -2358,48 +3016,76 @@ function App() {
     <main className={user ? 'app-shell dashboard-page' : 'app-shell'}>
       {user ? (
         <section className="dashboard-shell" aria-labelledby="dashboard-title">
+          <header className="topbar">
+            <span className="topbar-brand">School Management</span>
+            <nav className="topbar-nav" aria-label="Navegação principal">
+              <button
+                type="button"
+                className={`topbar-nav-btn${activeDashboard === 'schools' ? ' active' : ''}`}
+              >
+                Escolas
+              </button>
+              <button
+                type="button"
+                className={`topbar-nav-btn${activeDashboard === 'years' ? ' active' : ''}`}
+                disabled={schools.length === 0}
+              >
+                Anos Letivos
+              </button>
+              <button
+                type="button"
+                className={`topbar-nav-btn${activeDashboard === 'classes' ? ' active' : ''}`}
+                disabled={allAcademicYears.length === 0}
+              >
+                Turmas
+              </button>
+              <button
+                type="button"
+                className={`topbar-nav-btn${activeDashboard === 'students' ? ' active' : ''}`}
+                disabled={allClasses.length === 0}
+              >
+                Alunos
+              </button>
+            </nav>
+            <div className="topbar-actions">
+              <strong className="topbar-user-role">{user.role}</strong>
+              <span className="topbar-user-email">{user.email ?? email}</span>
+              <button
+                type="button"
+                className={`topbar-action-btn${activeDashboard === 'settings' ? ' active' : ''}`}
+                onClick={openSettingsDashboardWithAssessmentGuard}
+              >
+                Configurações
+              </button>
+              <button
+                type="button"
+                className="topbar-action-btn topbar-logout"
+                onClick={handleLogout}
+                disabled={isLoading}
+              >
+                {isLoading ? 'A terminar...' : 'Logout'}
+              </button>
+            </div>
+          </header>
           <section className="dashboard-content">
             <header className="dashboard-header">
-              <div>
-                <p className="app-title">School Management</p>
-                <h1 id="dashboard-title">{getDashboardTitle()}</h1>
-                <p>{getDashboardDescription()}</p>
-              </div>
-              <div className="user-summary">
-                <span>{user.email ?? email}</span>
-                <strong>{user.role}</strong>
-                {activeDashboard === 'classes' && (
-                  <button type="button" onClick={() => setActiveDashboard('years')}>
-                    Voltar aos anos letivos
-                  </button>
-                )}
-                {activeDashboard === 'students' && (
-                  <button type="button" onClick={() => setActiveDashboardWithAssessmentGuard('classes')}>
-                    Voltar às turmas
-                  </button>
-                )}
-                {activeDashboard === 'years' && (
-                  <button type="button" onClick={openSchoolsDashboard}>
-                    Voltar às escolas
-                  </button>
-                )}
-                {activeDashboard === 'settings' ? (
-                  <button type="button" onClick={openSchoolsDashboard}>
-                    Voltar às escolas
-                  </button>
-                ) : (
-                  <button type="button" onClick={openSettingsDashboardWithAssessmentGuard}>
-                    Configurações
-                  </button>
-                )}
-                <button type="button" onClick={handleLogout} disabled={isLoading}>
-                  {isLoading ? 'A terminar...' : 'Logout'}
-                </button>
-              </div>
+              {activeDashboard !== 'settings' && <h1 id="dashboard-title">{getDashboardTitle()}</h1>}
+              {getDashboardDescription() && <p>{getDashboardDescription()}</p>}
             </header>
 
             {activeDashboard === 'settings' ? (
               <section className="students-panel settings-panel" aria-label="Configurações da aplicação">
+                <div className="settings-theme-toggle">
+                  <span>Aparência</span>
+                  <button
+                    type="button"
+                    className="theme-toggle-btn secondary-button"
+                    onClick={() => setDarkMode(prev => !prev)}
+                    aria-label={darkMode ? 'Mudar para light mode' : 'Mudar para dark mode'}
+                  >
+                    {darkMode ? '☀ Light mode' : '☾ Dark mode'}
+                  </button>
+                </div>
                 <form className="settings-form" onSubmit={saveAppSettings}>
                   <div className="students-panel-heading">
                     <h2>Configurações gerais</h2>
@@ -2407,6 +3093,50 @@ function App() {
                       Gravar configurações
                     </button>
                   </div>
+                  <section className="settings-periods" aria-label="Períodos do ano letivo">
+                    <div>
+                      <h3>Períodos do ano letivo</h3>
+                      <p>Define se o ano letivo é dividido em semestres ou trimestres e as respetivas datas.</p>
+                    </div>
+                    <label className="settings-period-type-label">
+                      Tipo de período
+                      <select
+                        value={academicPeriodType}
+                        onChange={(e) => setAcademicPeriodType(e.target.value as AcademicPeriodType)}
+                      >
+                        <option value="semestres">Semestres</option>
+                        <option value="trimestres">Trimestres</option>
+                      </select>
+                    </label>
+                    <div className="settings-periods-table" role="table" aria-label="Datas dos períodos">
+                      <div className="settings-periods-row settings-periods-head" role="row">
+                        <span role="columnheader">Período</span>
+                        <span role="columnheader">Data de início</span>
+                        <span role="columnheader">Data de fim</span>
+                      </div>
+                      {(academicPeriodType === 'semestres' ? semesterPeriods : trimesterPeriods).map((period) => (
+                        <div className="settings-periods-row" role="row" key={period.id}>
+                          <span className="settings-period-label">{period.label}</span>
+                          <div role="cell">
+                            <input
+                              type="date"
+                              aria-label={`${period.label} — início`}
+                              value={period.startDate}
+                              onChange={(e) => updatePeriodDate(academicPeriodType, period.id, 'startDate', e.target.value)}
+                            />
+                          </div>
+                          <div role="cell">
+                            <input
+                              type="date"
+                              aria-label={`${period.label} — fim`}
+                              value={period.endDate}
+                              onChange={(e) => updatePeriodDate(academicPeriodType, period.id, 'endDate', e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
                   <div className="settings-grid">
                     <label>
                       Terminar sessão por inatividade (minutos)
@@ -2452,6 +3182,7 @@ function App() {
                         <span role="columnheader">Máx.</span>
                         <span role="columnheader">Fundo</span>
                         <span role="columnheader">Texto</span>
+                        <span role="columnheader">Exemplo</span>
                       </div>
                       {percentageRanges.map((range) => (
                         <div className="settings-ranges-row" role="row" key={range.id}>
@@ -2495,6 +3226,14 @@ function App() {
                               }
                             />
                           </label>
+                          <div role="cell" className="settings-ranges-preview">
+                            <span
+                              className="assessment-percentage"
+                              style={{ backgroundColor: range.backgroundColor, color: range.textColor }}
+                            >
+                              {range.min}–{range.max}%
+                            </span>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -2571,6 +3310,11 @@ function App() {
                   </article>
                 ))}
               </section>
+            ) : activeDashboard === 'years' ? (
+              <section className="dashboard-empty-state">
+                <h2>Seleciona uma escola</h2>
+                <p>Vai a <strong>Escolas</strong> e abre uma escola para ver os seus anos letivos.</p>
+              </section>
             ) : activeDashboard === 'classes' && selectedAcademicYearDocument ? (
               <section className="schools-grid" aria-label="Turmas">
                 <article className="school-card create-school-card">
@@ -2605,27 +3349,131 @@ function App() {
                   </article>
                 ))}
               </section>
+            ) : activeDashboard === 'classes' ? (
+              <section className="dashboard-empty-state">
+                <h2>Seleciona um ano letivo</h2>
+                <p>Vai a <strong>Anos Letivos</strong> e abre um ano letivo para ver as suas turmas.</p>
+              </section>
             ) : activeDashboard === 'students' && selectedClass ? (
               <section className="students-dashboard" aria-label="Dashboard dos alunos">
                 <aside className="students-sidebar" aria-label="Menu de alunos">
-                  {[1, 2, 3, 4, 5].map((option) => (
+                  {STUDENTS_MENU_OPTIONS.map((option) => (
                     <button
-                      key={option}
+                      key={option.id}
                       type="button"
-                      className={activeStudentsMenuOption === option ? 'active' : ''}
-                      onClick={() => handleStudentsMenuOptionChange(option)}
+                      className={activeStudentsMenuOption === option.id ? 'active' : ''}
+                      onClick={() => handleStudentsMenuOptionChange(option.id)}
                     >
-                      {option === 1
-                        ? 'Alunos'
-                        : option === 2
-                          ? 'Momento de Avaliação'
-                          : option === 3
-                            ? 'Alunos/M.Avaliação'
-                            : option === 4 ? 'Avaliações' : `Opção ${option}`}
+                      {option.label}
                     </button>
                   ))}
                 </aside>
-                {activeStudentsMenuOption === 2 ? (
+                {activeStudentsMenuOption === 0 ? (
+                  <section className="students-panel" aria-label="Calendário mensal">
+                    <div className="student-calendar-heading">
+                      <div>
+                        <h2>Calendário</h2>
+                        <p>{getStudentCalendarMonthLabel(studentCalendarDate)}</p>
+                      </div>
+                      <div className="student-calendar-actions" aria-label="Navegação do calendário">
+                        <button
+                          type="button"
+                          className="student-calendar-week-toggle"
+                          aria-pressed={isStudentCalendarFullWeek}
+                          aria-label={
+                            isStudentCalendarFullWeek
+                              ? 'Mostrar apenas dias úteis'
+                              : 'Mostrar semana toda'
+                          }
+                          onClick={toggleStudentCalendarWeekMode}
+                        >
+                          {isStudentCalendarFullWeek ? 'Semana toda' : 'Semana de trabalho'}
+                        </button>
+                        <button
+                          type="button"
+                          aria-label="Mês anterior"
+                          onClick={() => moveStudentCalendarMonth(-1)}
+                        >
+                          ‹
+                        </button>
+                        <button type="button" onClick={resetStudentCalendarMonth}>
+                          Hoje
+                        </button>
+                        <button
+                          type="button"
+                          aria-label="Mês seguinte"
+                          onClick={() => moveStudentCalendarMonth(1)}
+                        >
+                          ›
+                        </button>
+                      </div>
+                    </div>
+                    <div
+                      className={[
+                        'student-calendar',
+                        isStudentCalendarFullWeek ? 'full-week' : 'work-week',
+                      ].join(' ')}
+                      role="table"
+                      aria-label={
+                        isStudentCalendarFullWeek
+                          ? 'Calendário mensal com semana toda'
+                          : 'Calendário mensal com semana de trabalho'
+                      }
+                    >
+                      <div className="student-calendar-weekdays" role="row">
+                        {visibleStudentCalendarWeekdays.map((weekday, weekdayIndex) => (
+                          <span
+                            key={weekday}
+                            className={weekdayIndex >= CALENDAR_WORK_WEEKDAY_COUNT ? 'weekend' : ''}
+                            role="columnheader"
+                          >
+                            {weekday}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="student-calendar-grid">
+                        {studentCalendarDays.map((calendarDay) => {
+                          const calendarTasks = getStudentCalendarTasksForDate(calendarDay.date)
+
+                          return (
+                            <button
+                              key={calendarDay.key}
+                              type="button"
+                              className={[
+                                'student-calendar-day',
+                                calendarDay.isCurrentMonth ? '' : 'outside-month',
+                                calendarDay.isWeekend ? 'weekend' : '',
+                                calendarDay.isToday ? 'today' : '',
+                                calendarTasks.length > 0 ? 'has-tasks' : '',
+                              ].filter(Boolean).join(' ')}
+                              aria-label={`Abrir tarefas de ${getStudentCalendarDayLabel(calendarDay.date)}`}
+                              onDoubleClick={() => openStudentCalendarTaskModal(calendarDay)}
+                            >
+                              <time
+                                className="student-calendar-day-number"
+                                dateTime={getCalendarDateTime(calendarDay.date)}
+                              >
+                                {calendarDay.day}
+                              </time>
+                              {calendarTasks.length > 0 && (
+                                <span className="student-calendar-task-list">
+                                  {calendarTasks.map((task, taskIndex) => (
+                                    <span
+                                      className="student-calendar-task-title"
+                                      key={String(task._id ?? `${calendarDay.key}-${taskIndex}`)}
+                                    >
+                                      {getStudentCalendarTaskTitle(task)}
+                                    </span>
+                                  ))}
+                                </span>
+                              )}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </section>
+                ) : activeStudentsMenuOption === 2 ? (
                   <section className="students-panel" aria-label="Momentos de avaliação">
                     <div className="students-panel-heading">
                       <h2>Momento de Avaliação</h2>
@@ -2907,6 +3755,207 @@ function App() {
                       </div>
                     )}
                   </section>
+                ) : activeStudentsMenuOption === 5 ? (
+                  (() => {
+                    const ALL_STUDENTS_VALUE = '__all__'
+                    const students = getStudentsForClass(selectedClass)
+                    const allMoments = selectedClass ? getEvaluationMomentsForClass(selectedClass) : []
+                    const isAllStudents = chartStudentId === ALL_STUDENTS_VALUE
+                    const chartStudent = isAllStudents
+                      ? null
+                      : (students.find((s) => String(s._id ?? s.id) === chartStudentId) ?? students[0] ?? null)
+                    const selectedMoment = isAllStudents
+                      ? (allMoments.find((m) => String(m._id ?? m.id) === chartMomentId) ?? allMoments[0] ?? null)
+                      : null
+                    const singleData = chartStudent ? getChartData(chartStudent) : []
+                    const allMomentData = isAllStudents && selectedMoment
+                      ? getAllStudentsForMomentData(students, selectedMoment)
+                      : []
+                    const data = isAllStudents ? allMomentData : singleData
+                    const hasData = data.length > 0
+                    const CHART_COLOR = CHART_PALETTE[0]
+                    const CHART_COLOR_2 = CHART_PALETTE[1]
+                    const currentValue = chartStudentId || (students[0] ? String(students[0]._id ?? students[0].id) : '')
+                    return (
+                      <section className="students-panel charts-panel print-section" aria-label="Gráficos de avaliação">
+                        <div className="students-panel-heading">
+                          <h2>Gráficos</h2>
+                          <div className="students-panel-heading-actions">
+                            <button
+                              type="button"
+                              className="secondary-button"
+                              onClick={nextChartType}
+                              title="Mudar tipo de gráfico"
+                            >
+                              {getChartTypeLabel(chartType)}
+                            </button>
+                            <button
+                              type="button"
+                              className="secondary-button"
+                              onClick={exportChartToPdf}
+                              disabled={!hasData}
+                              title="Exportar para PDF"
+                            >
+                              📄 Exportar PDF
+                            </button>
+                          </div>
+                        </div>
+                        <div className="chart-filters">
+                          <label className="chart-student-select-label">
+                            Aluno
+                            <select
+                              value={currentValue || ALL_STUDENTS_VALUE}
+                              onChange={(e) => setChartStudentId(e.target.value)}
+                            >
+                              {students.length === 0 ? (
+                                <option value="">Sem alunos</option>
+                              ) : (
+                                <>
+                                  <option value={ALL_STUDENTS_VALUE}>Todos os alunos</option>
+                                  {students.map((s, i) => (
+                                    <option
+                                      key={String(s._id ?? s.id ?? i)}
+                                      value={String(s._id ?? s.id ?? i)}
+                                    >
+                                      {getStringValue(s.name)}
+                                    </option>
+                                  ))}
+                                </>
+                              )}
+                            </select>
+                          </label>
+                          {isAllStudents && (
+                            <label className="chart-student-select-label">
+                              Momento de avaliação
+                              <select
+                                value={chartMomentId || String(allMoments[0]?._id ?? allMoments[0]?.id ?? '')}
+                                onChange={(e) => setChartMomentId(e.target.value)}
+                              >
+                                {allMoments.length === 0 ? (
+                                  <option value="">Sem momentos</option>
+                                ) : (
+                                  allMoments.map((m, i) => (
+                                    <option
+                                      key={String(m._id ?? m.id ?? i)}
+                                      value={String(m._id ?? m.id ?? i)}
+                                    >
+                                      {getStringValue(m.name)}
+                                    </option>
+                                  ))
+                                )}
+                              </select>
+                            </label>
+                          )}
+                        </div>
+                        {!hasData ? (
+                          <p className="students-empty-state">
+                            {students.length === 0
+                              ? 'Ainda não existem alunos nesta turma.'
+                              : allMoments.length === 0
+                                ? 'Ainda não existem momentos de avaliação nesta turma.'
+                                : 'Seleciona um momento de avaliação.'}
+                          </p>
+                        ) : (
+                          <div className="chart-container">
+                            {chartStudent && (
+                              <p className="chart-student-name">{getStringValue(chartStudent.name)}</p>
+                            )}
+                            {isAllStudents && selectedMoment && (
+                              <p className="chart-student-name">
+                                {getStringValue(selectedMoment.name)}
+                                {' — '}máximo: {getEvaluationMomentMaxValue(selectedMoment)}
+                              </p>
+                            )}
+                            <ResponsiveContainer width="100%" height={320} className="chart-responsive-container">
+                              {chartType === 'bar' ? (
+                                <BarChart data={data} margin={{ top: 24, right: 24, left: 0, bottom: 40 }}>
+                                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                                  <XAxis dataKey="name" tick={{ fontSize: 11 }} angle={-25} textAnchor="end" />
+                                  <YAxis tick={{ fontSize: 11 }} />
+                                  <Tooltip />
+                                  <Legend />
+                                  <Bar dataKey="Nota" fill={CHART_COLOR} radius={[4, 4, 0, 0]}>
+                                    {isAllStudents
+                                      ? data.map((_, i) => <Cell key={i} fill={CHART_PALETTE[i % CHART_PALETTE.length]} />)
+                                      : <LabelList dataKey="Nota" position="top" style={{ fontSize: 10, fontWeight: 700 }} />
+                                    }
+                                  </Bar>
+                                  {!isAllStudents && (
+                                    <Bar dataKey="Máximo" fill={CHART_COLOR_2} radius={[4, 4, 0, 0]} opacity={0.4} />
+                                  )}
+                                </BarChart>
+                              ) : chartType === 'line' ? (
+                                <LineChart data={data} margin={{ top: 24, right: 24, left: 0, bottom: 40 }}>
+                                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                                  <XAxis dataKey="name" tick={{ fontSize: 11 }} angle={-25} textAnchor="end" />
+                                  <YAxis tick={{ fontSize: 11 }} />
+                                  <Tooltip />
+                                  <Legend />
+                                  <Line
+                                    type="monotone"
+                                    dataKey="Nota"
+                                    stroke={CHART_COLOR}
+                                    strokeWidth={2}
+                                    dot={isAllStudents
+                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                      ? (props: any) => <circle key={props.index} cx={props.cx} cy={props.cy} r={5} fill={CHART_PALETTE[props.index % CHART_PALETTE.length]} stroke="#fff" strokeWidth={1.5} />
+                                      : { r: 4 }
+                                    }
+                                  >
+                                    {!isAllStudents && <LabelList dataKey="Nota" position="top" style={{ fontSize: 10, fontWeight: 700 }} />}
+                                  </Line>
+                                  {!isAllStudents && (
+                                    <Line type="monotone" dataKey="Máximo" stroke={CHART_COLOR_2} strokeWidth={2} strokeDasharray="5 5" dot={false} />
+                                  )}
+                                </LineChart>
+                              ) : chartType === 'area' ? (
+                                <AreaChart data={data} margin={{ top: 24, right: 24, left: 0, bottom: 40 }}>
+                                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                                  <XAxis dataKey="name" tick={{ fontSize: 11 }} angle={-25} textAnchor="end" />
+                                  <YAxis tick={{ fontSize: 11 }} />
+                                  <Tooltip />
+                                  <Legend />
+                                  <Area
+                                    type="monotone"
+                                    dataKey="Nota"
+                                    stroke={CHART_COLOR}
+                                    fill={CHART_COLOR}
+                                    fillOpacity={0.2}
+                                    strokeWidth={2}
+                                    dot={isAllStudents
+                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                      ? (props: any) => <circle key={props.index} cx={props.cx} cy={props.cy} r={5} fill={CHART_PALETTE[props.index % CHART_PALETTE.length]} stroke="#fff" strokeWidth={1.5} />
+                                      : { r: 4 }
+                                    }
+                                  >
+                                    {!isAllStudents && <LabelList dataKey="Nota" position="top" style={{ fontSize: 10, fontWeight: 700 }} />}
+                                  </Area>
+                                  {!isAllStudents && (
+                                    <Area type="monotone" dataKey="Máximo" stroke={CHART_COLOR_2} fill={CHART_COLOR_2} fillOpacity={0.1} strokeWidth={2} strokeDasharray="5 5" />
+                                  )}
+                                </AreaChart>
+                              ) : (
+                                <RadarChart
+                                  data={data}
+                                  margin={{ top: 8, right: 24, left: 0, bottom: 8 }}
+                                >
+                                  <PolarGrid stroke="var(--border)" />
+                                  <PolarAngleAxis dataKey="name" tick={{ fontSize: 11 }} />
+                                  <PolarRadiusAxis tick={{ fontSize: 10 }} />
+                                  <Radar name="Nota" dataKey="Nota" stroke={CHART_COLOR} fill={CHART_COLOR} fillOpacity={0.35} />
+                                  {!isAllStudents && (
+                                    <Radar name="Máximo" dataKey="Máximo" stroke={CHART_COLOR_2} fill={CHART_COLOR_2} fillOpacity={0.1} />
+                                  )}
+                                  <Legend />
+                                  <Tooltip />
+                                </RadarChart>
+                              )}
+                            </ResponsiveContainer>
+                          </div>
+                        )}
+                      </section>
+                    )
+                  })()
                 ) : (
                   <section className="students-panel" aria-label="Lista de alunos da turma">
                     <div className="students-panel-heading">
@@ -2989,6 +4038,11 @@ function App() {
                   </section>
                 )}
               </section>
+            ) : activeDashboard === 'students' ? (
+              <section className="dashboard-empty-state">
+                <h2>Seleciona uma turma</h2>
+                <p>Vai a <strong>Turmas</strong> e abre uma turma para ver os seus alunos.</p>
+              </section>
             ) : (
               <section className="dashboard-empty-state">
                 <h2>Área em construção</h2>
@@ -2996,14 +4050,27 @@ function App() {
               </section>
             )}
 
-            {schoolsError && <p className="dashboard-feedback">{schoolsError}</p>}
-            {yearsError && <p className="dashboard-feedback">{yearsError}</p>}
-            {classesError && !isStudentModalOpen && !isEvaluationMomentModalOpen && (
+            {schoolsError && !isCreateSchoolModalOpen && <p className="dashboard-feedback">{schoolsError}</p>}
+            {yearsError && !isCreateYearModalOpen && <p className="dashboard-feedback">{yearsError}</p>}
+            {classesError && !isStudentModalOpen && !isEvaluationMomentModalOpen && !isCalendarTaskModalOpen && (
               <p className="dashboard-feedback">{classesError}</p>
             )}
             {message && <p className="dashboard-feedback success">{message}</p>}
             {isLoadingYears && <p className="dashboard-feedback info">A carregar anos letivos...</p>}
             {isLoadingClasses && <p className="dashboard-feedback info">A guardar turma...</p>}
+
+            {/* Toast global — sempre acima de tudo */}
+            <div className="toast-container" role="alert" aria-live="polite">
+              {schoolsError && isCreateSchoolModalOpen && (
+                <p className="toast error">{schoolsError}</p>
+              )}
+              {yearsError && isCreateYearModalOpen && (
+                <p className="toast error">{yearsError}</p>
+              )}
+              {classesError && (isStudentModalOpen || isEvaluationMomentModalOpen || isCalendarTaskModalOpen) && (
+                <p className="toast error">{classesError}</p>
+              )}
+            </div>
 
             {isCreateSchoolModalOpen && (
               <div className="modal-backdrop" role="presentation">
@@ -3024,6 +4091,18 @@ function App() {
                   </h2>
                   <form onSubmit={handleSaveSchool}>
                     <label>
+                      ID da Escola
+                      <input
+                        type="text"
+                        value={newSchool.schoolId}
+                        onChange={(event) => updateNewSchoolField('schoolId', event.target.value)}
+                        placeholder="Ex: ESC-001"
+                        minLength={1}
+                        autoFocus
+                        required
+                      />
+                    </label>
+                    <label>
                       Nome da escola
                       <input
                         type="text"
@@ -3031,7 +4110,6 @@ function App() {
                         onChange={(event) => updateNewSchoolField('name', event.target.value)}
                         placeholder="Ex: Escola Secundária Central"
                         minLength={2}
-                        autoFocus
                         required
                       />
                     </label>
@@ -3170,6 +4248,17 @@ function App() {
                         ))}
                       </select>
                     </label>
+                    <label>
+                      Organização do ano letivo
+                      <select
+                        value={yearPeriodType}
+                        onChange={(e) => setYearPeriodType(e.target.value as AcademicPeriodType)}
+                        required
+                      >
+                        <option value="semestres">Semestres</option>
+                        <option value="trimestres">Trimestres</option>
+                      </select>
+                    </label>
                     <button type="submit" disabled={isLoadingYears}>
                       {isLoadingYears
                         ? 'A guardar...'
@@ -3200,19 +4289,31 @@ function App() {
                   <form onSubmit={handleSaveClass}>
                     <div className="form-row">
                       <label>
-                        Nome da turma
+                        Ano
                         <input
-                          type="text"
-                          value={newClass.name}
-                          onChange={(event) => updateNewClassField('name', event.target.value)}
-                          placeholder="Ex: 7.º A"
-                          minLength={1}
+                          type="number"
+                          value={newClass.classYear}
+                          onChange={(event) => updateNewClassField('classYear', event.target.value)}
+                          placeholder="Ex: 7"
+                          min={1}
+                          max={12}
                           autoFocus
                           required
                         />
                       </label>
                       <label>
-                        Nome da diretora de turma
+                        Letra da turma
+                        <input
+                          type="text"
+                          value={newClass.classLetter}
+                          onChange={(event) => updateNewClassField('classLetter', event.target.value.toUpperCase())}
+                          placeholder="Ex: A"
+                          maxLength={3}
+                          required
+                        />
+                      </label>
+                      <label>
+                        Diretora de turma
                         <input
                           type="text"
                           value={newClass.directorName}
@@ -3459,6 +4560,106 @@ function App() {
                     </label>
                     <button type="submit">Gravar questão</button>
                   </form>
+                </section>
+              </div>
+            )}
+
+            {isCalendarTaskModalOpen && selectedStudentCalendarDay && (
+              <div className="modal-backdrop student-modal-backdrop" role="presentation">
+                <section className="modal-card calendar-task-modal-card" aria-labelledby="calendar-task-title" role="dialog" aria-modal="true">
+                  <button
+                    type="button"
+                    className="modal-close"
+                    aria-label="Fechar"
+                    onClick={closeStudentCalendarTaskModal}
+                  >
+                    ×
+                  </button>
+                  <h2 id="calendar-task-title">Tarefas do calendário</h2>
+                  {classesError && <p className="modal-feedback error">{classesError}</p>}
+                  {selectedStudentCalendarTasks.length > 0 && (
+                    <section className="calendar-task-summary" aria-label="Tarefas existentes">
+                      <h3>{getStudentCalendarDayLabel(selectedStudentCalendarDay.date)}</h3>
+                      <div className="calendar-task-summary-list">
+                        {selectedStudentCalendarTasks.map((task, taskIndex) => (
+                          <article
+                            className="calendar-task-summary-card"
+                            key={String(task._id ?? `task-${taskIndex}`)}
+                          >
+                            <strong>{getStudentCalendarTaskTitle(task)}</strong>
+                            <span>
+                              {getStudentCalendarTaskStartTime(task)} - {getStudentCalendarTaskEndTime(task)}
+                            </span>
+                            <p>{getStringValue(task.description)}</p>
+                          </article>
+                        ))}
+                      </div>
+                      {!isCreatingCalendarTask && (
+                        <button
+                          type="button"
+                          className="secondary-button"
+                          onClick={openNewStudentCalendarTaskForm}
+                        >
+                          Nova tarefa
+                        </button>
+                      )}
+                    </section>
+                  )}
+                  {isCreatingCalendarTask && (
+                    <form onSubmit={handleSaveStudentCalendarTask}>
+                      <label>
+                        Dia
+                        <input
+                          type="text"
+                          value={getStudentCalendarDayLabel(selectedStudentCalendarDay.date)}
+                          readOnly
+                        />
+                      </label>
+                      <label>
+                        Título
+                        <input
+                          type="text"
+                          value={newStudentCalendarTask.title}
+                          onChange={(event) => updateStudentCalendarTaskField('title', event.target.value)}
+                          placeholder="Ex: Entrega de trabalho"
+                          autoFocus
+                          required
+                        />
+                      </label>
+                      <label>
+                        Descrição
+                        <textarea
+                          value={newStudentCalendarTask.description}
+                          onChange={(event) => updateStudentCalendarTaskField('description', event.target.value)}
+                          placeholder="Detalhes da tarefa"
+                          required
+                        />
+                      </label>
+                      <div className="form-row">
+                        <label>
+                          Hora de início
+                          <input
+                            type="time"
+                            value={newStudentCalendarTask.startTime}
+                            onChange={(event) => updateStudentCalendarTaskField('startTime', event.target.value)}
+                            required
+                          />
+                        </label>
+                        <label>
+                          Hora de fim
+                          <input
+                            type="time"
+                            value={newStudentCalendarTask.endTime}
+                            onChange={(event) => updateStudentCalendarTaskField('endTime', event.target.value)}
+                            required
+                          />
+                        </label>
+                      </div>
+                      <button type="submit" disabled={isLoadingClasses}>
+                        {isLoadingClasses ? 'A guardar...' : 'Gravar'}
+                      </button>
+                    </form>
+                  )}
                 </section>
               </div>
             )}
