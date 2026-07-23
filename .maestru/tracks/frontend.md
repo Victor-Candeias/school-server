@@ -19,7 +19,7 @@ owner: victor
 | FE-02 | Implementar login e logout no frontend React | done | 2026-06-24 | victor | high | 2026-06-24 |  |  |
 | FE-03 | Criar layout principal com navegação e dashboard | done | 2026-06-24 | victor | high | 2026-06-24 |  |  |
 | FE-04 | Implementar listagem e criação de escolas | done | 2026-06-24 | victor | high | 2026-06-24 |  |  |
-| FE-05 | Implementar gestão de anos letivos | backlog | 2026-06-24 | victor | medium |  |  |  |
+| FE-05 | Implementar gestão de anos letivos | done | 2026-06-24 | victor | medium | 2026-07-23 |  | [FE-05](../specs/frontend/fe-05-spec.md) |
 | FE-06 | Implementar gestão de turmas | done | 2026-06-24 | victor | medium | 2026-06-26 |  |  |
 | FE-07 | Implementar gestão de alunos | done | 2026-06-24 | victor | medium | 2026-06-26 |  |  |
 | FE-08 | Implementar configurações de testes e momentos de avaliação | backlog | 2026-06-24 | victor | low |  |  |  |

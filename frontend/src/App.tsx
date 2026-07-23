@@ -1688,6 +1688,32 @@ function App() {
     setIsCreateYearModalOpen(true)
   }
 
+  async function deleteYear(year: SchoolDocument) {
+    const yearId = getDocumentId(year)
+    if (!yearId) {
+      setYearsError('Não foi possível identificar o ano letivo para apagar.')
+      return
+    }
+
+    if (!window.confirm('Tens a certeza que queres apagar este ano letivo?')) {
+      return
+    }
+
+    setIsLoadingYears(true)
+    setYearsError(null)
+
+    try {
+      await schoolApi.deleteYear(yearId)
+      if (selectedSchool) {
+        await loadAcademicYears(selectedSchool)
+      }
+    } catch (yearError) {
+      setYearsError(yearError instanceof Error ? yearError.message : 'Erro ao apagar ano letivo.')
+    } finally {
+      setIsLoadingYears(false)
+    }
+  }
+
   function openClassesDashboard(year: SchoolDocument) {
     setSelectedAcademicYearDocument(year)
     setSelectedClass(null)
@@ -3305,6 +3331,13 @@ function App() {
                         onClick={() => openEditYearModal(year)}
                       >
                         Editar informação
+                      </button>
+                      <button
+                        type="button"
+                        className="transparent-button"
+                        onClick={() => deleteYear(year)}
+                      >
+                        Eliminar
                       </button>
                     </div>
                   </article>

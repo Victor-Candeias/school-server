@@ -252,6 +252,21 @@ async def login(request: Request, response: Response):
         return JSONResponse(status_code=500, content={"message": errMessage})
 
 # -------------------------------
+# Endpoint: Logout a user
+# -------------------------------
+@auth_router.post("/logout")
+async def logout(request: Request, response: Response):
+    try:
+        logout_response = JSONResponse(status_code=200, content={"message": "User logout realizado com sucesso."})
+        logout_response.delete_cookie("access_token")
+        return logout_response
+
+    except Exception as e:
+        errMessage = f"Error message:{e}"
+        await utilities.add_log_to_db(api_client=api_client, source="auth_routes", method="logout", message=errMessage)
+        return JSONResponse(status_code=500, content={"message": errMessage})
+
+# -------------------------------
 # Endpoint: Delete a user
 # -------------------------------
 @auth_router.delete("/delete", response_model=UserLogin)
@@ -332,8 +347,7 @@ async def get_users(request: Request):
         JSONResponse: A response containing the list of users or an error message.
 
     Possible Status Codes:
-        - 200: Users retrieved successfully.
-        - 400: No users found.
+        - 200: Users retrieved successfully (or empty list if none found).
         - 500: Internal server error.
     """
     try:
@@ -363,14 +377,8 @@ async def get_users(request: Request):
             # Query the database via the REST API
             response = await api_client.find(endpoint="find", payload=payload)
 
-        # If no users are found, return a 400 response
-        if not response.get("documents"):
-            result = "Não foram encontrados utilizadores registados!!!"
-            await utilities.add_log_to_db(api_client=api_client, source="get_users", method="login", message=result)
-            return JSONResponse(status_code=400, content={"message": result})
-        
-        # Return the list of users
-        return JSONResponse(content={"message": response.get("documents")}, status_code=200)
+        # Sem resultados não é um erro: devolve 200 com uma lista vazia
+        return JSONResponse(content={"message": response.get("documents") or []}, status_code=200)
 
     except Exception as e:
         # Handle unexpected errors

@@ -201,12 +201,8 @@ class Utils:
             # await self.add_log_to_db(api_client=api_client, source=source, method=method, message=query_params)
             response = await api_client.find(endpoint=endpoint, payload=query_params)
             
-            if not response.get("documents"):
-                return JSONResponse(status_code=400, content=f"Document {method.capitalize()} not found!!!")
-            
-            # await self.add_log_to_db(api_client=api_client, source=source, method=method, message=f"Found {len(response.get('documents'))} {method}s!!!")
-            
-            return JSONResponse(content=response.get("documents"), status_code=200)
+            # Sem resultados não é um erro: devolve 200 com uma lista vazia
+            return JSONResponse(content=response.get("documents") or [], status_code=200)
         
         except Exception as e:
             await self.add_log_to_db(api_client=api_client, source=source, method=method, message=f"Get {method} error: {e}", error=True)

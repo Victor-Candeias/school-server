@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from utils.bd_client import BDClient  # Database handling utilities
 from utils import utilities  # General utilities
 
-from utils.config import YEARS_COLLECTION,BD_BASE_URL
+from utils.config import YEARS_COLLECTION, CLASSES_COLLECTION, BD_BASE_URL
 
 # Create a new router for data-related endpoints
 years_router = APIRouter()
@@ -54,3 +54,36 @@ async def update_year(request: Request, _: None = Depends(utilities.verificar_to
         return JSONResponse(status_code=404, content={"message": "Ano letivo não encontrado."})
 
     return JSONResponse(content=updated_year, status_code=200)
+
+
+@years_router.delete("/delete")
+async def delete_year(request: Request, _: None = Depends(utilities.verificar_token_cookie)):
+    body = await request.json()
+    year_id = body.get("id")
+
+    if not year_id:
+        return JSONResponse(
+            status_code=400,
+            content={"message": "O campo 'id' é obrigatório."},
+        )
+
+    existing_classes = await api_client.find(
+        endpoint="find",
+        payload={"collection": CLASSES_COLLECTION, "query": {"yearId": year_id}},
+    )
+    if existing_classes.get("documents"):
+        return JSONResponse(
+            status_code=409,
+            content={"message": "Não é possível eliminar um ano letivo com turmas associadas."},
+        )
+
+    response = await api_client.delete(
+        endpoint="delete",
+        payload={"collection": YEARS_COLLECTION, "id": year_id},
+    )
+
+    deleted_count = response.get("deleted_count", 0)
+    if not deleted_count:
+        return JSONResponse(status_code=404, content={"message": "Ano letivo não encontrado."})
+
+    return JSONResponse(content=deleted_count, status_code=200)

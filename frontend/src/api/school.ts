@@ -50,6 +50,11 @@ export const schoolApi = {
       method: 'PUT',
       body: { id, data: document },
     }),
+  deleteYear: (id: string) =>
+    apiRequest<number>(API_CONFIG.schoolBaseUrl, '/years/delete', {
+      method: 'DELETE',
+      body: { id },
+    }),
 
   findClasses: (query?: Record<string, unknown>) => findCollection('/class/find', query),
   addClass: (document: SchoolDocument) => addDocument('/class/add', document),
