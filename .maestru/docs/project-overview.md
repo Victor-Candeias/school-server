@@ -260,6 +260,35 @@ Arranque do PC
        └─ encaminha /auth-api, /school-api e /db-api
 ```
 
+### Estado instalado
+
+Deploy instalado e validado em 2026-07-24:
+
+| Componente | Estado instalado |
+|------------|------------------|
+| MongoDB | `mongodb44.service`, habilitado e ativo em `127.0.0.1:27017` |
+| Database API | `school-db.service`, habilitado e ativo em `127.0.0.1:8000` |
+| Authentication API | `school-auth.service`, habilitado e ativo em `127.0.0.1:8010` |
+| School API | `school-api.service`, habilitado e ativo em `127.0.0.1:8020` |
+| Frontend/proxy | `nginx.service`, habilitado e ativo em `0.0.0.0:80` |
+| Frontend publicado | `/var/www/school-server` |
+| Ambiente protegido | `/etc/school-server/backend.env` |
+| URL na rede local | `http://192.168.1.153/` |
+
+As configurações reproduzíveis estão versionadas em `deploy/`. A instalação
+ou atualização é executada com:
+
+```bash
+cd /home/victor/Dev/school/school-server
+cd frontend && npm ci && npm run build && cd ..
+sudo ./deploy/install.sh
+```
+
+Não está instalado um firewall de host (`ufw` ou `firewalld`). O isolamento
+externo é atualmente garantido pelo bind explícito de MongoDB e das APIs a
+`127.0.0.1`; os testes confirmaram que as portas backend não respondem pelo
+IP da rede. Apenas o Nginx escuta nas interfaces externas.
+
 ### 1. MongoDB
 
 Garantir que o MongoDB inicia automaticamente:

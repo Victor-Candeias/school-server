@@ -1,0 +1,24 @@
+[Unit]
+Description=School Server - Authentication API
+Requires=school-db.service
+After=network-online.target school-db.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=victor
+Group=victor
+WorkingDirectory=/home/victor/Dev/school/school-server/auth
+EnvironmentFile=/etc/school-server/backend.env
+Environment=HOST=127.0.0.1
+Environment=PORT=8010
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/home/victor/Dev/school/school-server/.venv/bin/python main.py
+Restart=always
+RestartSec=3
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
