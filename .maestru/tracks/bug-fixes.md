@@ -51,4 +51,5 @@ owner: victor
 | BUG-34 | Gravar valores em studentstestmoments | done | 2026-06-27 |  | critical | 2026-06-27 |  |  |
 | BUG-35 | Persistir temporizador de mensagens e cores de percentagem | done | 2026-06-27 |  | high | 2026-06-27 |  |  |
 | BUG-36 | Nomear opção quatro como Avaliações | done | 2026-06-27 |  | low | 2026-06-27 |  |  |
+| BUG-37 | Corrigir 404 da imagem de fundo no frontend | done | 2026-07-24 | developer | medium | 2026-07-24 |  |  |
 <!-- /maestru:work-items-list -->
