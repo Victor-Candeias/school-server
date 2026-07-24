@@ -3076,7 +3076,7 @@ function App() {
   const canReturnToClasses = activeDashboard === 'students'
 
   return (
-    <main className={user ? 'app-shell dashboard-page' : 'app-shell'}>
+    <main className={user ? 'app-shell dashboard-page' : 'app-shell auth-page'}>
       {user ? (
         <section className="dashboard-shell" aria-labelledby="dashboard-title">
           <header className="topbar">
@@ -4835,17 +4835,24 @@ function App() {
           </section>
         </section>
       ) : (
-        <section className="login-card" aria-labelledby="auth-title">
+        <section
+          className={`login-card${authMode === 'register' ? ' register-card' : ''}`}
+          aria-labelledby="auth-title"
+        >
           {authMode === 'login' ? (
           <form className="login-form" onSubmit={handleLogin}>
             <div className="login-heading">
-              <h1 id="auth-title">School Management</h1>
+              <span className="auth-eyebrow">School Management</span>
+              <h1 id="auth-title">Bem-vindo</h1>
+              <p>Inicia sessão para aceder à tua área de gestão.</p>
             </div>
 
             <label>
               Email
               <input
                 type="email"
+                autoComplete="email"
+                inputMode="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="utilizador@example.com"
@@ -4856,6 +4863,7 @@ function App() {
               Password
               <input
                 type="password"
+                autoComplete="current-password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 placeholder="A tua password"
@@ -4875,13 +4883,16 @@ function App() {
         ) : (
           <form className="login-form register-form" onSubmit={handleRegister}>
             <div className="login-heading">
-              <h1 id="auth-title">School Management</h1>
+              <span className="auth-eyebrow">School Management</span>
+              <h1 id="auth-title">Criar novo utilizador</h1>
+              <p>Preenche os dados para criar a tua conta.</p>
             </div>
 
             <label>
               Nome
               <input
                 type="text"
+                autoComplete="name"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 placeholder="Nome do utilizador"
@@ -4893,6 +4904,8 @@ function App() {
               Email
               <input
                 type="email"
+                autoComplete="email"
+                inputMode="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="utilizador@example.com"
@@ -4903,6 +4916,7 @@ function App() {
               Password
               <input
                 type="password"
+                autoComplete="new-password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 placeholder="Mínimo 8 caracteres e 1 símbolo"
@@ -4920,6 +4934,7 @@ function App() {
               Confirmar password
               <input
                 type="password"
+                autoComplete="new-password"
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
                 placeholder="Repete a password"

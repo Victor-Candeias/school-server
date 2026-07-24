@@ -97,39 +97,63 @@ button:disabled {
 }
 
 /* ── Login / Auth ────────────────────────────────────── */
+.auth-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background:
+    radial-gradient(circle at 15% 15%, rgb(37 99 235 / 24%), transparent 32rem),
+    radial-gradient(circle at 85% 85%, rgb(14 165 233 / 14%), transparent 28rem),
+    #171a23;
+}
+
 .login-card {
-  width: min(100%, 400px);
-  padding: 28px;
+  width: min(100%, 430px);
+  padding: clamp(24px, 4vw, 36px);
   border: 1px solid rgb(255 255 255 / 10%);
   border-radius: var(--radius-xl);
-  background: #1e293b;
+  background: rgb(30 41 59 / 96%);
   box-shadow: var(--shadow-lg);
 }
 
-.login-heading {
-  margin-bottom: 20px;
+.register-card {
+  width: min(100%, 720px);
 }
 
-.app-title {
-  margin: 0 0 8px;
-  color: var(--text-3);
+.login-heading {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.auth-eyebrow {
+  color: #60a5fa;
   font-size: 0.769rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
+.login-heading p {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.769rem;
+  font-weight: 500;
+}
+
 h1 {
   margin: 0;
   color: #f1f5f9;
-  font-size: 1.077rem; /* 14px */
+  font-size: clamp(1.25rem, 3vw, 1.55rem);
   font-weight: 700;
   line-height: 1.3;
 }
 
 .login-form {
   display: grid;
-  gap: 12px;
+  gap: 16px;
 }
 
 .login-form label {
@@ -144,7 +168,8 @@ h1 {
 .login-form select {
   width: 100%;
   box-sizing: border-box;
-  padding: 8px 11px;
+  min-height: 44px;
+  padding: 10px 12px;
   border: 1px solid rgb(255 255 255 / 12%);
   border-radius: var(--radius);
   color: #f1f5f9;
@@ -167,27 +192,34 @@ h1 {
 }
 
 .register-form {
-  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
 }
 
 .register-form .login-heading {
-  margin-bottom: 12px;
+  grid-column: 1 / -1;
 }
 
 .register-form label {
-  gap: 4px;
-  font-size: 0.692rem;
+  gap: 5px;
+  font-size: 0.769rem;
 }
 
 .register-form input,
 .register-form select {
-  padding: 6px 9px;
-  font-size: 0.769rem;
+  padding: 10px 12px;
+  font-size: 0.846rem;
 }
 
-.register-form button {
-  padding: 7px 12px;
-  font-size: 0.769rem;
+.register-form > button {
+  grid-column: 1 / -1;
+  min-height: 44px;
+  padding: 10px 14px;
+  font-size: 0.846rem;
+}
+
+.register-form .auth-switch {
+  grid-column: 1 / -1;
 }
 
 .password-strength {
@@ -1775,7 +1807,41 @@ h1 {
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 520px) {
   .app-shell { padding: 16px; }
-  .login-card { padding: 20px; }
+
+  .auth-page {
+    align-items: start;
+    padding:
+      max(16px, env(safe-area-inset-top))
+      max(16px, env(safe-area-inset-right))
+      max(16px, env(safe-area-inset-bottom))
+      max(16px, env(safe-area-inset-left));
+  }
+
+  .login-card {
+    padding: 22px 18px;
+    border-radius: var(--radius-lg);
+  }
+
+  .login-form,
+  .register-form {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .register-form .login-heading,
+  .register-form > button,
+  .register-form .auth-switch {
+    grid-column: auto;
+  }
+
+  .login-form input,
+  .login-form select {
+    font-size: 0.889rem;
+  }
+
+  .login-form > button {
+    min-height: 46px;
+  }
 
   .form-row,
   .form-row.three-columns { grid-template-columns: 1fr; }

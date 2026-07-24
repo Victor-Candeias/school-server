@@ -44,4 +44,5 @@ owner: victor
 | FE-27 | Gerar relatórios PDF de alunos | done | 2026-06-27 |  | high | 2026-06-27 |  |  |
 | FE-28 | Gerar relatório PDF por momento de avaliação | done | 2026-06-27 |  | medium | 2026-06-27 |  |  |
 | FE-29 | Criar dashboard de avaliações por semestre | done | 2026-06-27 |  | high | 2026-06-27 |  | [FE-29](../specs/frontend/fe-29-spec.md) |
+| FE-30 | Adaptar formulários de login e novo utilizador para mobile e desktop | done | 2026-07-24 |  | high | 2026-07-24 |  |  |
 <!-- /maestru:work-items-list -->
