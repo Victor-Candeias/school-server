@@ -46,4 +46,5 @@ owner: victor
 | FE-29 | Criar dashboard de avaliações por semestre | done | 2026-06-27 |  | high | 2026-06-27 |  | [FE-29](../specs/frontend/fe-29-spec.md) |
 | FE-30 | Adaptar formulários de login e novo utilizador para mobile e desktop | done | 2026-07-24 |  | high | 2026-07-24 |  |  |
 | FE-31 | Adaptar menu de escolas e barra superior para mobile e desktop | done | 2026-07-24 |  | high | 2026-07-24 |  |  |
+| FE-32 | Adaptar menu dos alunos para mobile e desktop | done | 2026-07-24 |  | high | 2026-07-24 |  |  |
 <!-- /maestru:work-items-list -->

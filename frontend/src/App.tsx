@@ -3451,18 +3451,20 @@ function App() {
               </section>
             ) : activeDashboard === 'students' && selectedClass ? (
               <section className="students-dashboard" aria-label="Dashboard dos alunos">
-                <aside className="students-sidebar" aria-label="Menu de alunos">
+                <nav className="students-sidebar" aria-label="Menu de alunos">
+                  <span className="students-sidebar-title">Menu da turma</span>
                   {STUDENTS_MENU_OPTIONS.map((option) => (
                     <button
                       key={option.id}
                       type="button"
                       className={activeStudentsMenuOption === option.id ? 'active' : ''}
                       onClick={() => handleStudentsMenuOptionChange(option.id)}
+                      aria-current={activeStudentsMenuOption === option.id ? 'page' : undefined}
                     >
                       {option.label}
                     </button>
                   ))}
-                </aside>
+                </nav>
                 {activeStudentsMenuOption === 0 ? (
                   <section className="students-panel" aria-label="Calendário mensal">
                     <div className="student-calendar-heading">
