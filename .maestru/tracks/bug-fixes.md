@@ -52,4 +52,6 @@ owner: victor
 | BUG-35 | Persistir temporizador de mensagens e cores de percentagem | done | 2026-06-27 |  | high | 2026-06-27 |  |  |
 | BUG-36 | Nomear opção quatro como Avaliações | done | 2026-06-27 |  | low | 2026-06-27 |  |  |
 | BUG-37 | Corrigir 404 da imagem de fundo no frontend | done | 2026-07-24 | developer | medium | 2026-07-24 |  |  |
+| BUG-38 | Corrigir navegação hierárquica do menu principal | done | 2026-07-24 |  | medium | 2026-07-24 |  |  |
+| BUG-39 | Corrigir estados cumulativos da navegação principal | done | 2026-07-24 |  | high | 2026-07-24 |  |  |
 <!-- /maestru:work-items-list -->

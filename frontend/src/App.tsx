@@ -2378,6 +2378,35 @@ function App() {
     openSettingsDashboard()
   }
 
+  function returnToSchoolsDashboard() {
+    if (activeDashboard === 'students' && activeStudentsMenuOption === 3 && !canLeaveAssessmentMoment()) {
+      return
+    }
+
+    setSelectedAcademicYearDocument(null)
+    setSelectedClass(null)
+    setActiveDashboard('schools')
+  }
+
+  function returnToYearsDashboard() {
+    if (activeDashboard === 'students' && activeStudentsMenuOption === 3 && !canLeaveAssessmentMoment()) {
+      return
+    }
+
+    setSelectedAcademicYearDocument(null)
+    setSelectedClass(null)
+    setActiveDashboard('years')
+  }
+
+  function returnToClassesDashboard() {
+    if (activeStudentsMenuOption === 3 && !canLeaveAssessmentMoment()) {
+      return
+    }
+
+    setSelectedClass(null)
+    setActiveDashboard('classes')
+  }
+
   function removeAssessmentDraftsForMoment(momentId: string) {
     setAssessmentCellDrafts((currentDrafts) => {
       const nextDrafts = { ...currentDrafts }
@@ -3038,6 +3067,14 @@ function App() {
     }
   }
 
+  const canReturnToSchools = (
+    activeDashboard === 'years'
+    || activeDashboard === 'classes'
+    || activeDashboard === 'students'
+  )
+  const canReturnToYears = activeDashboard === 'classes' || activeDashboard === 'students'
+  const canReturnToClasses = activeDashboard === 'students'
+
   return (
     <main className={user ? 'app-shell dashboard-page' : 'app-shell'}>
       {user ? (
@@ -3047,28 +3084,32 @@ function App() {
             <nav className="topbar-nav" aria-label="Navegação principal">
               <button
                 type="button"
-                className={`topbar-nav-btn${activeDashboard === 'schools' ? ' active' : ''}`}
+                className={`topbar-nav-btn${canReturnToSchools ? ' active' : ''}`}
+                onClick={returnToSchoolsDashboard}
+                disabled={!canReturnToSchools}
               >
                 Escolas
               </button>
               <button
                 type="button"
-                className={`topbar-nav-btn${activeDashboard === 'years' ? ' active' : ''}`}
-                disabled={schools.length === 0}
+                className={`topbar-nav-btn${canReturnToYears ? ' active' : ''}`}
+                onClick={returnToYearsDashboard}
+                disabled={!canReturnToYears}
               >
                 Anos Letivos
               </button>
               <button
                 type="button"
-                className={`topbar-nav-btn${activeDashboard === 'classes' ? ' active' : ''}`}
-                disabled={allAcademicYears.length === 0}
+                className={`topbar-nav-btn${canReturnToClasses ? ' active' : ''}`}
+                onClick={returnToClassesDashboard}
+                disabled={!canReturnToClasses}
               >
                 Turmas
               </button>
               <button
                 type="button"
-                className={`topbar-nav-btn${activeDashboard === 'students' ? ' active' : ''}`}
-                disabled={allClasses.length === 0}
+                className="topbar-nav-btn"
+                disabled
               >
                 Alunos
               </button>

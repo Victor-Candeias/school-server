@@ -321,6 +321,7 @@ h1 {
   border-bottom-color: #c0392b;
   background: transparent;
   font-weight: 700;
+  cursor: pointer;
 }
 
 .topbar-nav-btn:disabled {
