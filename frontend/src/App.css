@@ -291,6 +291,8 @@ h1 {
   grid-template-rows: auto 1fr;
   width: 100%;
   height: 100%;
+  min-width: 0;
+  min-height: 0;
   gap: 0;
   margin: 0;
   overflow: hidden;
@@ -319,10 +321,16 @@ h1 {
   border-right: 1px solid #e5e7eb;
 }
 
+.topbar-brand-short,
+.topbar-settings-label-short {
+  display: none;
+}
+
 .topbar-nav {
   display: flex;
   gap: 0;
   flex: 1;
+  min-width: 0;
   height: 100%;
 }
 
@@ -356,10 +364,23 @@ h1 {
   cursor: pointer;
 }
 
+.topbar-nav-btn.current {
+  color: #111827;
+  border-bottom-color: #c0392b;
+  background: #fef2f2;
+  font-weight: 700;
+  opacity: 1;
+}
+
 .topbar-nav-btn:disabled {
   color: #9ca3af;
   cursor: default;
   opacity: 0.55;
+}
+
+.topbar-nav-btn.current:disabled {
+  color: #111827;
+  opacity: 1;
 }
 
 .topbar-actions {
@@ -440,9 +461,9 @@ h1 {
 /* ── Dashboard content ───────────────────────────────── */
 .dashboard-content {
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 20px;
-  padding: 28px 32px;
+  padding: clamp(20px, 2.5vw, 32px);
   min-width: 0;
   min-height: 0;
   overflow-y: auto;
@@ -518,16 +539,17 @@ h1 {
 /* ── Schools / Years / Classes grid ─────────────────── */
 .schools-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 220px);
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 320px));
+  gap: 18px;
   justify-content: start;
   align-content: start;
 }
 
 .school-card {
-  width: 220px;
-  min-height: 200px;
-  padding: 18px;
+  width: 100%;
+  min-width: 0;
+  min-height: 220px;
+  padding: 20px;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--surface);
@@ -561,6 +583,7 @@ h1 {
 .create-school-card button,
 .school-card-actions button {
   margin-top: 14px;
+  min-height: 42px;
 }
 
 .existing-school-card {
@@ -1854,16 +1877,152 @@ h1 {
   .students-table-row { grid-template-columns: 1fr; }
 
   .student-summary { grid-template-columns: 1fr; }
+
+  .topbar-brand-full,
+  .topbar-settings-label-full {
+    display: none;
+  }
+
+  .topbar-brand-short,
+  .topbar-settings-label-short {
+    display: inline;
+  }
+
+  .dashboard-content {
+    gap: 16px;
+    padding: 18px 16px;
+  }
+
+  .schools-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .school-card {
+    min-height: 0;
+    padding: 18px;
+  }
+
+  .create-school-card {
+    gap: 12px;
+  }
+
+  .create-school-card button,
+  .school-card-actions button {
+    min-height: 46px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .topbar {
+    padding-inline: 18px;
+  }
+
+  .topbar-brand {
+    padding-right: 18px;
+  }
+
+  .topbar-nav-btn {
+    padding-inline: 14px;
+  }
+
+  .topbar-actions {
+    padding-left: 12px;
+  }
+
+  .topbar-user-email {
+    display: none;
+  }
+
+  .topbar-action-btn {
+    padding-inline: 12px;
+  }
 }
 
 @media (max-width: 900px) {
-  .dashboard-shell { height: auto; min-height: auto; }
+  .dashboard-shell {
+    height: 100%;
+    min-height: 0;
+  }
 
-  .topbar { flex-wrap: wrap; height: auto; padding: 10px 14px; gap: 8px; }
-  .topbar-nav { flex-wrap: wrap; }
-  .topbar-actions { flex-wrap: wrap; }
+  .topbar {
+    display: grid;
+    grid-template-areas:
+      'brand actions'
+      'nav nav';
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: stretch;
+    height: auto;
+    padding: 0 14px;
+  }
+
+  .topbar-brand {
+    grid-area: brand;
+    min-width: 0;
+    min-height: 52px;
+    padding: 0;
+    margin: 0;
+    border-right: 0;
+  }
+
+  .topbar-nav {
+    grid-area: nav;
+    width: 100%;
+    height: 47px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-top: 1px solid #e5e7eb;
+    scrollbar-width: thin;
+    overscroll-behavior-inline: contain;
+  }
+
+  .topbar-nav-btn {
+    flex: 0 0 auto;
+    height: 47px;
+    padding: 0 18px;
+  }
+
+  .topbar-actions {
+    grid-area: actions;
+    min-height: 52px;
+    padding: 0;
+    margin: 0;
+    border-left: 0;
+  }
+
+  .topbar-user-role,
+  .topbar-user-email {
+    display: none;
+  }
+
+  .topbar-action-btn {
+    min-height: 44px;
+    padding: 0 14px;
+  }
 
   .dashboard-grid { grid-template-columns: 1fr; }
+
+  .schools-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .topbar {
+    padding-inline: 12px;
+  }
+
+  .topbar-action-btn {
+    padding-inline: 10px;
+  }
+
+  .topbar-nav-btn {
+    padding-inline: 16px;
+  }
+
+  .schools-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* ── Settings theme toggle ───────────────────────────── */
@@ -2015,12 +2174,30 @@ html.dark .topbar-nav-btn.active {
   border-bottom-color: #c0392b;
 }
 
+html.dark .topbar-nav-btn.current,
+html.dark .topbar-nav-btn.current:disabled {
+  color: #f8fafc;
+  border-bottom-color: #ef4444;
+  background: #1e1a1a;
+  opacity: 1;
+}
+
 html.dark .topbar-nav-btn:disabled {
   color: #475569;
 }
 
+html.dark .topbar-nav-btn.current:disabled {
+  color: #f8fafc;
+}
+
 html.dark .topbar-actions {
   border-left-color: #334155;
+}
+
+@media (max-width: 900px) {
+  html.dark .topbar-nav {
+    border-top-color: #334155;
+  }
 }
 
 html.dark .topbar-user-email {

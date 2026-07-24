@@ -3080,36 +3080,55 @@ function App() {
       {user ? (
         <section className="dashboard-shell" aria-labelledby="dashboard-title">
           <header className="topbar">
-            <span className="topbar-brand">School Management</span>
+            <span className="topbar-brand">
+              <span className="topbar-brand-full">School Management</span>
+              <span className="topbar-brand-short" aria-hidden="true">School</span>
+            </span>
             <nav className="topbar-nav" aria-label="Navegação principal">
               <button
                 type="button"
-                className={`topbar-nav-btn${canReturnToSchools ? ' active' : ''}`}
+                className={[
+                  'topbar-nav-btn',
+                  activeDashboard === 'schools' ? 'current' : '',
+                  canReturnToSchools ? 'active' : '',
+                ].filter(Boolean).join(' ')}
                 onClick={returnToSchoolsDashboard}
                 disabled={!canReturnToSchools}
+                aria-current={activeDashboard === 'schools' ? 'page' : undefined}
               >
                 Escolas
               </button>
               <button
                 type="button"
-                className={`topbar-nav-btn${canReturnToYears ? ' active' : ''}`}
+                className={[
+                  'topbar-nav-btn',
+                  activeDashboard === 'years' ? 'current' : '',
+                  canReturnToYears ? 'active' : '',
+                ].filter(Boolean).join(' ')}
                 onClick={returnToYearsDashboard}
                 disabled={!canReturnToYears}
+                aria-current={activeDashboard === 'years' ? 'page' : undefined}
               >
                 Anos Letivos
               </button>
               <button
                 type="button"
-                className={`topbar-nav-btn${canReturnToClasses ? ' active' : ''}`}
+                className={[
+                  'topbar-nav-btn',
+                  activeDashboard === 'classes' ? 'current' : '',
+                  canReturnToClasses ? 'active' : '',
+                ].filter(Boolean).join(' ')}
                 onClick={returnToClassesDashboard}
                 disabled={!canReturnToClasses}
+                aria-current={activeDashboard === 'classes' ? 'page' : undefined}
               >
                 Turmas
               </button>
               <button
                 type="button"
-                className="topbar-nav-btn"
+                className={`topbar-nav-btn${activeDashboard === 'students' ? ' current' : ''}`}
                 disabled
+                aria-current={activeDashboard === 'students' ? 'page' : undefined}
               >
                 Alunos
               </button>
@@ -3121,8 +3140,10 @@ function App() {
                 type="button"
                 className={`topbar-action-btn${activeDashboard === 'settings' ? ' active' : ''}`}
                 onClick={openSettingsDashboardWithAssessmentGuard}
+                aria-current={activeDashboard === 'settings' ? 'page' : undefined}
               >
-                Configurações
+                <span className="topbar-settings-label-full">Configurações</span>
+                <span className="topbar-settings-label-short" aria-hidden="true">Config.</span>
               </button>
               <button
                 type="button"
