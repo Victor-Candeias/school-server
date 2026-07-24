@@ -54,4 +54,5 @@ owner: victor
 | BUG-37 | Corrigir 404 da imagem de fundo no frontend | done | 2026-07-24 | developer | medium | 2026-07-24 |  |  |
 | BUG-38 | Corrigir navegação hierárquica do menu principal | done | 2026-07-24 |  | medium | 2026-07-24 |  |  |
 | BUG-39 | Corrigir estados cumulativos da navegação principal | done | 2026-07-24 |  | high | 2026-07-24 |  |  |
+| BUG-40 | Corrigir toolbar e scroll do menu de alunos no mobile | done | 2026-07-24 |  | high | 2026-07-24 |  |  |
 <!-- /maestru:work-items-list -->

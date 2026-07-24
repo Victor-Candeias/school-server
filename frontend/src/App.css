@@ -1964,6 +1964,10 @@ h1 {
     min-height: 0;
   }
 
+  .dashboard-content:has(.students-dashboard) {
+    overflow: hidden;
+  }
+
   .topbar {
     display: grid;
     grid-template-areas:
@@ -2027,14 +2031,20 @@ h1 {
 
   .students-dashboard {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
     gap: 12px;
+    align-items: stretch;
+    min-height: 0;
+    overflow: hidden;
   }
 
   .students-sidebar {
     position: static;
     display: flex;
+    flex-wrap: nowrap;
     width: 100%;
     min-width: 0;
+    min-height: 0;
     padding: 8px;
     overflow-x: auto;
     overflow-y: hidden;
@@ -2059,6 +2069,14 @@ h1 {
   .students-dashboard .students-sidebar button.active {
     box-shadow: inset 0 -3px 0 var(--primary);
   }
+
+  .students-dashboard > .students-panel {
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 @media (max-width: 520px) {
@@ -2078,21 +2096,12 @@ h1 {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .students-sidebar {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px;
-    overflow: visible;
-  }
-
   .students-dashboard .students-sidebar button {
-    width: 100%;
-    min-height: 48px;
-    padding: 8px 10px;
+    width: auto;
+    min-height: 44px;
+    padding-inline: 12px;
     font-size: 0.72rem;
-    justify-content: center;
-    text-align: center;
-    white-space: normal;
+    white-space: nowrap;
   }
 }
 
