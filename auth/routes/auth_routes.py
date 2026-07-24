@@ -83,7 +83,7 @@ async def register(request: Request):
 
     Returns:
         JSONResponse: A response indicating success or failure.
-    
+
     Possible Status Codes:
         - 201: User registered successfully.
         - 400: User already exists or invalid input.
@@ -234,8 +234,9 @@ async def login(request: Request, response: Response):
         # get role
         role = responseAdd.get("documents", [{}])[0].get("role", "unknown")
 
-        # Return the generated token
-        return JSONResponse(
+        # Return the generated token and expose it to the school service through
+        # a same-origin, HTTP-only cookie.
+        login_response = JSONResponse(
             status_code=200,
             content={
                 "message": "Login realizado com sucesso.",
@@ -244,6 +245,15 @@ async def login(request: Request, response: Response):
                 "role": role,
             },
         )
+        login_response.set_cookie(
+            key="access_token",
+            value=token,
+            httponly=True,
+            secure=False,
+            samesite="lax",
+            path="/",
+        )
+        return login_response
     
     except Exception as e:
         # Handle unexpected errors
@@ -258,7 +268,7 @@ async def login(request: Request, response: Response):
 async def logout(request: Request, response: Response):
     try:
         logout_response = JSONResponse(status_code=200, content={"message": "User logout realizado com sucesso."})
-        logout_response.delete_cookie("access_token")
+        logout_response.delete_cookie("access_token", path="/")
         return logout_response
 
     except Exception as e:
@@ -385,4 +395,3 @@ async def get_users(request: Request):
         errMessage = f"Error message:{e}"
         await utilities.add_log_to_db(api_client=api_client, source="get_users", method="login", message=errMessage)
         return JSONResponse(status_code=500, content={"message":errMessage})
-    

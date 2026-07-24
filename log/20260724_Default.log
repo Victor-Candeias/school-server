@@ -1,0 +1,285 @@
+2026-07-24 11:01:35,067 - INFO - Logging setup successfully. Log file: /home/victor/Dev/school/school-server/log/20260724_Default.log
+2026-07-24 11:01:35,289 - INFO - Logging setup successfully. Log file: /home/victor/Dev/school/school-server/log/20260724_Default.log
+2026-07-24 11:50:42,337 - INFO - Logging setup successfully. Log file: /home/victor/Dev/school/school-server/log/20260724_Default.log
+2026-07-24 11:50:42,526 - INFO - Logging setup successfully. Log file: /home/victor/Dev/school/school-server/log/20260724_Default.log
+2026-07-24 11:57:52,180 - INFO - Logging setup successfully. Log file: /home/victor/Dev/school/school-server/log/20260724_Default.log
+2026-07-24 11:57:52,391 - INFO - Logging setup successfully. Log file: /home/victor/Dev/school/school-server/log/20260724_Default.log
+2026-07-24 11:58:28,364 - INFO - find_documents();collection=_healthcheck
+2026-07-24 11:58:28,365 - INFO - find_documents();query={}
+2026-07-24 11:58:28,381 - INFO - find();Found 0 documents in _healthcheck
+2026-07-24 12:07:15,154 - INFO - find_documents();collection=users
+2026-07-24 12:07:15,155 - INFO - find_documents();query={}
+2026-07-24 12:07:15,160 - INFO - find();Found 0 documents in users
+2026-07-24 12:08:35,888 - INFO - insert_document();collection=logs
+2026-07-24 12:08:35,888 - INFO - insert_document();source=auth_api
+2026-07-24 12:08:35,889 - INFO - insert_document();logtype=db
+2026-07-24 12:08:35,889 - INFO - insert_document();logLevel=INFO
+2026-07-24 12:08:35,895 - INFO - log_to_mongodb();Logged to logs: 6a6347b3c8e3bf9fffaf9199
+2026-07-24 12:08:35,956 - INFO - find_documents();collection=users
+2026-07-24 12:08:35,956 - INFO - find_documents();query={'email': 'victor.s.candeias@outlook.pt'}
+2026-07-24 12:08:35,961 - INFO - find();Found 0 documents in users
+2026-07-24 12:08:36,021 - INFO - insert_document();collection=logs
+2026-07-24 12:08:36,022 - INFO - insert_document();source=auth_api
+2026-07-24 12:08:36,023 - INFO - insert_document();logtype=db
+2026-07-24 12:08:36,023 - INFO - insert_document();logLevel=INFO
+2026-07-24 12:08:36,028 - INFO - log_to_mongodb();Logged to logs: 6a6347b4c8e3bf9fffaf919a
+2026-07-24 12:08:36,605 - INFO - insert_document();collection=users
+2026-07-24 12:08:36,606 - INFO - insert_document();data={'name': 'victor', 'email': 'victor.s.candeias@outlook.pt', 'password': '$2b$12$sKxYHV6WOsbMMiYyCLodO.1EqGa4XMEUaU6BtqjvRFptJUfyTN4ke', 'role': 'user'}
+2026-07-24 12:08:36,610 - INFO - insert();Inserted into users: 6a6347b4c8e3bf9fffaf919b
+2026-07-24 12:08:36,666 - INFO - insert_document();collection=logs
+2026-07-24 12:08:36,667 - INFO - insert_document();source=auth_api
+2026-07-24 12:08:36,668 - INFO - insert_document();logtype=db
+2026-07-24 12:08:36,668 - INFO - insert_document();logLevel=INFO
+2026-07-24 12:08:36,672 - INFO - log_to_mongodb();Logged to logs: 6a6347b4c8e3bf9fffaf919c
+2026-07-24 12:08:36,729 - INFO - insert_document();collection=logs
+2026-07-24 12:08:36,730 - INFO - insert_document();source=auth_api
+2026-07-24 12:08:36,730 - INFO - insert_document();logtype=db
+2026-07-24 12:08:36,731 - INFO - insert_document();logLevel=INFO
+2026-07-24 12:08:36,735 - INFO - log_to_mongodb();Logged to logs: 6a6347b4c8e3bf9fffaf919d
+2026-07-24 12:08:47,462 - INFO - insert_document();collection=logs
+2026-07-24 12:08:47,463 - INFO - insert_document();source=auth_api
+2026-07-24 12:08:47,463 - INFO - insert_document();logtype=db
+2026-07-24 12:08:47,464 - INFO - insert_document();logLevel=INFO
+2026-07-24 12:08:47,469 - INFO - log_to_mongodb();Logged to logs: 6a6347bfc8e3bf9fffaf919e
+2026-07-24 12:08:47,533 - INFO - find_documents();collection=users
+2026-07-24 12:08:47,534 - INFO - find_documents();query={'email': 'victor.s.candeias@outlook.pt'}
+2026-07-24 12:08:47,539 - INFO - find();Found 1 documents in users
+2026-07-24 12:08:49,216 - INFO - find_documents();collection=classes
+2026-07-24 12:08:49,216 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:08:49,219 - INFO - find();Found 0 documents in classes
+2026-07-24 12:08:49,227 - INFO - find_documents();collection=years
+2026-07-24 12:08:49,228 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:08:49,231 - INFO - find();Found 0 documents in years
+2026-07-24 12:08:49,235 - INFO - find_documents();collection=schools
+2026-07-24 12:08:49,235 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:08:49,238 - INFO - find();Found 0 documents in schools
+2026-07-24 12:08:49,241 - INFO - find_documents();collection=students
+2026-07-24 12:08:49,241 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:08:49,244 - INFO - find();Found 0 documents in students
+2026-07-24 12:09:00,718 - INFO - insert_document();collection=logs
+2026-07-24 12:09:00,719 - INFO - insert_document();source=auth_api
+2026-07-24 12:09:00,719 - INFO - insert_document();logtype=db
+2026-07-24 12:09:00,720 - INFO - insert_document();logLevel=INFO
+2026-07-24 12:09:00,724 - INFO - log_to_mongodb();Logged to logs: 6a6347ccc8e3bf9fffaf919f
+2026-07-24 12:09:00,786 - INFO - find_documents();collection=users
+2026-07-24 12:09:00,787 - INFO - find_documents();query={'email': 'victor.s.candeias@outlook.pt'}
+2026-07-24 12:09:00,792 - INFO - find();Found 1 documents in users
+2026-07-24 12:09:01,595 - INFO - find_documents();collection=schools
+2026-07-24 12:09:01,595 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:09:01,603 - INFO - find();Found 0 documents in schools
+2026-07-24 12:09:01,615 - INFO - find_documents();collection=years
+2026-07-24 12:09:01,615 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:09:01,618 - INFO - find();Found 0 documents in years
+2026-07-24 12:09:01,621 - INFO - find_documents();collection=classes
+2026-07-24 12:09:01,621 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:09:01,624 - INFO - find();Found 0 documents in classes
+2026-07-24 12:09:01,627 - INFO - find_documents();collection=students
+2026-07-24 12:09:01,627 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:09:01,630 - INFO - find();Found 0 documents in students
+2026-07-24 12:23:53,925 - INFO - find_documents();collection=appsettings
+2026-07-24 12:23:53,925 - INFO - find_documents();query={'key': 'global'}
+2026-07-24 12:23:53,931 - INFO - find();Found 0 documents in appsettings
+2026-07-24 12:23:53,991 - INFO - insert_document();collection=appsettings
+2026-07-24 12:23:53,992 - INFO - insert_document();data={'key': 'global', 'inactiveLogoutMinutes': 15, 'messageTimeoutSeconds': 5, 'percentageRanges': [{'id': 'very-low', 'min': 0, 'max': 10, 'backgroundColor': '#dc2626', 'textColor': '#ffffff'}, {'id': 'low', 'min': 11, 'max': 39, 'backgroundColor': '#fdba74', 'textColor': '#7c2d12'}, {'id': 'mid-low', 'min': 40, 'max': 49, 'backgroundColor': '#fde68a', 'textColor': '#713f12'}, {'id': 'mid', 'min': 50, 'max': 69, 'backgroundColor': '#bbf7d0', 'textColor': '#14532d'}, {'id': 'high', 'min': 70, 'max': 85, 'backgroundColor': '#15803d', 'textColor': '#ffffff'}, {'id': 'very-high', 'min': 86, 'max': 100, 'backgroundColor': '#ddd6fe', 'textColor': '#4c1d95'}]}
+2026-07-24 12:23:54,083 - INFO - insert();Inserted into appsettings: 6a634b49c8e3bf9fffaf91a0
+2026-07-24 12:24:48,511 - INFO - insert_document();collection=logs
+2026-07-24 12:24:48,512 - INFO - insert_document();source=auth_api
+2026-07-24 12:24:48,512 - INFO - insert_document();logtype=db
+2026-07-24 12:24:48,513 - INFO - insert_document();logLevel=INFO
+2026-07-24 12:24:48,521 - INFO - log_to_mongodb();Logged to logs: 6a634b80c8e3bf9fffaf91a1
+2026-07-24 12:24:48,579 - INFO - find_documents();collection=users
+2026-07-24 12:24:48,580 - INFO - find_documents();query={'email': 'victor.s.candeias@outlook.pt'}
+2026-07-24 12:24:48,584 - INFO - find();Found 1 documents in users
+2026-07-24 12:24:49,690 - INFO - find_documents();collection=schools
+2026-07-24 12:24:49,691 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:24:49,694 - INFO - find();Found 0 documents in schools
+2026-07-24 12:24:49,707 - INFO - find_documents();collection=students
+2026-07-24 12:24:49,708 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:24:49,713 - INFO - find();Found 0 documents in students
+2026-07-24 12:24:49,717 - INFO - find_documents();collection=years
+2026-07-24 12:24:49,718 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:24:49,721 - INFO - find();Found 0 documents in years
+2026-07-24 12:24:49,724 - INFO - find_documents();collection=classes
+2026-07-24 12:24:49,725 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:24:49,727 - INFO - find();Found 0 documents in classes
+2026-07-24 12:24:49,734 - INFO - find_documents();collection=testsmoments
+2026-07-24 12:24:49,734 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:24:49,737 - INFO - find();Found 0 documents in testsmoments
+2026-07-24 12:24:49,740 - INFO - find_documents();collection=studentstestmoments
+2026-07-24 12:24:49,740 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:24:49,743 - INFO - find();Found 0 documents in studentstestmoments
+2026-07-24 12:24:50,009 - INFO - find_documents();collection=appsettings
+2026-07-24 12:24:50,009 - INFO - find_documents();query={'key': 'global'}
+2026-07-24 12:24:50,013 - INFO - find();Found 1 documents in appsettings
+2026-07-24 12:25:10,902 - INFO - find_documents();collection=schools
+2026-07-24 12:25:10,903 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '123456', 'name': 'Pedro Santarem', 'address': {'street': 'Avenida Do Uruguai', 'postalCode': '1500-611', 'locality': 'Lisboa'}, 'phones': ['926391361'], 'director': {'name': 'Victor Candeias'}}
+2026-07-24 12:25:10,908 - INFO - find();Found 0 documents in schools
+2026-07-24 12:25:10,975 - INFO - insert_document();collection=schools
+2026-07-24 12:25:10,976 - INFO - insert_document();data={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '123456', 'name': 'Pedro Santarem', 'address': {'street': 'Avenida Do Uruguai', 'postalCode': '1500-611', 'locality': 'Lisboa'}, 'phones': ['926391361'], 'director': {'name': 'Victor Candeias'}}
+2026-07-24 12:25:11,051 - INFO - insert();Inserted into schools: 6a634b96c8e3bf9fffaf91a2
+2026-07-24 12:25:11,152 - INFO - find_documents();collection=schools
+2026-07-24 12:25:11,152 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:25:11,157 - INFO - find();Found 1 documents in schools
+2026-07-24 12:25:19,222 - INFO - find_documents();collection=years
+2026-07-24 12:25:19,222 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2'}
+2026-07-24 12:25:19,227 - INFO - find();Found 0 documents in years
+2026-07-24 12:25:23,100 - INFO - find_documents();collection=years
+2026-07-24 12:25:23,100 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'schoolName': 'Pedro Santarem', 'name': '2026/2027', 'startYear': 2026, 'endYear': 2027, 'periodType': 'semestres'}
+2026-07-24 12:25:23,105 - INFO - find();Found 0 documents in years
+2026-07-24 12:25:23,169 - INFO - insert_document();collection=years
+2026-07-24 12:25:23,170 - INFO - insert_document();data={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'schoolName': 'Pedro Santarem', 'name': '2026/2027', 'startYear': 2026, 'endYear': 2027, 'periodType': 'semestres'}
+2026-07-24 12:25:23,266 - INFO - insert();Inserted into years: 6a634ba3c8e3bf9fffaf91a3
+2026-07-24 12:25:23,365 - INFO - find_documents();collection=years
+2026-07-24 12:25:23,366 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2'}
+2026-07-24 12:25:23,371 - INFO - find();Found 1 documents in years
+2026-07-24 12:25:23,463 - INFO - find_documents();collection=years
+2026-07-24 12:25:23,464 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:25:23,469 - INFO - find();Found 1 documents in years
+2026-07-24 12:26:04,621 - INFO - find_documents();collection=classes
+2026-07-24 12:26:04,622 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'schoolName': 'Pedro Santarem', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'name': '7.º A', 'director': {'name': 'Carla Antunes'}}
+2026-07-24 12:26:04,627 - INFO - find();Found 0 documents in classes
+2026-07-24 12:26:04,693 - INFO - insert_document();collection=classes
+2026-07-24 12:26:04,694 - INFO - insert_document();data={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'schoolName': 'Pedro Santarem', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'name': '7.º A', 'director': {'name': 'Carla Antunes'}}
+2026-07-24 12:26:04,778 - INFO - insert();Inserted into classes: 6a634bccc8e3bf9fffaf91a4
+2026-07-24 12:26:05,108 - INFO - find_documents();collection=students
+2026-07-24 12:26:05,109 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'id': 1, 'name': 'Carminho', 'schoolNumber': '12345', 'schoolEmail': 'victor.s.candeias@outlook.pt', 'guardian': {'name': 'Carla Antunes', 'phone': '911231212', 'email': 'victor.s.candeias@outlook.pt'}, 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'schoolName': 'Pedro Santarem', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'classId': '6a634bccc8e3bf9fffaf91a4', 'className': '7.º A', 'active': True}
+2026-07-24 12:26:05,113 - INFO - find();Found 0 documents in students
+2026-07-24 12:26:05,181 - INFO - insert_document();collection=students
+2026-07-24 12:26:05,181 - INFO - insert_document();data={'userId': '6a6347b4c8e3bf9fffaf919b', 'id': 1, 'name': 'Carminho', 'schoolNumber': '12345', 'schoolEmail': 'victor.s.candeias@outlook.pt', 'guardian': {'name': 'Carla Antunes', 'phone': '911231212', 'email': 'victor.s.candeias@outlook.pt'}, 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'schoolName': 'Pedro Santarem', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'classId': '6a634bccc8e3bf9fffaf91a4', 'className': '7.º A', 'active': True}
+2026-07-24 12:26:05,281 - INFO - insert();Inserted into students: 6a634bcdc8e3bf9fffaf91a5
+2026-07-24 12:26:05,371 - INFO - find_documents();collection=classes
+2026-07-24 12:26:05,372 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:26:05,376 - INFO - find();Found 1 documents in classes
+2026-07-24 12:26:05,472 - INFO - find_documents();collection=students
+2026-07-24 12:26:05,473 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:26:05,477 - INFO - find();Found 1 documents in students
+2026-07-24 12:28:04,360 - INFO - find_documents();collection=studentscalendar
+2026-07-24 12:28:04,361 - INFO - find_documents();query={'userId': 'validation', 'schoolId': 'validation', 'yearId': 'validation', 'classId': 'validation'}
+2026-07-24 12:28:04,365 - INFO - find();Found 0 documents in studentscalendar
+2026-07-24 12:28:35,244 - INFO - insert_document();collection=logs
+2026-07-24 12:28:35,245 - INFO - insert_document();source=auth_api
+2026-07-24 12:28:35,246 - INFO - insert_document();logtype=db
+2026-07-24 12:28:35,246 - INFO - insert_document();logLevel=INFO
+2026-07-24 12:28:35,251 - INFO - log_to_mongodb();Logged to logs: 6a634c63c8e3bf9fffaf91a6
+2026-07-24 12:28:35,309 - INFO - find_documents();collection=users
+2026-07-24 12:28:35,310 - INFO - find_documents();query={'email': 'victor.s.candeias@outlook.pt'}
+2026-07-24 12:28:35,314 - INFO - find();Found 1 documents in users
+2026-07-24 12:28:36,085 - INFO - find_documents();collection=schools
+2026-07-24 12:28:36,086 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:28:36,089 - INFO - find();Found 1 documents in schools
+2026-07-24 12:28:36,176 - INFO - find_documents();collection=years
+2026-07-24 12:28:36,177 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:28:36,180 - INFO - find();Found 1 documents in years
+2026-07-24 12:28:36,189 - INFO - find_documents();collection=classes
+2026-07-24 12:28:36,189 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:28:36,192 - INFO - find();Found 1 documents in classes
+2026-07-24 12:28:36,195 - INFO - find_documents();collection=students
+2026-07-24 12:28:36,195 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:28:36,198 - INFO - find();Found 1 documents in students
+2026-07-24 12:28:36,227 - INFO - find_documents();collection=studentstestmoments
+2026-07-24 12:28:36,227 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:28:36,230 - INFO - find();Found 0 documents in studentstestmoments
+2026-07-24 12:28:36,233 - INFO - find_documents();collection=testsmoments
+2026-07-24 12:28:36,234 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:28:36,236 - INFO - find();Found 0 documents in testsmoments
+2026-07-24 12:28:36,294 - INFO - find_documents();collection=appsettings
+2026-07-24 12:28:36,294 - INFO - find_documents();query={'key': 'global'}
+2026-07-24 12:28:36,297 - INFO - find();Found 1 documents in appsettings
+2026-07-24 12:28:37,675 - INFO - find_documents();collection=years
+2026-07-24 12:28:37,676 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2'}
+2026-07-24 12:28:37,681 - INFO - find();Found 1 documents in years
+2026-07-24 12:28:39,371 - INFO - find_documents();collection=studentscalendar
+2026-07-24 12:28:39,372 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4'}
+2026-07-24 12:28:39,376 - INFO - find();Found 0 documents in studentscalendar
+2026-07-24 12:29:16,396 - INFO - find_documents();collection=testsmoments
+2026-07-24 12:29:16,397 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'schoolName': 'Pedro Santarem', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'classId': '6a634bccc8e3bf9fffaf91a4', 'className': '7.º A', 'name': 'Teste 1', 'type': 'teste', 'semester': '1', 'totalValue': 20, 'questions': [{'number': '1', 'value': 5}, {'number': '2', 'value': 5}, {'number': '3', 'value': 4}, {'number': '4', 'value': 5}, {'number': '5', 'value': 1}]}
+2026-07-24 12:29:16,402 - INFO - find();Found 0 documents in testsmoments
+2026-07-24 12:29:16,468 - INFO - insert_document();collection=testsmoments
+2026-07-24 12:29:16,468 - INFO - insert_document();data={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'schoolName': 'Pedro Santarem', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'classId': '6a634bccc8e3bf9fffaf91a4', 'className': '7.º A', 'name': 'Teste 1', 'type': 'teste', 'semester': '1', 'totalValue': 20, 'questions': [{'number': '1', 'value': 5}, {'number': '2', 'value': 5}, {'number': '3', 'value': 4}, {'number': '4', 'value': 5}, {'number': '5', 'value': 1}]}
+2026-07-24 12:29:16,548 - INFO - insert();Inserted into testsmoments: 6a634c8cc8e3bf9fffaf91a7
+2026-07-24 12:29:16,668 - INFO - find_documents();collection=testsmoments
+2026-07-24 12:29:16,668 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b'}
+2026-07-24 12:29:16,673 - INFO - find();Found 1 documents in testsmoments
+2026-07-24 12:29:20,023 - INFO - find_documents();collection=studentstestmoments
+2026-07-24 12:29:20,024 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7'}
+2026-07-24 12:29:20,028 - INFO - find();Found 0 documents in studentstestmoments
+2026-07-24 12:29:20,620 - INFO - update_document();collection=studentstestmoments
+2026-07-24 12:29:20,621 - INFO - update_document();id=None
+2026-07-24 12:29:20,622 - INFO - update_document();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '5'}
+2026-07-24 12:29:20,622 - INFO - update_document();data={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '5', 'schoolName': 'Pedro Santarem', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'className': '7.º A', 'name': 'Teste 1', 'momentName': 'Teste 1', 'studentUniqueId': 1, 'studentName': 'Carminho', 'questionValue': 1, 'value': '0'}
+2026-07-24 12:29:20,651 - INFO - update();Updated document in studentstestmoments: None
+2026-07-24 12:29:20,663 - INFO - update_document();collection=studentstestmoments
+2026-07-24 12:29:20,664 - INFO - update_document();id=None
+2026-07-24 12:29:20,665 - INFO - update_document();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '2'}
+2026-07-24 12:29:20,665 - INFO - update_document();data={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '2', 'schoolName': 'Pedro Santarem', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'className': '7.º A', 'name': 'Teste 1', 'momentName': 'Teste 1', 'studentUniqueId': 1, 'studentName': 'Carminho', 'questionValue': 5, 'value': '0'}
+2026-07-24 12:29:20,670 - INFO - update();Updated document in studentstestmoments: None
+2026-07-24 12:29:20,676 - INFO - update_document();collection=studentstestmoments
+2026-07-24 12:29:20,676 - INFO - update_document();id=None
+2026-07-24 12:29:20,677 - INFO - update_document();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '1'}
+2026-07-24 12:29:20,677 - INFO - update_document();data={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '1', 'schoolName': 'Pedro Santarem', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'className': '7.º A', 'name': 'Teste 1', 'momentName': 'Teste 1', 'studentUniqueId': 1, 'studentName': 'Carminho', 'questionValue': 5, 'value': '0'}
+2026-07-24 12:29:20,682 - INFO - update();Updated document in studentstestmoments: None
+2026-07-24 12:29:20,688 - INFO - update_document();collection=studentstestmoments
+2026-07-24 12:29:20,688 - INFO - update_document();id=None
+2026-07-24 12:29:20,689 - INFO - update_document();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '4'}
+2026-07-24 12:29:20,689 - INFO - update_document();data={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '4', 'schoolName': 'Pedro Santarem', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'className': '7.º A', 'name': 'Teste 1', 'momentName': 'Teste 1', 'studentUniqueId': 1, 'studentName': 'Carminho', 'questionValue': 5, 'value': '0'}
+2026-07-24 12:29:20,694 - INFO - update();Updated document in studentstestmoments: None
+2026-07-24 12:29:20,703 - INFO - update_document();collection=studentstestmoments
+2026-07-24 12:29:20,704 - INFO - update_document();id=None
+2026-07-24 12:29:20,704 - INFO - update_document();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '3'}
+2026-07-24 12:29:20,705 - INFO - update_document();data={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '3', 'schoolName': 'Pedro Santarem', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'className': '7.º A', 'name': 'Teste 1', 'momentName': 'Teste 1', 'studentUniqueId': 1, 'studentName': 'Carminho', 'questionValue': 4, 'value': '0'}
+2026-07-24 12:29:20,710 - INFO - update();Updated document in studentstestmoments: None
+2026-07-24 12:29:20,886 - INFO - find_documents();collection=studentstestmoments
+2026-07-24 12:29:20,887 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '5'}
+2026-07-24 12:29:20,890 - INFO - find();Found 0 documents in studentstestmoments
+2026-07-24 12:29:20,897 - INFO - find_documents();collection=studentstestmoments
+2026-07-24 12:29:20,897 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '2'}
+2026-07-24 12:29:20,900 - INFO - find();Found 0 documents in studentstestmoments
+2026-07-24 12:29:20,903 - INFO - find_documents();collection=studentstestmoments
+2026-07-24 12:29:20,903 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '1'}
+2026-07-24 12:29:20,906 - INFO - find();Found 0 documents in studentstestmoments
+2026-07-24 12:29:20,908 - INFO - find_documents();collection=studentstestmoments
+2026-07-24 12:29:20,909 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '4'}
+2026-07-24 12:29:20,912 - INFO - find();Found 0 documents in studentstestmoments
+2026-07-24 12:29:20,944 - INFO - find_documents();collection=studentstestmoments
+2026-07-24 12:29:20,945 - INFO - find_documents();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '3'}
+2026-07-24 12:29:20,948 - INFO - find();Found 0 documents in studentstestmoments
+2026-07-24 12:29:21,130 - INFO - insert_document();collection=studentstestmoments
+2026-07-24 12:29:21,130 - INFO - insert_document();data={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '5', 'schoolName': 'Pedro Santarem', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'className': '7.º A', 'name': 'Teste 1', 'momentName': 'Teste 1', 'studentUniqueId': 1, 'studentName': 'Carminho', 'questionValue': 1, 'value': '0'}
+2026-07-24 12:29:21,213 - INFO - insert();Inserted into studentstestmoments: 6a634c91c8e3bf9fffaf91a8
+2026-07-24 12:29:21,226 - INFO - insert_document();collection=studentstestmoments
+2026-07-24 12:29:21,226 - INFO - insert_document();data={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '2', 'schoolName': 'Pedro Santarem', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'className': '7.º A', 'name': 'Teste 1', 'momentName': 'Teste 1', 'studentUniqueId': 1, 'studentName': 'Carminho', 'questionValue': 5, 'value': '0'}
+2026-07-24 12:29:21,232 - INFO - insert();Inserted into studentstestmoments: 6a634c91c8e3bf9fffaf91a9
+2026-07-24 12:29:21,236 - INFO - insert_document();collection=studentstestmoments
+2026-07-24 12:29:21,237 - INFO - insert_document();data={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '1', 'schoolName': 'Pedro Santarem', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'className': '7.º A', 'name': 'Teste 1', 'momentName': 'Teste 1', 'studentUniqueId': 1, 'studentName': 'Carminho', 'questionValue': 5, 'value': '0'}
+2026-07-24 12:29:21,239 - INFO - insert();Inserted into studentstestmoments: 6a634c91c8e3bf9fffaf91aa
+2026-07-24 12:29:21,242 - INFO - insert_document();collection=studentstestmoments
+2026-07-24 12:29:21,242 - INFO - insert_document();data={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '4', 'schoolName': 'Pedro Santarem', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'className': '7.º A', 'name': 'Teste 1', 'momentName': 'Teste 1', 'studentUniqueId': 1, 'studentName': 'Carminho', 'questionValue': 5, 'value': '0'}
+2026-07-24 12:29:21,245 - INFO - insert();Inserted into studentstestmoments: 6a634c91c8e3bf9fffaf91ab
+2026-07-24 12:29:21,248 - INFO - insert_document();collection=studentstestmoments
+2026-07-24 12:29:21,249 - INFO - insert_document();data={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '3', 'schoolName': 'Pedro Santarem', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'className': '7.º A', 'name': 'Teste 1', 'momentName': 'Teste 1', 'studentUniqueId': 1, 'studentName': 'Carminho', 'questionValue': 4, 'value': '0'}
+2026-07-24 12:29:21,252 - INFO - insert();Inserted into studentstestmoments: 6a634c91c8e3bf9fffaf91ac
+2026-07-24 12:29:31,149 - INFO - update_document();collection=studentstestmoments
+2026-07-24 12:29:31,150 - INFO - update_document();id=None
+2026-07-24 12:29:31,150 - INFO - update_document();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '5'}
+2026-07-24 12:29:31,150 - INFO - update_document();data={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '5', 'schoolName': 'Pedro Santarem', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'className': '7.º A', 'name': 'Teste 1', 'momentName': 'Teste 1', 'studentUniqueId': 1, 'studentName': 'Carminho', 'questionValue': 1, 'value': '1'}
+2026-07-24 12:29:31,197 - INFO - update();Updated document in studentstestmoments: {'_id': ObjectId('6a634c91c8e3bf9fffaf91a8'), 'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '5', 'schoolName': 'Pedro Santarem', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'className': '7.º A', 'name': 'Teste 1', 'momentName': 'Teste 1', 'studentUniqueId': 1, 'studentName': 'Carminho', 'questionValue': 1, 'value': '1'}
+2026-07-24 12:29:31,203 - INFO - update_document();collection=studentstestmoments
+2026-07-24 12:29:31,203 - INFO - update_document();id=None
+2026-07-24 12:29:31,203 - INFO - update_document();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '4'}
+2026-07-24 12:29:31,203 - INFO - update_document();data={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '4', 'schoolName': 'Pedro Santarem', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'className': '7.º A', 'name': 'Teste 1', 'momentName': 'Teste 1', 'studentUniqueId': 1, 'studentName': 'Carminho', 'questionValue': 5, 'value': '4'}
+2026-07-24 12:29:31,207 - INFO - update();Updated document in studentstestmoments: {'_id': ObjectId('6a634c91c8e3bf9fffaf91ab'), 'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '4', 'schoolName': 'Pedro Santarem', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'className': '7.º A', 'name': 'Teste 1', 'momentName': 'Teste 1', 'studentUniqueId': 1, 'studentName': 'Carminho', 'questionValue': 5, 'value': '4'}
+2026-07-24 12:29:31,213 - INFO - update_document();collection=studentstestmoments
+2026-07-24 12:29:31,214 - INFO - update_document();id=None
+2026-07-24 12:29:31,214 - INFO - update_document();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '3'}
+2026-07-24 12:29:31,214 - INFO - update_document();data={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '3', 'schoolName': 'Pedro Santarem', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'className': '7.º A', 'name': 'Teste 1', 'momentName': 'Teste 1', 'studentUniqueId': 1, 'studentName': 'Carminho', 'questionValue': 4, 'value': '4'}
+2026-07-24 12:29:31,218 - INFO - update();Updated document in studentstestmoments: {'_id': ObjectId('6a634c91c8e3bf9fffaf91ac'), 'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '3', 'schoolName': 'Pedro Santarem', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'className': '7.º A', 'name': 'Teste 1', 'momentName': 'Teste 1', 'studentUniqueId': 1, 'studentName': 'Carminho', 'questionValue': 4, 'value': '4'}
+2026-07-24 12:29:31,221 - INFO - update_document();collection=studentstestmoments
+2026-07-24 12:29:31,222 - INFO - update_document();id=None
+2026-07-24 12:29:31,222 - INFO - update_document();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '1'}
+2026-07-24 12:29:31,222 - INFO - update_document();data={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '1', 'schoolName': 'Pedro Santarem', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'className': '7.º A', 'name': 'Teste 1', 'momentName': 'Teste 1', 'studentUniqueId': 1, 'studentName': 'Carminho', 'questionValue': 5, 'value': '4'}
+2026-07-24 12:29:31,225 - INFO - update();Updated document in studentstestmoments: {'_id': ObjectId('6a634c91c8e3bf9fffaf91aa'), 'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '1', 'schoolName': 'Pedro Santarem', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'className': '7.º A', 'name': 'Teste 1', 'momentName': 'Teste 1', 'studentUniqueId': 1, 'studentName': 'Carminho', 'questionValue': 5, 'value': '4'}
+2026-07-24 12:29:31,228 - INFO - update_document();collection=studentstestmoments
+2026-07-24 12:29:31,229 - INFO - update_document();id=None
+2026-07-24 12:29:31,229 - INFO - update_document();query={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '2'}
+2026-07-24 12:29:31,229 - INFO - update_document();data={'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '2', 'schoolName': 'Pedro Santarem', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'className': '7.º A', 'name': 'Teste 1', 'momentName': 'Teste 1', 'studentUniqueId': 1, 'studentName': 'Carminho', 'questionValue': 5, 'value': '4'}
+2026-07-24 12:29:31,233 - INFO - update();Updated document in studentstestmoments: {'_id': ObjectId('6a634c91c8e3bf9fffaf91a9'), 'userId': '6a6347b4c8e3bf9fffaf919b', 'schoolId': '6a634b96c8e3bf9fffaf91a2', 'yearId': '6a634ba3c8e3bf9fffaf91a3', 'classId': '6a634bccc8e3bf9fffaf91a4', 'momentId': '6a634c8cc8e3bf9fffaf91a7', 'studentId': '6a634bcdc8e3bf9fffaf91a5', 'questionNumber': '2', 'schoolName': 'Pedro Santarem', 'academicYearId': '6a634ba3c8e3bf9fffaf91a3', 'academicYearName': '2026/2027', 'className': '7.º A', 'name': 'Teste 1', 'momentName': 'Teste 1', 'studentUniqueId': 1, 'studentName': 'Carminho', 'questionValue': 5, 'value': '4'}

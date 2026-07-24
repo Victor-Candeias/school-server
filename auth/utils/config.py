@@ -11,4 +11,4 @@ USERS_COLLECTION: str = "users"
 # MongoDB connection string
 
 ENCRYPTION_KEY: str = os.getenv("ENCRYPTION_KEY", "")
-BD_BASE_URL: str = os.getenv("BD_BASE_URL", "") 
+BD_BASE_URL: str = os.getenv("BD_BASE_URL", "http://127.0.0.1:8000/db-api")

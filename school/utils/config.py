@@ -16,6 +16,7 @@ TESTS_COLLECTION: str = "schooltestes"
 STUDENT_TESTES_COLLECTION: str = "classtestes"
 MOMENTS_COLLECTION: str = "testsmoments"
 CLASS_MOMENTS_COLLECTION: str = "studentstestmoments"
+STUDENT_CALENDAR_COLLECTION: str = "studentscalendar"
 SEMESTER_EVALUATIONS_COLLECTION: str = "semesterstudentsevaluations"
 # MongoDB connection string
 

@@ -7,7 +7,7 @@ created: 2026-06-24
 description: "Documento explicativo sobre a arquitetura, microserviços e funcionamento do projeto school-server"
 owner: victor
 tags: [overview, architecture, microservices]
-updated: 2026-06-24
+updated: 2026-07-24
 ---
 
 # School Server — Visão Geral do Projeto
@@ -15,7 +15,7 @@ updated: 2026-06-24
 ## Descrição
 
 <!-- maestru:summary -->
-Backend de gestão escolar em arquitetura de microserviços (Python/FastAPI). Composto por 3 serviços independentes: db_service (MongoDB, porta 8000), auth (autenticação, porta 8010) e school (gestão escolar, porta 8020). Suporta Docker e integração com frontend Next.js.
+Backend de gestão escolar em arquitetura de microserviços (Python/FastAPI). Composto por 3 serviços independentes: db_service (MongoDB, porta 8000), auth (autenticação, porta 8010) e school (gestão escolar, porta 8020). A base de dados canónica local é MongoDB 4.4.29, executada pelo serviço mongodb44.service em 127.0.0.1:27017.
 <!-- /maestru:summary -->
 
 O **School Server** é um backend para gestão escolar construído com uma arquitetura de **microserviços**. Cada serviço é independente, desenvolvido em **Python com FastAPI**, e comunicam entre si via HTTP. O sistema permite gerir escolas, anos letivos, turmas, alunos, testes e autenticação de utilizadores.
@@ -34,6 +34,19 @@ school-server/
 ```
 
 O ficheiro `_StartServers.cmd` inicia os 3 serviços por ordem, com um intervalo de 2 segundos entre cada um.
+
+### Base de dados canónica local
+
+- **Versão:** MongoDB 4.4.29
+- **Serviço systemd:** `mongodb44.service` (instalado e ativo no arranque do sistema)
+- **Servidor:** `/home/victor/.mongo-local/bin/mongod`
+- **Shell:** `/home/victor/.mongo-local/bin/mongo`
+- **Diretório de dados:** `/home/victor/.mongodata`
+- **Endereço:** `mongodb://127.0.0.1:27017`
+- **Exposição:** apenas loopback; não aceita ligações MongoDB externas
+- **Cache WiredTiger:** 0,25 GB
+
+Esta instalação local é a forma canónica de executar MongoDB neste computador. Os ficheiros Docker Compose são apenas uma alternativa portátil e usam a linha MongoDB 4.4, compatível com o processador sem AVX.
 
 ---
 
@@ -76,6 +89,7 @@ O ficheiro `_StartServers.cmd` inicia os 3 serviços por ordem, com um intervalo
 | Tecnologia       | Versão    | Uso                                   |
 |------------------|-----------|---------------------------------------|
 | Python           | 3.x       | Linguagem principal                   |
+| MongoDB          | 4.4.29    | Base de dados local canónica           |
 | FastAPI          | 0.115.11  | Framework web / REST API              |
 | Uvicorn          | 0.34.0    | Servidor ASGI                         |
 | PyMongo          | 4.11.3    | Driver MongoDB                        |
@@ -94,10 +108,23 @@ Cada serviço utiliza um ficheiro `.env` para configuração:
 |----------|----------------------------------|-------------|
 | `HOST`   | IP/hostname do servidor          | `127.0.0.1` |
 | `PORT`   | Porta do servidor                | varia       |
+| `MONGO_DB_CONNECTION_STRING` | Ligação ao MongoDB local | `mongodb://127.0.0.1:27017` |
 
 ---
 
 ## Como Iniciar
+
+### Linux — execução canónica
+```bash
+sudo systemctl start mongodb44
+
+HOST=127.0.0.1 PORT=8000 ./.venv/bin/python db_service/main.py
+HOST=127.0.0.1 PORT=8010 ./.venv/bin/python auth/main.py
+HOST=127.0.0.1 PORT=8020 ./.venv/bin/python school/main.py
+
+cd frontend
+npm run dev -- --host 0.0.0.0
+```
 
 ### Windows
 ```cmd
@@ -117,7 +144,7 @@ cd auth && python main.py
 cd school && python main.py
 ```
 
-### Docker
+### Docker — alternativa portátil
 ```bash
 cd db_service && docker-compose up
 cd auth && docker-compose up
