@@ -329,7 +329,6 @@ function getAssessmentsSemesterMoments() {
 
     return runtime.getEvaluationMomentsForClass(runtime.selectedClass).filter(
       (moment) =>
-        moment.type === 'teste' &&
         runtime.getEvaluationMomentSemester(moment) === runtime.selectedAssessmentsSemester,
     )
   }

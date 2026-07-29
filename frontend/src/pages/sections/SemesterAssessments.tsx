@@ -29,7 +29,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                     <div className="assessment-panel-heading">
                       <div>
                         <h2>Avaliações</h2>
-                        <p>Seleciona um semestre para consultar os totais dos testes por aluno.</p>
+                        <p>Seleciona um semestre para consultar os totais dos momentos de avaliação por aluno.</p>
                       </div>
                       <label>
                         Semestre
@@ -67,7 +67,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                       </p>
                     ) : getAssessmentsSemesterMoments().length === 0 ? (
                       <p className="students-empty-state">
-                        Ainda não existem testes no semestre selecionado.
+                        Ainda não existem momentos de avaliação no semestre selecionado.
                       </p>
                     ) : getStudentsForClass(selectedClass).length === 0 ? (
                       <p className="students-empty-state">Ainda não existem alunos nesta turma.</p>

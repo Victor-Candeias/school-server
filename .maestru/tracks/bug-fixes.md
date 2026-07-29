@@ -71,4 +71,5 @@ owner: victor
 | BUG-54 | Restaurar navegação após novo login | done | 2026-07-29 |  | high | 2026-07-29 |  | [BUG-54](../specs/bug-fixes/bug-54-spec.md) |
 | BUG-55 | Restaurar confirmação ao fechar configurações | done | 2026-07-29 | developer | high | 2026-07-29 |  | [BUG-55](../specs/bug-fixes/bug-55-spec.md) |
 | BUG-56 | Configurar cores dos popups de aviso | done | 2026-07-29 |  | medium | 2026-07-29 |  | [BUG-56](../specs/bug-fixes/bug-56-spec.md) |
+| BUG-57 | Atualizar avaliações por semestre com momentos criados | done | 2026-07-29 | victor | high | 2026-07-29 |  |  |
 <!-- /maestru:work-items-list -->
