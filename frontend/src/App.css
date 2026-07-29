@@ -1338,6 +1338,22 @@ h1 {
   font-weight: 800;
 }
 
+.semester-assessments-final-head,
+.semester-assessments-final-subhead,
+.semester-assessments-final-cell {
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 10%, transparent);
+  font-weight: 800;
+  text-align: center;
+}
+
+.semester-assessments-final-head {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .semester-assessments-row strong { font-size: 0.769rem; }
 
 .question-max-value {

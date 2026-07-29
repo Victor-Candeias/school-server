@@ -22,13 +22,14 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
     getStudentSavedMomentTotal,
     getStudentAssessmentGroupAverage,
     getStudentAssessmentGroupWeightedValue,
+    getStudentAssessmentFinalValue,
     formatAssessmentValue,
   } = model
 
   if (!selectedClass) return null
 
   const momentGroups = getAssessmentsSemesterMomentGroups()
-  const assessmentColumnCount = momentGroups.reduce(
+  const assessmentColumnCount = 1 + momentGroups.reduce(
     (columnCount, group) => columnCount + group.moments.length + 2,
     0,
   )
@@ -103,6 +104,12 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 {group.type}
                               </span>
                             ))}
+                            <span
+                              className="semester-assessments-final-head"
+                              role="columnheader"
+                            >
+                              Final
+                            </span>
                           </div>
                           <div
                             className="semester-assessments-row semester-assessments-subhead"
@@ -135,6 +142,10 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 M*{formatAssessmentValue(group.weightPercentage)}%
                               </span>,
                             ])}
+                            <span
+                              className="semester-assessments-final-subhead"
+                              aria-hidden="true"
+                            />
                           </div>
                         </div>
                         {getStudentsForClass(selectedClass).map((student, studentIndex) => (
@@ -166,6 +177,12 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 {formatAssessmentValue(getStudentAssessmentGroupWeightedValue(student, group))}
                               </strong>,
                             ])}
+                            <strong
+                              className="semester-assessments-final-cell"
+                              role="cell"
+                            >
+                              {formatAssessmentValue(getStudentAssessmentFinalValue(student, momentGroups))}
+                            </strong>
                           </div>
                         ))}
                       </div>

@@ -301,6 +301,7 @@ export type ApplicationActions = {
   getStudentSavedMomentTotal: (student: SchoolDocument, moment: SchoolDocument) => number
   getStudentAssessmentGroupAverage: (student: SchoolDocument, group: AssessmentMomentGroup) => number
   getStudentAssessmentGroupWeightedValue: (student: SchoolDocument, group: AssessmentMomentGroup) => number
+  getStudentAssessmentFinalValue: (student: SchoolDocument, groups: AssessmentMomentGroup[]) => number
   formatAssessmentValue: (value: number) => string
   getChartData: (student: SchoolDocument) => { name: string; Nota: number; Máximo: number; '%': number; }[]
   getAllStudentsForMomentData: (students: SchoolDocument[], moment: SchoolDocument) => { name: string; Nota: number; Máximo: number; }[]

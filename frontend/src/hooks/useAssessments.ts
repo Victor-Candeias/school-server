@@ -5,7 +5,7 @@ import type { ApplicationActions, ApplicationRuntime, AssessmentMomentGroup } fr
 
 export function useAssessments(
   runtime: ApplicationRuntime,
-): Pick<ApplicationActions, 'loadAllStudentMomentValues' | 'getSelectedGradingMoment' | 'getStudentMomentValueKey' | 'getStudentMomentValueRecord' | 'isSameStudentMomentValue' | 'mergeStudentMomentValues' | 'hasStudentMomentValueRecord' | 'buildStudentMomentValuePayload' | 'handleSelectGradingMoment' | 'getSavedStudentMomentCellValue' | 'getStudentMomentCellValue' | 'getAssessmentChangePayloads' | 'hasUnsavedAssessmentChanges' | 'canLeaveAssessmentMoment' | 'removeAssessmentDraftsForMoment' | 'getStudentMomentTotal' | 'getAssessmentsSemesterMoments' | 'getAssessmentsSemesterMomentGroups' | 'getStudentSavedMomentTotal' | 'getStudentAssessmentGroupAverage' | 'getStudentAssessmentGroupWeightedValue' | 'formatAssessmentValue' | 'getAllStudentsForMomentData' | 'getAssessmentsDashboardRows' | 'buildSemesterEvaluationsPayload' | 'saveSemesterEvaluations' | 'getStudentMomentProjectedTotal' | 'getAssessmentCellValidationError' | 'updateAssessmentCellDraft' | 'saveAssessmentCell' | 'saveAssessmentChanges'> {
+): Pick<ApplicationActions, 'loadAllStudentMomentValues' | 'getSelectedGradingMoment' | 'getStudentMomentValueKey' | 'getStudentMomentValueRecord' | 'isSameStudentMomentValue' | 'mergeStudentMomentValues' | 'hasStudentMomentValueRecord' | 'buildStudentMomentValuePayload' | 'handleSelectGradingMoment' | 'getSavedStudentMomentCellValue' | 'getStudentMomentCellValue' | 'getAssessmentChangePayloads' | 'hasUnsavedAssessmentChanges' | 'canLeaveAssessmentMoment' | 'removeAssessmentDraftsForMoment' | 'getStudentMomentTotal' | 'getAssessmentsSemesterMoments' | 'getAssessmentsSemesterMomentGroups' | 'getStudentSavedMomentTotal' | 'getStudentAssessmentGroupAverage' | 'getStudentAssessmentGroupWeightedValue' | 'getStudentAssessmentFinalValue' | 'formatAssessmentValue' | 'getAllStudentsForMomentData' | 'getAssessmentsDashboardRows' | 'buildSemesterEvaluationsPayload' | 'saveSemesterEvaluations' | 'getStudentMomentProjectedTotal' | 'getAssessmentCellValidationError' | 'updateAssessmentCellDraft' | 'saveAssessmentCell' | 'saveAssessmentChanges'> {
 async function loadAllStudentMomentValues() {
     try {
       const existingValues = await schoolApi.findStudentMomentValues({ userId: runtime.getLoggedUserId() })
@@ -375,7 +375,14 @@ function getStudentAssessmentGroupAverage(student: SchoolDocument, group: Assess
   }
 
 function getStudentAssessmentGroupWeightedValue(student: SchoolDocument, group: AssessmentMomentGroup) {
-    return getStudentAssessmentGroupAverage(student, group) * group.weightPercentage / 100
+    return getStudentAssessmentGroupAverage(student, group) * (group.weightPercentage / 100)
+  }
+
+function getStudentAssessmentFinalValue(student: SchoolDocument, groups: AssessmentMomentGroup[]) {
+    return groups.reduce(
+      (finalValue, group) => finalValue + getStudentAssessmentGroupWeightedValue(student, group),
+      0,
+    )
   }
 
 function formatAssessmentValue(value: number) {
@@ -403,6 +410,7 @@ function getAssessmentsDashboardRows() {
         formatAssessmentValue(getStudentAssessmentGroupAverage(student, group)),
         formatAssessmentValue(getStudentAssessmentGroupWeightedValue(student, group)),
       ]),
+      formatAssessmentValue(getStudentAssessmentFinalValue(student, groups)),
     ])
   }
 
@@ -430,6 +438,7 @@ function buildSemesterEvaluationsPayload() {
         `${group.type} - Média`,
         `${group.type} - M*${formatAssessmentValue(group.weightPercentage)}%`,
       ]),
+      'Final',
     ]
 
     return {
@@ -630,6 +639,7 @@ async function saveAssessmentChanges() {
     getStudentSavedMomentTotal,
     getStudentAssessmentGroupAverage,
     getStudentAssessmentGroupWeightedValue,
+    getStudentAssessmentFinalValue,
     formatAssessmentValue,
     getAllStudentsForMomentData,
     getAssessmentsDashboardRows,
