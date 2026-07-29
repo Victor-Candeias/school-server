@@ -1,11 +1,11 @@
 import { schoolApi } from '../api/school'
 import type { SchoolDocument } from '../api/school'
 import type { EvaluationQuestionForm } from '../types'
-import type { ApplicationActions, ApplicationRuntime } from './applicationRuntime'
+import type { ApplicationActions, ApplicationRuntime, AssessmentMomentGroup } from './applicationRuntime'
 
 export function useAssessments(
   runtime: ApplicationRuntime,
-): Pick<ApplicationActions, 'loadAllStudentMomentValues' | 'getSelectedGradingMoment' | 'getStudentMomentValueKey' | 'getStudentMomentValueRecord' | 'isSameStudentMomentValue' | 'mergeStudentMomentValues' | 'hasStudentMomentValueRecord' | 'buildStudentMomentValuePayload' | 'handleSelectGradingMoment' | 'getSavedStudentMomentCellValue' | 'getStudentMomentCellValue' | 'getAssessmentChangePayloads' | 'hasUnsavedAssessmentChanges' | 'canLeaveAssessmentMoment' | 'removeAssessmentDraftsForMoment' | 'getStudentMomentTotal' | 'getAssessmentsSemesterMoments' | 'getStudentSavedMomentTotal' | 'getAllStudentsForMomentData' | 'getAssessmentsDashboardRows' | 'buildSemesterEvaluationsPayload' | 'saveSemesterEvaluations' | 'getStudentMomentProjectedTotal' | 'getAssessmentCellValidationError' | 'updateAssessmentCellDraft' | 'saveAssessmentCell' | 'saveAssessmentChanges'> {
+): Pick<ApplicationActions, 'loadAllStudentMomentValues' | 'getSelectedGradingMoment' | 'getStudentMomentValueKey' | 'getStudentMomentValueRecord' | 'isSameStudentMomentValue' | 'mergeStudentMomentValues' | 'hasStudentMomentValueRecord' | 'buildStudentMomentValuePayload' | 'handleSelectGradingMoment' | 'getSavedStudentMomentCellValue' | 'getStudentMomentCellValue' | 'getAssessmentChangePayloads' | 'hasUnsavedAssessmentChanges' | 'canLeaveAssessmentMoment' | 'removeAssessmentDraftsForMoment' | 'getStudentMomentTotal' | 'getAssessmentsSemesterMoments' | 'getAssessmentsSemesterMomentGroups' | 'getStudentSavedMomentTotal' | 'getStudentAssessmentGroupTotal' | 'getAllStudentsForMomentData' | 'getAssessmentsDashboardRows' | 'buildSemesterEvaluationsPayload' | 'saveSemesterEvaluations' | 'getStudentMomentProjectedTotal' | 'getAssessmentCellValidationError' | 'updateAssessmentCellDraft' | 'saveAssessmentCell' | 'saveAssessmentChanges'> {
 async function loadAllStudentMomentValues() {
     try {
       const existingValues = await schoolApi.findStudentMomentValues({ userId: runtime.getLoggedUserId() })
@@ -333,9 +333,31 @@ function getAssessmentsSemesterMoments() {
     )
   }
 
+function getAssessmentsSemesterMomentGroups() {
+    return getAssessmentsSemesterMoments().reduce<AssessmentMomentGroup[]>((groups, moment) => {
+      const type = runtime.getEvaluationMomentTypeLabel(moment) || 'Sem tipo'
+      const existingGroup = groups.find((group) => group.type === type)
+
+      if (existingGroup) {
+        existingGroup.moments.push(moment)
+      } else {
+        groups.push({ type, moments: [moment] })
+      }
+
+      return groups
+    }, [])
+  }
+
 function getStudentSavedMomentTotal(student: SchoolDocument, moment: SchoolDocument) {
     return runtime.getEvaluationMomentQuestions(moment).reduce(
       (total, question) => total + (Number(getSavedStudentMomentCellValue(student, moment, question)) || 0),
+      0,
+    )
+  }
+
+function getStudentAssessmentGroupTotal(student: SchoolDocument, group: AssessmentMomentGroup) {
+    return group.moments.reduce(
+      (total, moment) => total + getStudentSavedMomentTotal(student, moment),
       0,
     )
   }
@@ -353,10 +375,13 @@ function getAssessmentsDashboardRows() {
       return []
     }
 
-    const moments = getAssessmentsSemesterMoments()
+    const groups = getAssessmentsSemesterMomentGroups()
     return runtime.getStudentsForClass(runtime.selectedClass).map((student) => [
       runtime.getStringValue(student.name),
-      ...moments.map((moment) => String(getStudentSavedMomentTotal(student, moment))),
+      ...groups.flatMap((group) => [
+        ...group.moments.map((moment) => String(getStudentSavedMomentTotal(student, moment))),
+        String(getStudentAssessmentGroupTotal(student, group)),
+      ]),
     ])
   }
 
@@ -375,10 +400,14 @@ function buildSemesterEvaluationsPayload() {
       return null
     }
 
-    const moments = getAssessmentsSemesterMoments()
+    const groups = getAssessmentsSemesterMomentGroups()
+    const moments = groups.flatMap((group) => group.moments)
     const headers = [
       'Aluno',
-      ...moments.map((moment) => `${runtime.getStringValue(moment.name)} (${runtime.getEvaluationMomentMaxValue(moment)})`),
+      ...groups.flatMap((group) => [
+        ...group.moments.map((moment) => `${runtime.getStringValue(moment.name)} (${runtime.getEvaluationMomentMaxValue(moment)})`),
+        `${group.type} - Soma`,
+      ]),
     ]
 
     return {
@@ -575,7 +604,9 @@ async function saveAssessmentChanges() {
     removeAssessmentDraftsForMoment,
     getStudentMomentTotal,
     getAssessmentsSemesterMoments,
+    getAssessmentsSemesterMomentGroups,
     getStudentSavedMomentTotal,
+    getStudentAssessmentGroupTotal,
     getAllStudentsForMomentData,
     getAssessmentsDashboardRows,
     buildSemesterEvaluationsPayload,

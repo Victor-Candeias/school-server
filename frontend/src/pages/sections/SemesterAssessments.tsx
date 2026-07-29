@@ -13,15 +13,24 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
     isLoadingClasses,
     saveSemesterEvaluations,
     getAssessmentsSemesterMoments,
+    getAssessmentsSemesterMomentGroups,
     getStudentsForClass,
     selectedClass,
     getDocumentId,
     getStringValue,
     getEvaluationMomentMaxValue,
     getStudentSavedMomentTotal,
+    getStudentAssessmentGroupTotal,
   } = model
 
   if (!selectedClass) return null
+
+  const momentGroups = getAssessmentsSemesterMomentGroups()
+  const assessmentColumnCount = momentGroups.reduce(
+    (columnCount, group) => columnCount + group.moments.length + 1,
+    0,
+  )
+  const assessmentGridColumns = `minmax(180px, 1.4fr) repeat(${assessmentColumnCount}, minmax(120px, 1fr))`
 
   return (
     (
@@ -73,38 +82,73 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                       <p className="students-empty-state">Ainda não existem alunos nesta turma.</p>
                     ) : (
                       <div className="semester-assessments-table" role="table" aria-label="Avaliações por semestre">
-                        <div
-                          className="semester-assessments-row semester-assessments-head"
-                          role="row"
-                          style={{
-                            gridTemplateColumns: `minmax(180px, 1.4fr) repeat(${getAssessmentsSemesterMoments().length}, minmax(120px, 1fr))`,
-                          }}
-                        >
-                          <span role="columnheader">Aluno</span>
-                          {getAssessmentsSemesterMoments().map((moment) => (
-                            <span role="columnheader" key={getDocumentId(moment) ?? getStringValue(moment.name)}>
-                              {getStringValue(moment.name)}{' '}
-                              <strong className="question-max-value">
-                                ({getEvaluationMomentMaxValue(moment)})
-                              </strong>
+                        <div className="semester-assessments-header" role="rowgroup">
+                          <div
+                            className="semester-assessments-row semester-assessments-group-head"
+                            role="row"
+                            style={{ gridTemplateColumns: assessmentGridColumns }}
+                          >
+                            <span className="semester-assessments-student-head" role="columnheader">
+                              Aluno
                             </span>
-                          ))}
+                            {momentGroups.map((group) => (
+                              <span
+                                className="semester-assessments-type-head"
+                                role="columnheader"
+                                key={group.type}
+                                style={{ gridColumn: `span ${group.moments.length + 1}` }}
+                              >
+                                {group.type}
+                              </span>
+                            ))}
+                          </div>
+                          <div
+                            className="semester-assessments-row semester-assessments-subhead"
+                            role="row"
+                            style={{ gridTemplateColumns: assessmentGridColumns }}
+                          >
+                            <span aria-hidden="true" />
+                            {momentGroups.flatMap((group) => [
+                              ...group.moments.map((moment) => (
+                                <span role="columnheader" key={getDocumentId(moment) ?? getStringValue(moment.name)}>
+                                  {getStringValue(moment.name)}{' '}
+                                  <strong className="question-max-value">
+                                    ({getEvaluationMomentMaxValue(moment)})
+                                  </strong>
+                                </span>
+                              )),
+                              <span
+                                className="semester-assessments-sum-head"
+                                role="columnheader"
+                                key={`${group.type}-sum`}
+                              >
+                                Soma
+                              </span>,
+                            ])}
+                          </div>
                         </div>
                         {getStudentsForClass(selectedClass).map((student, studentIndex) => (
                           <div
                             className="semester-assessments-row"
                             role="row"
                             key={String(student._id ?? student.id ?? studentIndex)}
-                            style={{
-                              gridTemplateColumns: `minmax(180px, 1.4fr) repeat(${getAssessmentsSemesterMoments().length}, minmax(120px, 1fr))`,
-                            }}
+                            style={{ gridTemplateColumns: assessmentGridColumns }}
                           >
                             <span role="cell">{getStringValue(student.name)}</span>
-                            {getAssessmentsSemesterMoments().map((moment) => (
-                              <strong role="cell" key={getDocumentId(moment) ?? getStringValue(moment.name)}>
-                                {getStudentSavedMomentTotal(student, moment)}
-                              </strong>
-                            ))}
+                            {momentGroups.flatMap((group) => [
+                              ...group.moments.map((moment) => (
+                                <strong role="cell" key={getDocumentId(moment) ?? getStringValue(moment.name)}>
+                                  {getStudentSavedMomentTotal(student, moment)}
+                                </strong>
+                              )),
+                              <strong
+                                className="semester-assessments-sum-cell"
+                                role="cell"
+                                key={`${group.type}-sum`}
+                              >
+                                {getStudentAssessmentGroupTotal(student, group)}
+                              </strong>,
+                            ])}
                           </div>
                         ))}
                       </div>

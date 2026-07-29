@@ -1280,13 +1280,46 @@ h1 {
   border-top: 1px solid var(--border);
 }
 
-.semester-assessments-head {
+.semester-assessments-header {
+  display: grid;
+  min-width: max-content;
+}
+
+.semester-assessments-group-head,
+.semester-assessments-subhead {
   color: var(--text-2);
   background: var(--surface-2);
   font-size: 0.615rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.semester-assessments-group-head {
+  padding-bottom: 0;
+}
+
+.semester-assessments-subhead {
+  padding-top: 0;
+}
+
+.semester-assessments-student-head {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+}
+
+.semester-assessments-type-head {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+
+.semester-assessments-sum-head,
+.semester-assessments-sum-cell {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  font-weight: 800;
 }
 
 .semester-assessments-row strong { font-size: 0.769rem; }

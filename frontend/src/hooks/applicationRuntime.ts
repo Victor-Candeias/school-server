@@ -170,6 +170,11 @@ export type ApplicationState = {
   selectedStudentCalendarTasks: SchoolDocument[]
 }
 
+export type AssessmentMomentGroup = {
+  type: string
+  moments: SchoolDocument[]
+}
+
 export type ApplicationActions = {
   loadSchools: () => Promise<void>
   loadAppSettings: () => Promise<void>
@@ -291,7 +296,9 @@ export type ApplicationActions = {
   getStudentMomentPercentageValue: (student: SchoolDocument, moment: SchoolDocument) => number
   getStudentMomentPercentageStyle: (student: SchoolDocument, moment: SchoolDocument) => { backgroundColor: string; color: string; }
   getAssessmentsSemesterMoments: () => SchoolDocument[]
+  getAssessmentsSemesterMomentGroups: () => AssessmentMomentGroup[]
   getStudentSavedMomentTotal: (student: SchoolDocument, moment: SchoolDocument) => number
+  getStudentAssessmentGroupTotal: (student: SchoolDocument, group: AssessmentMomentGroup) => number
   getChartData: (student: SchoolDocument) => { name: string; Nota: number; Máximo: number; '%': number; }[]
   getAllStudentsForMomentData: (students: SchoolDocument[], moment: SchoolDocument) => { name: string; Nota: number; Máximo: number; }[]
   getChartTypeLabel: (type: ChartType) => string
