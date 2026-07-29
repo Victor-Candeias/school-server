@@ -1674,6 +1674,33 @@ h1 {
   background: #b91c1c;
 }
 
+.settings-confirmation-backdrop {
+  z-index: 40;
+}
+
+.settings-confirmation-card > p {
+  margin: 0 0 16px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+.settings-confirmation-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.settings-confirmation-actions button {
+  margin: 0;
+}
+
+.settings-confirmation-save {
+  background: var(--danger);
+}
+
+.settings-confirmation-save:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
 .settings-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

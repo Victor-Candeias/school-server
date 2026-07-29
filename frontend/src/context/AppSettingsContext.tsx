@@ -10,9 +10,8 @@ type AppSettingsProviderProps = {
 
 export function AppSettingsProvider({ model, children }: AppSettingsProviderProps) {
   const value: AppSettingsContextValue = {
-    saveAppSettings: model.saveAppSettings,
     hasUnsavedAppSettingsChanges: model.hasUnsavedAppSettingsChanges,
-    closeSettingsDashboard: model.closeSettingsDashboard,
+    handleSettingsAction: model.handleSettingsAction,
     isLoadingClasses: model.isLoadingClasses,
     academicPeriodType: model.academicPeriodType,
     setAcademicPeriodType: model.setAcademicPeriodType,

@@ -67,6 +67,7 @@ const [isStudentModalOpen, setIsStudentModalOpen] = useState(false)
 const [isEvaluationMomentModalOpen, setIsEvaluationMomentModalOpen] = useState(false)
 const [isEvaluationQuestionModalOpen, setIsEvaluationQuestionModalOpen] = useState(false)
 const [isCalendarTaskModalOpen, setIsCalendarTaskModalOpen] = useState(false)
+const [isSettingsConfirmationOpen, setIsSettingsConfirmationOpen] = useState(false)
 const [isCreatingCalendarTask, setIsCreatingCalendarTask] = useState(false)
 const [editingYearId, setEditingYearId] = useState<string | null>(null)
 const [editingClassId, setEditingClassId] = useState<string | null>(null)
@@ -192,6 +193,8 @@ const isStudentCalendarFullWeek = studentCalendarWeekMode === 'full'
     setIsEvaluationQuestionModalOpen,
     isCalendarTaskModalOpen,
     setIsCalendarTaskModalOpen,
+    isSettingsConfirmationOpen,
+    setIsSettingsConfirmationOpen,
     isCreatingCalendarTask,
     setIsCreatingCalendarTask,
     editingYearId,

@@ -18,7 +18,7 @@ import type { ApplicationActions, ApplicationRuntime } from './applicationRuntim
 
 export function useAppSettings(
   runtime: ApplicationRuntime,
-): Pick<ApplicationActions, 'loadAppSettings' | 'saveAppSettings' | 'hasUnsavedAppSettingsChanges' | 'addEvaluationMomentTemplate' | 'updateEvaluationMomentTemplate' | 'removeEvaluationMomentTemplate' | 'updatePercentageRange' | 'updatePeriodDate' | 'openSettingsDashboard' | 'openSettingsDashboardWithAssessmentGuard' | 'closeSettingsDashboard' | 'getStudentMomentPercentage' | 'getStudentMomentPercentageValue' | 'getStudentMomentPercentageStyle'> {
+): Pick<ApplicationActions, 'loadAppSettings' | 'saveAppSettings' | 'hasUnsavedAppSettingsChanges' | 'handleSettingsAction' | 'saveAndCloseSettings' | 'discardAndCloseSettings' | 'cancelSettingsClose' | 'addEvaluationMomentTemplate' | 'updateEvaluationMomentTemplate' | 'removeEvaluationMomentTemplate' | 'updatePercentageRange' | 'updatePeriodDate' | 'openSettingsDashboard' | 'openSettingsDashboardWithAssessmentGuard' | 'closeSettingsDashboard' | 'getStudentMomentPercentage' | 'getStudentMomentPercentageValue' | 'getStudentMomentPercentageStyle'> {
   const previousDashboardRef = useRef<Exclude<DashboardSection, 'settings'>>('schools')
 
 async function loadAppSettings() {
@@ -36,8 +36,7 @@ async function loadAppSettings() {
     }
   }
 
-async function saveAppSettings(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+async function saveAppSettings() {
     runtime.setIsLoadingClasses(true)
     runtime.setClassesError(null)
 
@@ -55,12 +54,14 @@ async function saveAppSettings(event: FormEvent<HTMLFormElement>) {
       applyAppSettings(normalizedSettings)
       runtime.setSavedAppSettingsFingerprint(getAppSettingsFingerprint(normalizedSettings))
       runtime.setMessage('Configurações gravadas com sucesso.')
+      return true
     } catch (settingsError) {
       runtime.setClassesError(
         settingsError instanceof Error
           ? settingsError.message
           : 'Erro ao gravar configurações da aplicação.',
       )
+      return false
     } finally {
       runtime.setIsLoadingClasses(false)
     }
@@ -213,7 +214,52 @@ function openSettingsDashboardWithAssessmentGuard() {
   }
 
 function closeSettingsDashboard() {
+    runtime.setIsSettingsConfirmationOpen(false)
     runtime.setActiveDashboard(previousDashboardRef.current)
+  }
+
+function handleSettingsAction(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    if (hasUnsavedAppSettingsChanges()) {
+      runtime.setIsSettingsConfirmationOpen(true)
+      return
+    }
+
+    closeSettingsDashboard()
+  }
+
+async function saveAndCloseSettings() {
+    if (await saveAppSettings()) {
+      closeSettingsDashboard()
+    }
+  }
+
+function discardAndCloseSettings() {
+    const savedSettings = getSavedAppSettings()
+
+    if (savedSettings) {
+      applyAppSettings(savedSettings)
+    }
+
+    runtime.setClassesError(null)
+    closeSettingsDashboard()
+  }
+
+function cancelSettingsClose() {
+    runtime.setIsSettingsConfirmationOpen(false)
+  }
+
+function getSavedAppSettings(): NormalizedAppSettings | null {
+    if (!runtime.savedAppSettingsFingerprint) {
+      return null
+    }
+
+    try {
+      return normalizeAppSettings(JSON.parse(runtime.savedAppSettingsFingerprint) as AppSettings)
+    } catch {
+      return null
+    }
   }
 
 function getStudentMomentPercentage(student: SchoolDocument, moment: SchoolDocument) {
@@ -246,6 +292,10 @@ function getStudentMomentPercentageStyle(student: SchoolDocument, moment: School
     loadAppSettings,
     saveAppSettings,
     hasUnsavedAppSettingsChanges,
+    handleSettingsAction,
+    saveAndCloseSettings,
+    discardAndCloseSettings,
+    cancelSettingsClose,
     addEvaluationMomentTemplate,
     updateEvaluationMomentTemplate,
     removeEvaluationMomentTemplate,

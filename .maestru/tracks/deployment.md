@@ -19,4 +19,5 @@ status: active
 | DEPLOY-01 | Configurar deploy com arranque automático | done | 2026-07-24 | victor | high | 2026-07-24 |  | [DEPLOY-01](../specs/deployment/deploy-01-spec.md) |
 | DEPLOY-02 | Adicionar scripts para iniciar e parar o deployment | done | 2026-07-24 | victor | medium | 2026-07-24 |  |  |
 | DEPLOY-03 | Publicar alterações do menu principal | done | 2026-07-24 | victor | medium | 2026-07-24 |  |  |
+| DEPLOY-04 | Adicionar script de atualização do backend e frontend | done | 2026-07-29 | victor | medium | 2026-07-29 |  |  |
 <!-- /maestru:work-items-list -->
