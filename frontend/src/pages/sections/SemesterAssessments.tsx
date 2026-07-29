@@ -20,14 +20,16 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
     getStringValue,
     getEvaluationMomentMaxValue,
     getStudentSavedMomentTotal,
-    getStudentAssessmentGroupTotal,
+    getStudentAssessmentGroupAverage,
+    getStudentAssessmentGroupWeightedValue,
+    formatAssessmentValue,
   } = model
 
   if (!selectedClass) return null
 
   const momentGroups = getAssessmentsSemesterMomentGroups()
   const assessmentColumnCount = momentGroups.reduce(
-    (columnCount, group) => columnCount + group.moments.length + 1,
+    (columnCount, group) => columnCount + group.moments.length + 2,
     0,
   )
   const assessmentGridColumns = `minmax(180px, 1.4fr) repeat(${assessmentColumnCount}, minmax(120px, 1fr))`
@@ -96,7 +98,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 className="semester-assessments-type-head"
                                 role="columnheader"
                                 key={group.type}
-                                style={{ gridColumn: `span ${group.moments.length + 1}` }}
+                                style={{ gridColumn: `span ${group.moments.length + 2}` }}
                               >
                                 {group.type}
                               </span>
@@ -118,11 +120,19 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 </span>
                               )),
                               <span
-                                className="semester-assessments-sum-head"
+                                className="semester-assessments-average-head"
                                 role="columnheader"
-                                key={`${group.type}-sum`}
+                                key={`${group.type}-average`}
                               >
-                                Soma
+                                Média
+                              </span>,
+                              <span
+                                className="semester-assessments-weighted-head"
+                                role="columnheader"
+                                key={`${group.type}-weighted`}
+                                title={`Média × ${formatAssessmentValue(group.weightPercentage)}%`}
+                              >
+                                M*{formatAssessmentValue(group.weightPercentage)}%
                               </span>,
                             ])}
                           </div>
@@ -142,11 +152,18 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 </strong>
                               )),
                               <strong
-                                className="semester-assessments-sum-cell"
+                                className="semester-assessments-average-cell"
                                 role="cell"
-                                key={`${group.type}-sum`}
+                                key={`${group.type}-average`}
                               >
-                                {getStudentAssessmentGroupTotal(student, group)}
+                                {formatAssessmentValue(getStudentAssessmentGroupAverage(student, group))}
+                              </strong>,
+                              <strong
+                                className="semester-assessments-weighted-cell"
+                                role="cell"
+                                key={`${group.type}-weighted`}
+                              >
+                                {formatAssessmentValue(getStudentAssessmentGroupWeightedValue(student, group))}
                               </strong>,
                             ])}
                           </div>

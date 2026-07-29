@@ -51,4 +51,5 @@ owner: victor
 | FE-34 | Modularizar frontend por páginas, secções, hooks e contextos | done | 2026-07-28 |  | high | 2026-07-28 |  | [FE-34](../specs/frontend/fe-34-spec.md) |
 | FE-35 | Aplicar code splitting e otimizar bundle do frontend | done | 2026-07-28 |  | medium | 2026-07-28 |  | [FE-35](../specs/frontend/fe-35-spec.md) |
 | FE-36 | Agrupar avaliações por tipo com subtotais | done | 2026-07-29 | victor | high | 2026-07-29 |  | [FE-36](../specs/frontend/fe-36-spec.md) |
+| FE-37 | Calcular médias e ponderações nas avaliações | done | 2026-07-29 | victor | high | 2026-07-29 |  | [FE-37](../specs/frontend/fe-37-spec.md) |
 <!-- /maestru:work-items-list -->

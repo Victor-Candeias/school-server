@@ -1315,8 +1315,24 @@ h1 {
   text-align: center;
 }
 
-.semester-assessments-sum-head,
-.semester-assessments-sum-cell {
+.semester-assessments-subhead > span,
+.semester-assessments-row > strong {
+  text-align: center;
+}
+
+.semester-assessments-row > strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.semester-assessments-average-head,
+.semester-assessments-average-cell {
+  color: var(--text);
+  background: color-mix(in srgb, var(--primary) 4%, transparent);
+  font-weight: 800;
+}
+
+.semester-assessments-weighted-head,
+.semester-assessments-weighted-cell {
   color: var(--primary);
   background: color-mix(in srgb, var(--primary) 8%, transparent);
   font-weight: 800;

@@ -172,6 +172,7 @@ export type ApplicationState = {
 
 export type AssessmentMomentGroup = {
   type: string
+  weightPercentage: number
   moments: SchoolDocument[]
 }
 
@@ -298,7 +299,9 @@ export type ApplicationActions = {
   getAssessmentsSemesterMoments: () => SchoolDocument[]
   getAssessmentsSemesterMomentGroups: () => AssessmentMomentGroup[]
   getStudentSavedMomentTotal: (student: SchoolDocument, moment: SchoolDocument) => number
-  getStudentAssessmentGroupTotal: (student: SchoolDocument, group: AssessmentMomentGroup) => number
+  getStudentAssessmentGroupAverage: (student: SchoolDocument, group: AssessmentMomentGroup) => number
+  getStudentAssessmentGroupWeightedValue: (student: SchoolDocument, group: AssessmentMomentGroup) => number
+  formatAssessmentValue: (value: number) => string
   getChartData: (student: SchoolDocument) => { name: string; Nota: number; Máximo: number; '%': number; }[]
   getAllStudentsForMomentData: (students: SchoolDocument[], moment: SchoolDocument) => { name: string; Nota: number; Máximo: number; }[]
   getChartTypeLabel: (type: ChartType) => string
