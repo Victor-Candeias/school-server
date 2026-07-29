@@ -22,6 +22,8 @@ import { DEFAULT_ACADEMIC_PERIOD_TYPE } from '../utils/constants'
 import { DEFAULT_INACTIVITY_LOGOUT_MINUTES } from '../utils/constants'
 import { DEFAULT_EVALUATION_MOMENT_TEMPLATES } from '../utils/constants'
 import { DEFAULT_MESSAGE_TIMEOUT_SECONDS } from '../utils/constants'
+import { DEFAULT_POPUP_BACKGROUND_COLOR } from '../utils/constants'
+import { DEFAULT_POPUP_TEXT_COLOR } from '../utils/constants'
 import { DEFAULT_PERCENTAGE_RANGES } from '../utils/constants'
 import { EMPTY_CLASS_FORM } from '../utils/constants'
 import { EMPTY_EVALUATION_MOMENT_FORM } from '../utils/constants'
@@ -110,6 +112,10 @@ const [inactiveLogoutMinutes, setInactiveLogoutMinutes] = useState(
 const [messageTimeoutSeconds, setMessageTimeoutSeconds] = useState(
     DEFAULT_MESSAGE_TIMEOUT_SECONDS,
   )
+const [popupBackgroundColor, setPopupBackgroundColor] = useState(
+    DEFAULT_POPUP_BACKGROUND_COLOR,
+  )
+const [popupTextColor, setPopupTextColor] = useState(DEFAULT_POPUP_TEXT_COLOR)
 const [percentageRanges, setPercentageRanges] = useState<PercentageRange[]>(
     DEFAULT_PERCENTAGE_RANGES,
   )
@@ -258,6 +264,10 @@ const isStudentCalendarFullWeek = studentCalendarWeekMode === 'full'
     setInactiveLogoutMinutes,
     messageTimeoutSeconds,
     setMessageTimeoutSeconds,
+    popupBackgroundColor,
+    setPopupBackgroundColor,
+    popupTextColor,
+    setPopupTextColor,
     percentageRanges,
     setPercentageRanges,
     evaluationMomentTemplates,

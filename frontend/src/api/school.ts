@@ -7,6 +7,8 @@ export type SchoolDocument = Record<string, unknown>
 export type AppSettings = {
   inactiveLogoutMinutes: number
   messageTimeoutSeconds: number
+  popupBackgroundColor: string
+  popupTextColor: string
   percentageRanges: PercentageRange[]
   evaluationMomentTemplates?: EvaluationMomentTemplate[]
   academicPeriodType?: string

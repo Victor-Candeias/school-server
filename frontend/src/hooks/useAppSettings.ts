@@ -10,6 +10,8 @@ import type { EvaluationMomentTemplate } from '../types'
 import { DEFAULT_EVALUATION_MOMENT_TEMPLATES } from '../utils/constants'
 import { DEFAULT_INACTIVITY_LOGOUT_MINUTES } from '../utils/constants'
 import { DEFAULT_MESSAGE_TIMEOUT_SECONDS } from '../utils/constants'
+import { DEFAULT_POPUP_BACKGROUND_COLOR } from '../utils/constants'
+import { DEFAULT_POPUP_TEXT_COLOR } from '../utils/constants'
 import { DEFAULT_PERCENTAGE_RANGES } from '../utils/constants'
 import { normalizeNonNegativeInteger } from '../utils/validation'
 import { normalizePercentageRanges } from '../utils/validation'
@@ -44,6 +46,8 @@ async function saveAppSettings() {
       const settings = await schoolApi.updateAppSettings({
         inactiveLogoutMinutes: runtime.inactiveLogoutMinutes,
         messageTimeoutSeconds: runtime.messageTimeoutSeconds,
+        popupBackgroundColor: runtime.popupBackgroundColor,
+        popupTextColor: runtime.popupTextColor,
         evaluationMomentTemplates: runtime.evaluationMomentTemplates,
         percentageRanges: runtime.percentageRanges,
         academicPeriodType: runtime.academicPeriodType,
@@ -77,6 +81,14 @@ function normalizeAppSettings(settings: AppSettings): NormalizedAppSettings {
         settings.messageTimeoutSeconds,
         DEFAULT_MESSAGE_TIMEOUT_SECONDS,
       ),
+      popupBackgroundColor: normalizeHexColor(
+        settings.popupBackgroundColor,
+        DEFAULT_POPUP_BACKGROUND_COLOR,
+      ),
+      popupTextColor: normalizeHexColor(
+        settings.popupTextColor,
+        DEFAULT_POPUP_TEXT_COLOR,
+      ),
       evaluationMomentTemplates: normalizeEvaluationMomentTemplates(
         settings.evaluationMomentTemplates,
       ),
@@ -99,6 +111,8 @@ function normalizeAppSettings(settings: AppSettings): NormalizedAppSettings {
 function applyAppSettings(settings: NormalizedAppSettings) {
     runtime.setInactiveLogoutMinutes(settings.inactiveLogoutMinutes)
     runtime.setMessageTimeoutSeconds(settings.messageTimeoutSeconds)
+    runtime.setPopupBackgroundColor(settings.popupBackgroundColor)
+    runtime.setPopupTextColor(settings.popupTextColor)
     runtime.setEvaluationMomentTemplates(settings.evaluationMomentTemplates)
     runtime.setPercentageRanges(settings.percentageRanges)
     runtime.setAcademicPeriodType(settings.academicPeriodType)
@@ -114,6 +128,8 @@ function getCurrentAppSettings(): NormalizedAppSettings {
     return {
       inactiveLogoutMinutes: runtime.inactiveLogoutMinutes,
       messageTimeoutSeconds: runtime.messageTimeoutSeconds,
+      popupBackgroundColor: runtime.popupBackgroundColor,
+      popupTextColor: runtime.popupTextColor,
       evaluationMomentTemplates: runtime.evaluationMomentTemplates,
       percentageRanges: runtime.percentageRanges,
       academicPeriodType: runtime.academicPeriodType,
@@ -313,11 +329,19 @@ function getStudentMomentPercentageStyle(student: SchoolDocument, moment: School
 type NormalizedAppSettings = {
   inactiveLogoutMinutes: number
   messageTimeoutSeconds: number
+  popupBackgroundColor: string
+  popupTextColor: string
   evaluationMomentTemplates: EvaluationMomentTemplate[]
   percentageRanges: AppSettings['percentageRanges']
   academicPeriodType: AcademicPeriodType
   semesterPeriods: AcademicPeriod[]
   trimesterPeriods: AcademicPeriod[]
+}
+
+function normalizeHexColor(value: unknown, fallback: string) {
+  return typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value)
+    ? value.toLowerCase()
+    : fallback
 }
 
 function normalizeEvaluationMomentTemplates(value: unknown): EvaluationMomentTemplate[] {

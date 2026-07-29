@@ -145,6 +145,10 @@ export type ApplicationState = {
   setInactiveLogoutMinutes: import("react").Dispatch<import("react").SetStateAction<number>>
   messageTimeoutSeconds: number
   setMessageTimeoutSeconds: import("react").Dispatch<import("react").SetStateAction<number>>
+  popupBackgroundColor: string
+  setPopupBackgroundColor: import("react").Dispatch<import("react").SetStateAction<string>>
+  popupTextColor: string
+  setPopupTextColor: import("react").Dispatch<import("react").SetStateAction<string>>
   percentageRanges: PercentageRange[]
   setPercentageRanges: import("react").Dispatch<import("react").SetStateAction<PercentageRange[]>>
   evaluationMomentTemplates: EvaluationMomentTemplate[]

@@ -16,6 +16,10 @@ export const DEFAULT_INACTIVITY_LOGOUT_MINUTES = 15
 
 export const DEFAULT_MESSAGE_TIMEOUT_SECONDS = 5
 
+export const DEFAULT_POPUP_BACKGROUND_COLOR = '#15803d'
+
+export const DEFAULT_POPUP_TEXT_COLOR = '#ffffff'
+
 export const DEFAULT_REGISTER_ROLE = 'user'
 
 export const INACTIVITY_EVENTS = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'] as const

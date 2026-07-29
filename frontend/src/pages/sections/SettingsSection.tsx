@@ -18,6 +18,10 @@ export function SettingsSection() {
     messageTimeoutSeconds,
     setMessageTimeoutSeconds,
     DEFAULT_MESSAGE_TIMEOUT_SECONDS,
+    popupBackgroundColor,
+    setPopupBackgroundColor,
+    popupTextColor,
+    setPopupTextColor,
     evaluationMomentTemplates,
     addEvaluationMomentTemplate,
     updateEvaluationMomentTemplate,
@@ -119,6 +123,40 @@ export function SettingsSection() {
                       />
                     </label>
                   </div>
+                  <section className="settings-popup-colors" aria-label="Cores dos popups de aviso">
+                    <div>
+                      <h3>Cores dos popups de aviso</h3>
+                      <p>Define o fundo e a cor da letra usados nas mensagens de sucesso.</p>
+                    </div>
+                    <div className="settings-popup-colors-controls">
+                      <label>
+                        Cor de fundo
+                        <input
+                          type="color"
+                          value={popupBackgroundColor}
+                          onChange={(event) => setPopupBackgroundColor(event.target.value)}
+                        />
+                      </label>
+                      <label>
+                        Cor da letra
+                        <input
+                          type="color"
+                          value={popupTextColor}
+                          onChange={(event) => setPopupTextColor(event.target.value)}
+                        />
+                      </label>
+                      <div className="settings-popup-colors-preview">
+                        <span
+                          style={{
+                            backgroundColor: popupBackgroundColor,
+                            color: popupTextColor,
+                          }}
+                        >
+                          Exemplo de aviso
+                        </span>
+                      </div>
+                    </div>
+                  </section>
                   <section
                     className="settings-templates"
                     aria-label="Templates de momentos de avaliação"

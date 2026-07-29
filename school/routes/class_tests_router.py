@@ -36,6 +36,8 @@ DEFAULT_APP_SETTINGS = {
     "key": APP_SETTINGS_KEY,
     "inactiveLogoutMinutes": 15,
     "messageTimeoutSeconds": 5,
+    "popupBackgroundColor": "#15803d",
+    "popupTextColor": "#ffffff",
     "evaluationMomentTemplates": [],
     "percentageRanges": [
         {
@@ -111,6 +113,13 @@ def normalize_message_timeout_seconds(value):
         return DEFAULT_APP_SETTINGS["messageTimeoutSeconds"]
 
     return seconds if seconds > 0 else DEFAULT_APP_SETTINGS["messageTimeoutSeconds"]
+
+
+def normalize_hex_color(value, default):
+    if not isinstance(value, str) or not re.fullmatch(r"#[0-9a-fA-F]{6}", value):
+        return default
+
+    return value.lower()
 
 
 def normalize_evaluation_moment_templates(value):
@@ -204,12 +213,22 @@ async def get_app_settings(_: None = Depends(utilities.verificar_token_cookie)):
     settings["messageTimeoutSeconds"] = normalize_message_timeout_seconds(
         settings.get("messageTimeoutSeconds"),
     )
+    settings["popupBackgroundColor"] = normalize_hex_color(
+        settings.get("popupBackgroundColor"),
+        DEFAULT_APP_SETTINGS["popupBackgroundColor"],
+    )
+    settings["popupTextColor"] = normalize_hex_color(
+        settings.get("popupTextColor"),
+        DEFAULT_APP_SETTINGS["popupTextColor"],
+    )
     settings["evaluationMomentTemplates"] = normalize_evaluation_moment_templates(
         settings.get("evaluationMomentTemplates"),
     )
     settings["percentageRanges"] = normalize_percentage_ranges(settings.get("percentageRanges"))
     if (
         documents[0].get("messageTimeoutSeconds") != settings["messageTimeoutSeconds"]
+        or documents[0].get("popupBackgroundColor") != settings["popupBackgroundColor"]
+        or documents[0].get("popupTextColor") != settings["popupTextColor"]
         or documents[0].get("evaluationMomentTemplates") != settings["evaluationMomentTemplates"]
         or documents[0].get("percentageRanges") != settings["percentageRanges"]
     ):
@@ -234,6 +253,14 @@ async def update_app_settings(request: Request, _: None = Depends(utilities.veri
         "key": APP_SETTINGS_KEY,
         "inactiveLogoutMinutes": inactive_logout_minutes,
         "messageTimeoutSeconds": normalize_message_timeout_seconds(body.get("messageTimeoutSeconds")),
+        "popupBackgroundColor": normalize_hex_color(
+            body.get("popupBackgroundColor"),
+            DEFAULT_APP_SETTINGS["popupBackgroundColor"],
+        ),
+        "popupTextColor": normalize_hex_color(
+            body.get("popupTextColor"),
+            DEFAULT_APP_SETTINGS["popupTextColor"],
+        ),
         "evaluationMomentTemplates": normalize_evaluation_moment_templates(
             body.get("evaluationMomentTemplates"),
         ),

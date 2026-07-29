@@ -14,6 +14,8 @@
   --danger-light:   #fee2e2;
   --success:        #16a34a;
   --success-light:  #dcfce7;
+  --popup-background-color: #15803d;
+  --popup-text-color: #ffffff;
   --radius-sm:      6px;
   --radius:         8px;
   --radius-lg:      12px;
@@ -700,9 +702,9 @@ h1 {
 }
 
 .dashboard-feedback.success {
-  color: #fff;
-  background: #15803d;
-  border-color: #166534;
+  color: var(--popup-text-color);
+  background: var(--popup-background-color);
+  border-color: rgb(0 0 0 / 20%);
 }
 
 .dashboard-feedback.info {
@@ -744,9 +746,9 @@ h1 {
 }
 
 .toast.success {
-  color: #fff;
-  background: #15803d;
-  border-color: #166534;
+  color: var(--popup-text-color);
+  background: var(--popup-background-color);
+  border-color: rgb(0 0 0 / 20%);
 }
 
 .toast.info {
@@ -1637,9 +1639,9 @@ h1 {
 }
 
 .feedback.success {
-  color: #fff;
-  background: #15803d;
-  border: 1px solid #166534;
+  color: var(--popup-text-color);
+  background: var(--popup-background-color);
+  border: 1px solid rgb(0 0 0 / 20%);
 }
 
 .feedback.error {
@@ -1705,6 +1707,53 @@ h1 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 12px;
+}
+
+.settings-popup-colors {
+  display: grid;
+  gap: 10px;
+}
+
+.settings-popup-colors h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.923rem;
+  font-weight: 700;
+}
+
+.settings-popup-colors p {
+  margin: 3px 0 0;
+  color: var(--text-2);
+  font-size: 0.769rem;
+}
+
+.settings-popup-colors-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(140px, 200px)) minmax(180px, 1fr);
+  gap: 12px;
+  align-items: end;
+}
+
+.settings-popup-colors-controls input[type='color'] {
+  height: 38px;
+  padding: 3px;
+}
+
+.settings-popup-colors-preview {
+  display: flex;
+  align-items: center;
+  min-height: 38px;
+}
+
+.settings-popup-colors-preview span {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid rgb(0 0 0 / 20%);
+  border-radius: var(--radius);
+  font-size: 0.769rem;
+  font-weight: 600;
+  text-align: center;
 }
 
 .settings-form label {
@@ -2067,6 +2116,10 @@ h1 {
 
   .form-row,
   .form-row.three-columns { grid-template-columns: 1fr; }
+
+  .settings-popup-colors-controls {
+    grid-template-columns: 1fr;
+  }
 
   .students-form-header { display: grid; }
   .students-form-header button { width: 100%; }
