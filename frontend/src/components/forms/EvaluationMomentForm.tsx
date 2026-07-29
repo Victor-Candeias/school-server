@@ -14,7 +14,10 @@ export function EvaluationMomentForm({ model }: EvaluationMomentFormProps) {
     openEvaluationQuestionModal,
     isLoadingClasses,
     editingEvaluationMomentId,
+    evaluationMomentTemplates,
   } = model
+
+  const hasEvaluationMomentTemplates = evaluationMomentTemplates.length > 0
 
   return (
     <form onSubmit={handleSaveEvaluationMoment}>
@@ -31,19 +34,25 @@ export function EvaluationMomentForm({ model }: EvaluationMomentFormProps) {
                     </label>
                     <div className="form-row three-columns">
                       <label>
-                        Tipo
+                        Template
                         <select
-                          value={newEvaluationMoment.type}
+                          value={newEvaluationMoment.templateId}
                           onChange={(event) =>
-                            updateEvaluationMomentField(
-                              'type',
-                              event.target.value === 'questao-aula' ? 'questao-aula' : 'teste',
-                            )
+                            updateEvaluationMomentField('templateId', event.target.value)
                           }
+                          disabled={!hasEvaluationMomentTemplates}
                           required
                         >
-                          <option value="teste">Teste</option>
-                          <option value="questao-aula">Questão aula</option>
+                          <option value="">
+                            {hasEvaluationMomentTemplates
+                              ? 'Seleciona um template'
+                              : 'Sem templates configurados'}
+                          </option>
+                          {evaluationMomentTemplates.map((template) => (
+                            <option key={template.id} value={template.id}>
+                              {template.type} ({template.weightPercentage}%)
+                            </option>
+                          ))}
                         </select>
                       </label>
                       <label>
@@ -119,7 +128,10 @@ export function EvaluationMomentForm({ model }: EvaluationMomentFormProps) {
                     >
                       Inserir lista de questões
                     </button>
-                    <button type="submit" disabled={isLoadingClasses}>
+                    <button
+                      type="submit"
+                      disabled={isLoadingClasses || !hasEvaluationMomentTemplates}
+                    >
                       {isLoadingClasses
                         ? 'A guardar...'
                         : editingEvaluationMomentId

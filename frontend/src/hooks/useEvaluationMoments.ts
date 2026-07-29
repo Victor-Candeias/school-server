@@ -102,6 +102,15 @@ async function handleSaveEvaluationMoment(event: FormEvent<HTMLFormElement>) {
       return
     }
 
+    const selectedTemplate = runtime.evaluationMomentTemplates.find(
+      (template) => template.id === runtime.newEvaluationMoment.templateId,
+    )
+
+    if (!selectedTemplate) {
+      runtime.setClassesError('Seleciona um template para o momento de avaliação.')
+      return
+    }
+
     const questions = runtime.newEvaluationMoment.questions.map((question) => ({
       number: question.questionNumber.trim(),
       value: Number(question.value),
@@ -137,7 +146,10 @@ async function handleSaveEvaluationMoment(event: FormEvent<HTMLFormElement>) {
         classId,
         className: runtime.getClassTitle(runtime.selectedClass),
         name: runtime.newEvaluationMoment.name.trim(),
-        type: runtime.newEvaluationMoment.type,
+        type: selectedTemplate.type,
+        evaluationMomentTemplateId: selectedTemplate.id,
+        evaluationMomentTemplateType: selectedTemplate.type,
+        evaluationMomentTemplateWeightPercentage: selectedTemplate.weightPercentage,
         semester: runtime.newEvaluationMoment.semester,
         totalValue: runtime.newEvaluationMoment.totalValue,
         questions,
@@ -184,10 +196,20 @@ function openEditEvaluationMomentModal(moment: SchoolDocument) {
     }
 
     const questions = Array.isArray(moment.questions) ? moment.questions : []
+    const storedTemplateId = runtime.getStringValue(moment.evaluationMomentTemplateId)
+    const storedTemplateType = runtime.getStringValue(
+      moment.evaluationMomentTemplateType || moment.type,
+    )
+    const matchingTemplate = runtime.evaluationMomentTemplates.find(
+      (template) =>
+        template.id === storedTemplateId
+        || (!storedTemplateId && template.type === storedTemplateType),
+    )
+
     runtime.setEditingEvaluationMomentId(momentId)
     runtime.setNewEvaluationMoment({
       name: runtime.getStringValue(moment.name),
-      type: moment.type === 'questao-aula' ? 'questao-aula' : 'teste',
+      templateId: matchingTemplate?.id ?? '',
       semester: getEvaluationMomentSemester(moment),
       totalValue: moment.totalValue === 100 ? 100 : 20,
       questions: questions.map((question) => {
@@ -241,7 +263,19 @@ function getEvaluationMomentsForClass(schoolClass: SchoolDocument) {
   }
 
 function getEvaluationMomentTypeLabel(moment: SchoolDocument) {
-    return moment.type === 'questao-aula' ? 'Questão aula' : 'Teste'
+    const momentType = runtime.getStringValue(
+      moment.evaluationMomentTemplateType || moment.type,
+    )
+
+    if (momentType === 'questao-aula') {
+      return 'Questão aula'
+    }
+
+    if (momentType === 'teste') {
+      return 'Teste'
+    }
+
+    return momentType
   }
 
 function getEvaluationMomentSemester(moment: SchoolDocument): '1' | '2' {

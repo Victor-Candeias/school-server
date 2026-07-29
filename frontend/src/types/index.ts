@@ -25,7 +25,7 @@ export type StudentForm = {
 
 export type EvaluationMomentForm = {
   name: string
-  type: 'teste' | 'questao-aula'
+  templateId: string
   semester: '1' | '2'
   totalValue: 20 | 100
   questions: EvaluationQuestionForm[]

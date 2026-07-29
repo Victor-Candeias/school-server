@@ -99,7 +99,7 @@ export const EMPTY_STUDENT_FORM: StudentForm = {
 
 export const EMPTY_EVALUATION_MOMENT_FORM: EvaluationMomentForm = {
   name: '',
-  type: 'teste',
+  templateId: '',
   semester: '1',
   totalValue: 20,
   questions: [],
