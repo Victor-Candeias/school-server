@@ -1,9 +1,42 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
+export default defineConfig(({ mode }) => ({
+  plugins: [
+    react(),
+    ...(mode === 'analyze'
+      ? [visualizer({
+          filename: 'dist/stats.html',
+          template: 'treemap',
+          gzipSize: true,
+          brotliSize: true,
+          open: false,
+        })]
+      : []),
+  ],
+
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            {
+              name: 'react-vendor',
+              test: /node_modules[\\/](?:react|react-dom|scheduler)[\\/]/,
+              priority: 20,
+            },
+            {
+              name: 'charts-vendor',
+              test: /node_modules[\\/]recharts[\\/]/,
+              priority: 10,
+            },
+          ],
+        },
+      },
+    },
+  },
 
   server: {
     host: '0.0.0.0',
@@ -31,4 +64,4 @@ export default defineConfig({
       }
     }
   }
-})
+}))

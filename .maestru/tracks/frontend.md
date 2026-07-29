@@ -22,7 +22,7 @@ owner: victor
 | FE-05 | Implementar gestão de anos letivos | done | 2026-06-24 | victor | medium | 2026-07-23 |  | [FE-05](../specs/frontend/fe-05-spec.md) |
 | FE-06 | Implementar gestão de turmas | done | 2026-06-24 | victor | medium | 2026-06-26 |  |  |
 | FE-07 | Implementar gestão de alunos | done | 2026-06-24 | victor | medium | 2026-06-26 |  |  |
-| FE-08 | Implementar configurações de testes e momentos de avaliação | backlog | 2026-06-24 | victor | low |  |  |  |
+| FE-08 | Implementar configurações de testes e momentos de avaliação | done | 2026-06-24 | victor | high | 2026-07-29 |  | [FE-08](../specs/frontend/fe-08-spec.md) |
 | FE-09 | Modernizar e simplificar ecrã de login | done | 2026-06-24 | victor | high | 2026-06-24 |  |  |
 | FE-10 | Criar formulário de registo de utilizador no frontend | done | 2026-06-24 | victor | high | 2026-06-24 |  |  |
 | FE-11 | Adicionar título e indicador de força da password | done | 2026-06-24 | victor | high | 2026-06-24 |  |  |
@@ -47,4 +47,7 @@ owner: victor
 | FE-30 | Adaptar formulários de login e novo utilizador para mobile e desktop | done | 2026-07-24 |  | high | 2026-07-24 |  |  |
 | FE-31 | Adaptar menu de escolas e barra superior para mobile e desktop | done | 2026-07-24 |  | high | 2026-07-24 |  |  |
 | FE-32 | Adaptar menu dos alunos para mobile e desktop | done | 2026-07-24 |  | high | 2026-07-24 |  |  |
+| FE-33 | Dividir App.tsx em componentes e reduzir a shell | done | 2026-07-28 |  | medium | 2026-07-28 |  | [FE-33](../specs/frontend/fe-33-spec.md) |
+| FE-34 | Modularizar frontend por páginas, secções, hooks e contextos | done | 2026-07-28 |  | high | 2026-07-28 |  | [FE-34](../specs/frontend/fe-34-spec.md) |
+| FE-35 | Aplicar code splitting e otimizar bundle do frontend | done | 2026-07-28 |  | medium | 2026-07-28 |  | [FE-35](../specs/frontend/fe-35-spec.md) |
 <!-- /maestru:work-items-list -->

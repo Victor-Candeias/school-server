@@ -55,4 +55,18 @@ owner: victor
 | BUG-38 | Corrigir navegação hierárquica do menu principal | done | 2026-07-24 |  | medium | 2026-07-24 |  |  |
 | BUG-39 | Corrigir estados cumulativos da navegação principal | done | 2026-07-24 |  | high | 2026-07-24 |  |  |
 | BUG-40 | Corrigir toolbar e scroll do menu de alunos no mobile | done | 2026-07-24 |  | high | 2026-07-24 |  |  |
+| BUG-41 | Atualizar PostCSS vulnerável usado pelo Vite | done | 2026-07-28 |  | high | 2026-07-28 |  |  |
+| BUG-42 | Distinguir fechar e gravar configurações | done | 2026-07-28 |  | medium | 2026-07-28 |  | [BUG-42](../specs/bug-fixes/bug-42-spec.md) |
+| BUG-43 | Mover seletor de tema para a top bar | done | 2026-07-28 |  | medium | 2026-07-28 |  | [BUG-43](../specs/bug-fixes/bug-43-spec.md) |
+| BUG-44 | Adicionar menu hambúrguer à top bar mobile | done | 2026-07-28 |  | high | 2026-07-28 |  |  |
+| BUG-45 | Ajustar ações mobile e identidade visual do frontend | done | 2026-07-28 |  | medium | 2026-07-28 |  | [BUG-45](../specs/bug-fixes/bug-45-spec.md) |
+| BUG-46 | Corrigir scroll vertical dos dashboards no mobile | done | 2026-07-28 |  | high | 2026-07-28 |  |  |
+| BUG-47 | Reorganizar informação dos alunos no mobile | done | 2026-07-28 |  | medium | 2026-07-28 |  |  |
+| BUG-48 | Reorganizar momentos de avaliação no mobile | done | 2026-07-28 |  | medium | 2026-07-28 |  |  |
+| BUG-49 | Adaptar Alunos M.Avaliação ao mobile | done | 2026-07-28 |  | high | 2026-07-28 |  |  |
+| BUG-50 | Usar texto branco nos popups de sucesso | done | 2026-07-28 |  | low | 2026-07-28 |  |  |
+| BUG-51 | Regressar ao menu anterior ao fechar configurações | done | 2026-07-29 |  | medium | 2026-07-29 |  | [BUG-51](../specs/bug-fixes/bug-51-spec.md) |
+| BUG-52 | Reorganizar grelha de M.Avaliação no mobile | done | 2026-07-29 |  | medium | 2026-07-29 |  |  |
+| BUG-53 | Adaptar calendário dos alunos ao mobile | done | 2026-07-29 |  | high | 2026-07-29 |  |  |
+| BUG-54 | Restaurar navegação após novo login | done | 2026-07-29 |  | high | 2026-07-29 |  | [BUG-54](../specs/bug-fixes/bug-54-spec.md) |
 <!-- /maestru:work-items-list -->

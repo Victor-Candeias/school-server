@@ -36,6 +36,7 @@ DEFAULT_APP_SETTINGS = {
     "key": APP_SETTINGS_KEY,
     "inactiveLogoutMinutes": 15,
     "messageTimeoutSeconds": 5,
+    "evaluationMomentTemplates": [],
     "percentageRanges": [
         {
             "id": "very-low",
@@ -112,6 +113,39 @@ def normalize_message_timeout_seconds(value):
     return seconds if seconds > 0 else DEFAULT_APP_SETTINGS["messageTimeoutSeconds"]
 
 
+def normalize_evaluation_moment_templates(value):
+    if not isinstance(value, list):
+        return DEFAULT_APP_SETTINGS["evaluationMomentTemplates"]
+
+    normalized_templates = []
+    for template_index, template in enumerate(value):
+        if not isinstance(template, dict):
+            continue
+
+        moment_type = template.get("type")
+        if not isinstance(moment_type, str) or not moment_type.strip():
+            continue
+
+        weight_percentage = template.get("weightPercentage")
+        if isinstance(weight_percentage, bool):
+            continue
+
+        try:
+            normalized_weight = round(float(weight_percentage))
+        except (TypeError, ValueError):
+            continue
+
+        normalized_templates.append(
+            {
+                "id": str(template.get("id") or f"evaluation-template-{template_index + 1}"),
+                "type": moment_type.strip(),
+                "weightPercentage": min(100, max(0, normalized_weight)),
+            }
+        )
+
+    return normalized_templates
+
+
 def normalize_percentage_ranges(value):
     if not isinstance(value, list):
         return DEFAULT_APP_SETTINGS["percentageRanges"]
@@ -170,9 +204,13 @@ async def get_app_settings(_: None = Depends(utilities.verificar_token_cookie)):
     settings["messageTimeoutSeconds"] = normalize_message_timeout_seconds(
         settings.get("messageTimeoutSeconds"),
     )
+    settings["evaluationMomentTemplates"] = normalize_evaluation_moment_templates(
+        settings.get("evaluationMomentTemplates"),
+    )
     settings["percentageRanges"] = normalize_percentage_ranges(settings.get("percentageRanges"))
     if (
         documents[0].get("messageTimeoutSeconds") != settings["messageTimeoutSeconds"]
+        or documents[0].get("evaluationMomentTemplates") != settings["evaluationMomentTemplates"]
         or documents[0].get("percentageRanges") != settings["percentageRanges"]
     ):
         await api_client.update(
@@ -196,6 +234,9 @@ async def update_app_settings(request: Request, _: None = Depends(utilities.veri
         "key": APP_SETTINGS_KEY,
         "inactiveLogoutMinutes": inactive_logout_minutes,
         "messageTimeoutSeconds": normalize_message_timeout_seconds(body.get("messageTimeoutSeconds")),
+        "evaluationMomentTemplates": normalize_evaluation_moment_templates(
+            body.get("evaluationMomentTemplates"),
+        ),
         "percentageRanges": normalize_percentage_ranges(body.get("percentageRanges")),
     }
     payload = {
