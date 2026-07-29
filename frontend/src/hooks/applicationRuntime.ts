@@ -80,6 +80,8 @@ export type ApplicationState = {
   setIsEvaluationQuestionModalOpen: import("react").Dispatch<import("react").SetStateAction<boolean>>
   isCalendarTaskModalOpen: boolean
   setIsCalendarTaskModalOpen: import("react").Dispatch<import("react").SetStateAction<boolean>>
+  isSettingsConfirmationOpen: boolean
+  setIsSettingsConfirmationOpen: import("react").Dispatch<import("react").SetStateAction<boolean>>
   isCreatingCalendarTask: boolean
   setIsCreatingCalendarTask: import("react").Dispatch<import("react").SetStateAction<boolean>>
   editingYearId: string | null
@@ -174,8 +176,12 @@ export type ApplicationActions = {
   loadAllEvaluationMoments: () => Promise<void>
   loadAllStudentMomentValues: () => Promise<void>
   loadStudentCalendarTasks: (schoolClass?: SchoolDocument | null) => Promise<void>
-  saveAppSettings: (event: FormEvent<HTMLFormElement>) => Promise<void>
+  saveAppSettings: () => Promise<boolean>
   hasUnsavedAppSettingsChanges: () => boolean
+  handleSettingsAction: (event: FormEvent<HTMLFormElement>) => void
+  saveAndCloseSettings: () => Promise<void>
+  discardAndCloseSettings: () => void
+  cancelSettingsClose: () => void
   addEvaluationMomentTemplate: () => void
   updateEvaluationMomentTemplate: (templateId: string, field: "type" | "weightPercentage", value: string) => void
   removeEvaluationMomentTemplate: (templateId: string) => void

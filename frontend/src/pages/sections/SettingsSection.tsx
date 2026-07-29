@@ -3,9 +3,8 @@ import type { AcademicPeriodType } from '../../hooks/useSchoolApplication'
 
 export function SettingsSection() {
   const {
-    saveAppSettings,
     hasUnsavedAppSettingsChanges,
-    closeSettingsDashboard,
+    handleSettingsAction,
     isLoadingClasses,
     academicPeriodType,
     setAcademicPeriodType,
@@ -31,14 +30,13 @@ export function SettingsSection() {
   return (
     (
               <section className="students-panel settings-panel" aria-label="Configurações da aplicação">
-                <form className="settings-form" onSubmit={saveAppSettings}>
+                <form className="settings-form" onSubmit={handleSettingsAction}>
                   <div className="students-panel-heading">
                     <h2>Configurações gerais</h2>
                     <button
-                      type={hasUnsavedChanges ? 'submit' : 'button'}
+                      type="submit"
                       className={`settings-action-button ${hasUnsavedChanges ? 'save' : 'close'}`}
                       disabled={isLoadingClasses}
-                      onClick={hasUnsavedChanges ? undefined : closeSettingsDashboard}
                     >
                       {hasUnsavedChanges ? 'Gravar configurações' : 'Fechar configurações'}
                     </button>

@@ -39,6 +39,9 @@ const EvaluationQuestionModal = lazy(() =>
 const CalendarTaskModal = lazy(() =>
   import('../components/modals/CalendarTaskModal').then((module) => ({ default: module.CalendarTaskModal })),
 )
+const SettingsConfirmationModal = lazy(() =>
+  import('../components/modals/SettingsConfirmationModal').then((module) => ({ default: module.SettingsConfirmationModal })),
+)
 
 type DashboardPageProps = {
   model: SchoolApplicationModel
@@ -73,6 +76,7 @@ export function DashboardPage({ model }: DashboardPageProps) {
     isStudentModalOpen,
     isEvaluationMomentModalOpen,
     isCalendarTaskModalOpen,
+    isSettingsConfirmationOpen,
     message,
     isLoadingYears,
     isLoadingClasses,
@@ -180,6 +184,10 @@ export function DashboardPage({ model }: DashboardPageProps) {
 
               {isStudentModalOpen && (
                 <StudentModal model={model} />
+              )}
+
+              {isSettingsConfirmationOpen && (
+                <SettingsConfirmationModal model={model} />
               )}
             </Suspense>
           </section>

@@ -3,9 +3,8 @@ import type { SchoolApplicationModel } from '../hooks/useSchoolApplication'
 
 export type AppSettingsContextValue = Pick<
   SchoolApplicationModel,
-  | 'saveAppSettings'
   | 'hasUnsavedAppSettingsChanges'
-  | 'closeSettingsDashboard'
+  | 'handleSettingsAction'
   | 'isLoadingClasses'
   | 'academicPeriodType'
   | 'setAcademicPeriodType'

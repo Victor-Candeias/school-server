@@ -69,4 +69,5 @@ owner: victor
 | BUG-52 | Reorganizar grelha de M.Avaliação no mobile | done | 2026-07-29 |  | medium | 2026-07-29 |  |  |
 | BUG-53 | Adaptar calendário dos alunos ao mobile | done | 2026-07-29 |  | high | 2026-07-29 |  |  |
 | BUG-54 | Restaurar navegação após novo login | done | 2026-07-29 |  | high | 2026-07-29 |  | [BUG-54](../specs/bug-fixes/bug-54-spec.md) |
+| BUG-55 | Restaurar confirmação ao fechar configurações | done | 2026-07-29 | developer | high | 2026-07-29 |  | [BUG-55](../specs/bug-fixes/bug-55-spec.md) |
 <!-- /maestru:work-items-list -->
