@@ -1456,6 +1456,64 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
   background: var(--assessment-group-weighted-background);
 }
 
+/* Match the separated, high-contrast cells used by the dark reference. */
+html:not(.dark) .semester-assessments-table {
+ gap: 0;
+ padding: 0 8px 8px;
+ background: #1e293b;
+}
+
+html:not(.dark) .semester-assessments-row {
+ gap: 8px;
+ padding: 7px 6px;
+}
+
+html:not(.dark) .semester-assessments-group-0 {
+ --assessment-group-background: #1e40af;
+ --assessment-group-average-background: #1d4ed8;
+ --assessment-group-weighted-background: #2563eb;
+ --assessment-group-text: #eff6ff;
+}
+
+html:not(.dark) .semester-assessments-group-1 {
+ --assessment-group-background: #5b21b6;
+ --assessment-group-average-background: #6d28d9;
+ --assessment-group-weighted-background: #7c3aed;
+ --assessment-group-text: #f5f3ff;
+}
+
+html:not(.dark) .semester-assessments-group-2 {
+ --assessment-group-background: #9a3412;
+ --assessment-group-average-background: #c2410c;
+ --assessment-group-weighted-background: #ea580c;
+ --assessment-group-text: #fff7ed;
+}
+
+html:not(.dark) .semester-assessments-group-3 {
+ --assessment-group-background: #115e59;
+ --assessment-group-average-background: #0f766e;
+ --assessment-group-weighted-background: #0d9488;
+ --assessment-group-text: #f0fdfa;
+}
+
+html:not(.dark) .semester-assessments-group-head,
+html:not(.dark) .semester-assessments-subhead {
+ color: #cbd5e1;
+ background: #0f172a;
+}
+
+html:not(.dark) .semester-assessments-row > span:not(.semester-assessments-group-cell),
+html:not(.dark) .semester-assessments-row > strong:not(.semester-assessments-group-cell) {
+ color: #f8fafc;
+ background: #334155;
+}
+
+html:not(.dark) .semester-assessments-group-head > span:not(.semester-assessments-group-cell),
+html:not(.dark) .semester-assessments-subhead > span:not(.semester-assessments-group-cell) {
+ border-color: #334155;
+ background: #1e293b;
+}
+
 .semester-assessments-final-head {
   align-self: stretch;
   display: flex;
