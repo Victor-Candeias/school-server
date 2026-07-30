@@ -23,6 +23,12 @@
   --shadow-sm:      0 1px 3px rgb(0 0 0 / 8%), 0 1px 2px rgb(0 0 0 / 5%);
   --shadow:         0 4px 12px rgb(0 0 0 / 10%);
   --shadow-lg:      0 8px 24px rgb(0 0 0 / 12%);
+  --table-surface:  #ffffff;
+  --table-head:     #f8fafc;
+  --table-cell:     #ffffff;
+  --table-border:   #e2e8f0;
+  --table-text:     #0f172a;
+  --table-muted:    #475569;
 }
 
 /* ── Layout ──────────────────────────────────────────── */
@@ -919,29 +925,29 @@ h1 {
 .evaluation-questions-table {
   display: grid;
   overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
+  border: 1px solid var(--table-border);
+  border-radius: var(--radius-lg);
+  background: var(--table-surface);
 }
 
 .evaluation-questions-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 100px 100px;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
-  padding: 5px 8px;
-  color: var(--text);
+  padding: 7px 10px;
+  color: var(--table-text);
   font-size: 0.692rem;
   font-weight: 600;
 }
 
 .evaluation-questions-row + .evaluation-questions-row {
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--table-border);
 }
 
 .evaluation-questions-table-head {
-  color: var(--text-2);
-  background: var(--surface-2);
+  color: var(--table-muted);
+  background: var(--table-head);
   font-size: 0.615rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -1204,23 +1210,24 @@ h1 {
   display: grid;
   overflow: auto;
   padding-bottom: 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--table-border);
   border-radius: var(--radius-lg);
+  background: var(--table-surface);
 }
 
 .student-assessment-row {
   display: grid;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
   min-width: max-content;
-  padding: 5px 8px;
-  color: var(--text);
+  padding: 7px 10px;
+  color: var(--table-text);
   font-size: 0.692rem;
   font-weight: 600;
 }
 
 .student-assessment-row + .student-assessment-row {
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--table-border);
 }
 
 .student-assessment-row:not(.student-assessment-table-head) > * {
@@ -1235,8 +1242,8 @@ h1 {
 }
 
 .student-assessment-table-head {
-  color: var(--text-2);
-  background: var(--surface-2);
+  color: var(--table-muted);
+  background: var(--table-head);
   font-size: 0.615rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -1273,18 +1280,18 @@ h1 {
   overflow: auto;
   gap: 0;
   padding: 8px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--table-border);
   border-radius: var(--radius-lg);
-  background: whitesmoke;
+  background: var(--table-surface);
 }
 
 .semester-assessments-row {
   display: grid;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
   min-width: max-content;
-  padding: 6px 10px;
-  color: var(--text);
+  padding: 7px 10px;
+  color: var(--table-text);
   font-size: 0.769rem;
   font-weight: 600;
 }
@@ -1308,8 +1315,8 @@ h1 {
 
 .semester-assessments-group-head,
 .semester-assessments-subhead {
-  color: var(--text-2);
-  background: var(--surface-2);
+  color: var(--table-muted);
+  background: var(--table-head);
   font-size: 0.615rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -1428,17 +1435,17 @@ h1 {
 
 /* Keep the light table readable while preserving each assessment group's colour. */
 html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):not(.semester-assessments-subhead) {
-  color: #0f172a;
+  color: var(--table-text);
 }
 
 html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):not(.semester-assessments-subhead) > span:not(.semester-assessments-group-cell),
 html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):not(.semester-assessments-subhead) > strong:not(.semester-assessments-group-cell) {
   min-height: 30px;
   padding: 6px 8px;
-  border: 0;
+  border: 1px solid var(--table-border);
   border-radius: 6px;
-  color: #0f172a;
-  background: #ffffff;
+  color: var(--table-text);
+  background: var(--table-cell);
 }
 
 html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):not(.semester-assessments-subhead) > .semester-assessments-group-cell {
@@ -1538,9 +1545,9 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
 .student-calendar {
   display: grid;
   overflow: hidden;
-  border: 1px solid var(--border);
+  border: 1px solid var(--table-border);
   border-radius: var(--radius-lg);
-  background: var(--surface);
+  background: var(--table-surface);
 }
 
 .student-calendar-weekdays,
@@ -1555,8 +1562,8 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
 }
 
 .student-calendar-weekdays {
-  color: var(--text-2);
-  background: var(--surface-2);
+  color: var(--table-muted);
+  background: var(--table-head);
   font-size: 0.615rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -1573,7 +1580,7 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
   background: #f0fdf4;
 }
 
-.student-calendar-grid { border-top: 1px solid var(--border); }
+.student-calendar-grid { border-top: 1px solid var(--table-border); }
 
 .student-calendar-day {
   display: flex;
@@ -1586,10 +1593,10 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
   margin: 0;
   padding: 8px;
   border: 0;
-  border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  color: var(--text);
-  background: var(--surface);
+  border-right: 1px solid var(--table-border);
+  border-bottom: 1px solid var(--table-border);
+  color: var(--table-text);
+  background: var(--table-cell);
   box-shadow: none;
   font-size: 0.769rem;
   font-style: normal;
@@ -1627,18 +1634,18 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
 .student-calendar-day:nth-child(7n)       { border-right: 0; }
 .student-calendar-day:nth-last-child(-n+7) { border-bottom: 0; }
 
-.student-calendar.work-week .student-calendar-day:nth-child(7n)        { border-right: 1px solid var(--border); }
+.student-calendar.work-week .student-calendar-day:nth-child(7n)        { border-right: 1px solid var(--table-border); }
 .student-calendar.work-week .student-calendar-day:nth-child(5n)        { border-right: 0; }
-.student-calendar.work-week .student-calendar-day:nth-last-child(-n+7) { border-bottom: 1px solid var(--border); }
+.student-calendar.work-week .student-calendar-day:nth-last-child(-n+7) { border-bottom: 1px solid var(--table-border); }
 .student-calendar.work-week .student-calendar-day:nth-last-child(-n+5) { border-bottom: 0; }
 
 /* Override for students-dashboard calendar (same rules, no duplicate needed) */
 .students-dashboard .student-calendar-day { border-radius: 0; }
 .students-dashboard .student-calendar-day:nth-child(7n)       { border-right: 0; }
 .students-dashboard .student-calendar-day:nth-last-child(-n+7) { border-bottom: 0; }
-.students-dashboard .student-calendar.work-week .student-calendar-day:nth-child(7n)        { border-right: 1px solid var(--border); }
+.students-dashboard .student-calendar.work-week .student-calendar-day:nth-child(7n)        { border-right: 1px solid var(--table-border); }
 .students-dashboard .student-calendar.work-week .student-calendar-day:nth-child(5n)        { border-right: 0; }
-.students-dashboard .student-calendar.work-week .student-calendar-day:nth-last-child(-n+7) { border-bottom: 1px solid var(--border); }
+.students-dashboard .student-calendar.work-week .student-calendar-day:nth-last-child(-n+7) { border-bottom: 1px solid var(--table-border); }
 .students-dashboard .student-calendar.work-week .student-calendar-day:nth-last-child(-n+5) { border-bottom: 0; }
 .students-dashboard .student-calendar-day.outside-month { color: var(--text-3); background: #fafafa; }
 .students-dashboard .student-calendar-day.today   { color: #ffffff; background: var(--primary); }
@@ -1680,8 +1687,9 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
 .students-table {
   display: grid;
   overflow: visible;
-  border: 1px solid var(--border);
+  border: 1px solid var(--table-border);
   border-radius: var(--radius-lg);
+  background: var(--table-surface);
 }
 
 .students-table-row {
@@ -1691,17 +1699,17 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
   gap: 8px;
   align-items: center;
   padding: 6px 10px;
-  color: var(--text);
+  color: var(--table-text);
   font-size: 0.769rem;
   font-weight: 600;
 }
 
-.students-table-row + .students-table-row { border-top: 1px solid var(--border); }
+.students-table-row + .students-table-row { border-top: 1px solid var(--table-border); }
 
 .students-table-head {
   z-index: 1;
-  color: var(--text-2);
-  background: var(--surface-2);
+  color: var(--table-muted);
+  background: var(--table-head);
   font-size: 0.615rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -2006,8 +2014,9 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
 .settings-templates-table {
   display: grid;
   overflow: hidden;
-  border: 1px solid var(--border);
+  border: 1px solid var(--table-border);
   border-radius: var(--radius-lg);
+  background: var(--table-surface);
 }
 
 .settings-templates-row {
@@ -2016,15 +2025,16 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
   gap: 10px;
   align-items: center;
   padding: 8px 12px;
+  color: var(--table-text);
 }
 
 .settings-templates-row + .settings-templates-row {
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--table-border);
 }
 
 .settings-templates-head {
-  color: var(--text-2);
-  background: var(--surface-2);
+  color: var(--table-muted);
+  background: var(--table-head);
   font-size: 0.615rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -2066,8 +2076,9 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
 .settings-ranges-table {
   display: grid;
   overflow: hidden;
-  border: 1px solid var(--border);
+  border: 1px solid var(--table-border);
   border-radius: var(--radius-lg);
+  background: var(--table-surface);
 }
 
 .settings-ranges-row {
@@ -2076,6 +2087,7 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
   gap: 8px;
   align-items: center;
   padding: 7px 10px;
+  color: var(--table-text);
 }
 
 .settings-ranges-preview {
@@ -2084,11 +2096,11 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
   justify-content: center;
 }
 
-.settings-ranges-row + .settings-ranges-row { border-top: 1px solid var(--border); }
+.settings-ranges-row + .settings-ranges-row { border-top: 1px solid var(--table-border); }
 
 .settings-ranges-head {
-  color: var(--text-2);
-  background: var(--surface-2);
+  color: var(--table-muted);
+  background: var(--table-head);
   font-size: 0.615rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -2141,8 +2153,9 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
 .settings-periods-table {
   display: grid;
   overflow: hidden;
-  border: 1px solid var(--border);
+  border: 1px solid var(--table-border);
   border-radius: var(--radius-lg);
+  background: var(--table-surface);
 }
 
 .settings-periods-row {
@@ -2151,13 +2164,14 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
   gap: 10px;
   align-items: center;
   padding: 8px 12px;
+  color: var(--table-text);
 }
 
-.settings-periods-row + .settings-periods-row { border-top: 1px solid var(--border); }
+.settings-periods-row + .settings-periods-row { border-top: 1px solid var(--table-border); }
 
 .settings-periods-head {
-  color: var(--text-2);
-  background: var(--surface-2);
+  color: var(--table-muted);
+  background: var(--table-head);
   font-size: 0.615rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -2202,8 +2216,9 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
 .evaluation-moments-table {
   display: grid;
   overflow: hidden;
-  border: 1px solid var(--border);
+  border: 1px solid var(--table-border);
   border-radius: var(--radius-lg);
+  background: var(--table-surface);
 }
 
 .evaluation-moments-row {
@@ -2212,16 +2227,16 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
   gap: 8px;
   align-items: center;
   padding: 6px 10px;
-  color: var(--text);
+  color: var(--table-text);
   font-size: 0.769rem;
   font-weight: 600;
 }
 
-.evaluation-moments-row + .evaluation-moments-row { border-top: 1px solid var(--border); }
+.evaluation-moments-row + .evaluation-moments-row { border-top: 1px solid var(--table-border); }
 
 .evaluation-moments-table-head {
-  color: var(--text-2);
-  background: var(--surface-2);
+  color: var(--table-muted);
+  background: var(--table-head);
   font-size: 0.615rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -3152,6 +3167,12 @@ html.dark {
   --shadow-sm:      0 1px 3px rgb(0 0 0 / 30%), 0 1px 2px rgb(0 0 0 / 20%);
   --shadow:         0 4px 12px rgb(0 0 0 / 40%);
   --shadow-lg:      0 8px 24px rgb(0 0 0 / 50%);
+  --table-surface:  #1e293b;
+  --table-head:     #0f172a;
+  --table-cell:     #334155;
+  --table-border:   #334155;
+  --table-text:     #f1f5f9;
+  --table-muted:    #cbd5e1;
 }
 
 html.dark .topbar {
@@ -3298,9 +3319,9 @@ html.dark .student-assessment-table,
 html.dark .semester-assessments-table {
   gap: 0;
   padding: 0 8px 8px;
-  border-color: #334155;
+  border-color: var(--table-border);
   border-radius: 8px;
-  background: #1e293b;
+  background: var(--table-surface);
 }
 
 html.dark .student-assessment-row,
@@ -3341,8 +3362,8 @@ html.dark .semester-assessments-group-3 {
 html.dark .student-assessment-table-head,
 html.dark .semester-assessments-group-head,
 html.dark .semester-assessments-subhead {
-  color: #cbd5e1;
-  background: #0f172a;
+  color: var(--table-muted);
+  background: var(--table-head);
 }
 
 html.dark .student-assessment-row input {
@@ -3362,15 +3383,15 @@ html.dark .semester-assessments-row > span:not(.semester-assessments-group-cell)
 html.dark .semester-assessments-row > strong:not(.semester-assessments-group-cell) {
   min-height: 30px;
   padding: 6px 8px;
-  border: 1px solid #475569;
+  border: 1px solid var(--border-strong);
   border-radius: 6px;
-  background: #334155;
+  background: var(--table-cell);
 }
 
 html.dark .semester-assessments-group-head > span:not(.semester-assessments-group-cell),
 html.dark .semester-assessments-subhead > span:not(.semester-assessments-group-cell) {
-  border-color: #334155;
-  background: #1e293b;
+  border-color: var(--table-border);
+  background: var(--table-surface);
 }
 
 html.dark .semester-assessments-final-cell,
