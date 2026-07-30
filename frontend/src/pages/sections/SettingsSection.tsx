@@ -252,6 +252,7 @@ export function SettingsSection() {
                       <div className="settings-ranges-row settings-ranges-head" role="row">
                         <span role="columnheader">Mín.</span>
                         <span role="columnheader">Máx.</span>
+                        <span role="columnheader">Nota</span>
                         <span role="columnheader">Fundo</span>
                         <span role="columnheader">Texto</span>
                         <span role="columnheader">Exemplo</span>
@@ -279,6 +280,16 @@ export function SettingsSection() {
                             />
                           </label>
                           <label role="cell">
+                            <span>Nota</span>
+                            <input
+                              type="number"
+                              min="0"
+                              max="20"
+                              value={range.nota}
+                              onChange={(event) => updatePercentageRange(range.id, 'nota', event.target.value)}
+                            />
+                          </label>
+                          <label role="cell">
                             <span>Fundo</span>
                             <input
                               type="color"
@@ -303,7 +314,7 @@ export function SettingsSection() {
                               className="assessment-percentage"
                               style={{ backgroundColor: range.backgroundColor, color: range.textColor }}
                             >
-                              {range.min}–{range.max}%
+                              {range.min}–{range.max}% (Nota {range.nota})
                             </span>
                           </div>
                         </div>

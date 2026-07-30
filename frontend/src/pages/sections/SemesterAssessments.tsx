@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { SchoolApplicationModel } from '../../hooks/useSchoolApplication'
 
 
@@ -23,17 +24,42 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
     getStudentAssessmentGroupAverage,
     getStudentAssessmentGroupWeightedValue,
     getStudentAssessmentFinalValue,
+    percentageRanges,
     formatAssessmentValue,
   } = model
+
+  const [hiddenGroupMetrics, setHiddenGroupMetrics] = useState<Set<string>>(() => new Set())
 
   if (!selectedClass) return null
 
   const momentGroups = getAssessmentsSemesterMomentGroups()
-  const assessmentColumnCount = 1 + momentGroups.reduce(
-    (columnCount, group) => columnCount + group.moments.length + 2,
+  const getGroupClassName = (groupIndex: number) =>
+    `semester-assessments-group-${groupIndex % 4}`
+  const isGroupMetricsHidden = (groupType: string) => hiddenGroupMetrics.has(groupType)
+  const toggleGroupMetrics = (groupType: string) => {
+    setHiddenGroupMetrics((currentHiddenGroups) => {
+      const nextHiddenGroups = new Set(currentHiddenGroups)
+      if (nextHiddenGroups.has(groupType)) {
+        nextHiddenGroups.delete(groupType)
+      } else {
+        nextHiddenGroups.add(groupType)
+      }
+      return nextHiddenGroups
+    })
+  }
+  const assessmentColumnCount = 2 + momentGroups.reduce(
+    (columnCount, group) => columnCount
+      + group.moments.length
+      + (isGroupMetricsHidden(group.type) ? 0 : 2),
     0,
   )
-  const assessmentGridColumns = `minmax(180px, 1.4fr) repeat(${assessmentColumnCount}, minmax(120px, 1fr))`
+  const assessmentGridColumns = `minmax(140px, 1.3fr) repeat(${assessmentColumnCount}, minmax(60px, 1fr))`
+
+  const getFinalRange = (value: number) =>
+    percentageRanges.find((range) => value >= range.min && value <= range.max)
+      ?? percentageRanges[percentageRanges.length - 1]
+
+  const getFinalGrade = (value: number) => getFinalRange(value)?.nota ?? 0
 
   return (
     (
@@ -94,21 +120,40 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                             <span className="semester-assessments-student-head" role="columnheader">
                               Aluno
                             </span>
-                            {momentGroups.map((group) => (
+                            {momentGroups.map((group, groupIndex) => {
+                              const metricsHidden = isGroupMetricsHidden(group.type)
+                              const groupClassName = getGroupClassName(groupIndex)
+                              return (
                               <span
-                                className="semester-assessments-type-head"
+                                className={`semester-assessments-type-head semester-assessments-group-cell ${groupClassName}`}
                                 role="columnheader"
                                 key={group.type}
-                                style={{ gridColumn: `span ${group.moments.length + 2}` }}
+                                style={{
+                                  gridColumn: `span ${group.moments.length + (metricsHidden ? 0 : 2)}`,
+                                }}
                               >
                                 {group.type}
+                                <button
+                                  className="semester-assessments-group-toggle"
+                                  type="button"
+                                  aria-label={`${metricsHidden ? 'Mostrar' : 'Ocultar'} média e ponderação de ${group.type}`}
+                                  aria-pressed={!metricsHidden}
+                                  title={`${metricsHidden ? 'Mostrar' : 'Ocultar'} média e ponderação`}
+                                  onClick={() => toggleGroupMetrics(group.type)}
+                                >
+                                  {metricsHidden ? '+' : '−'}
+                                </button>
                               </span>
-                            ))}
+                              )
+                            })}
                             <span
                               className="semester-assessments-final-head"
                               role="columnheader"
                             >
                               Final
+                            </span>
+                            <span className="semester-assessments-grade-head" role="columnheader">
+                              Nota
                             </span>
                           </div>
                           <div
@@ -117,35 +162,42 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                             style={{ gridTemplateColumns: assessmentGridColumns }}
                           >
                             <span aria-hidden="true" />
-                            {momentGroups.flatMap((group) => [
+                            {momentGroups.flatMap((group, groupIndex) => [
                               ...group.moments.map((moment) => (
-                                <span role="columnheader" key={getDocumentId(moment) ?? getStringValue(moment.name)}>
+                                <span
+                                  className={`semester-assessments-group-cell ${getGroupClassName(groupIndex)}`}
+                                  role="columnheader"
+                                  key={getDocumentId(moment) ?? getStringValue(moment.name)}
+                                >
                                   {getStringValue(moment.name)}{' '}
                                   <strong className="question-max-value">
                                     ({getEvaluationMomentMaxValue(moment)})
                                   </strong>
                                 </span>
                               )),
+                              ...(isGroupMetricsHidden(group.type) ? [] : [
                               <span
-                                className="semester-assessments-average-head"
+                                className={`semester-assessments-average-head semester-assessments-group-cell ${getGroupClassName(groupIndex)}`}
                                 role="columnheader"
                                 key={`${group.type}-average`}
                               >
                                 Média
                               </span>,
                               <span
-                                className="semester-assessments-weighted-head"
+                                className={`semester-assessments-weighted-head semester-assessments-group-cell ${getGroupClassName(groupIndex)}`}
                                 role="columnheader"
                                 key={`${group.type}-weighted`}
                                 title={`Média × ${formatAssessmentValue(group.weightPercentage)}%`}
                               >
                                 M*{formatAssessmentValue(group.weightPercentage)}%
                               </span>,
+                              ]),
                             ])}
                             <span
                               className="semester-assessments-final-subhead"
                               aria-hidden="true"
                             />
+                            <span className="semester-assessments-final-subhead" aria-hidden="true" />
                           </div>
                         </div>
                         {getStudentsForClass(selectedClass).map((student, studentIndex) => (
@@ -156,32 +208,58 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                             style={{ gridTemplateColumns: assessmentGridColumns }}
                           >
                             <span role="cell">{getStringValue(student.name)}</span>
-                            {momentGroups.flatMap((group) => [
+                            {momentGroups.flatMap((group, groupIndex) => [
                               ...group.moments.map((moment) => (
-                                <strong role="cell" key={getDocumentId(moment) ?? getStringValue(moment.name)}>
+                                <strong
+                                  className={`semester-assessments-group-cell ${getGroupClassName(groupIndex)}`}
+                                  role="cell"
+                                  key={getDocumentId(moment) ?? getStringValue(moment.name)}
+                                >
                                   {getStudentSavedMomentTotal(student, moment)}
                                 </strong>
                               )),
+                              ...(isGroupMetricsHidden(group.type) ? [] : [
                               <strong
-                                className="semester-assessments-average-cell"
+                                className={`semester-assessments-average-cell semester-assessments-group-cell ${getGroupClassName(groupIndex)}`}
                                 role="cell"
                                 key={`${group.type}-average`}
                               >
                                 {formatAssessmentValue(getStudentAssessmentGroupAverage(student, group))}
                               </strong>,
                               <strong
-                                className="semester-assessments-weighted-cell"
+                                className={`semester-assessments-weighted-cell semester-assessments-group-cell ${getGroupClassName(groupIndex)}`}
                                 role="cell"
                                 key={`${group.type}-weighted`}
                               >
                                 {formatAssessmentValue(getStudentAssessmentGroupWeightedValue(student, group))}
                               </strong>,
+                              ]),
                             ])}
                             <strong
                               className="semester-assessments-final-cell"
                               role="cell"
+                              style={(() => {
+                                const finalValue = getStudentAssessmentFinalValue(student, momentGroups)
+                                const range = getFinalRange(finalValue)
+                                return range
+                                  ? { backgroundColor: range.backgroundColor, color: range.textColor }
+                                  : undefined
+                              })()}
                             >
                               {formatAssessmentValue(getStudentAssessmentFinalValue(student, momentGroups))}
+                            </strong>
+                            <strong
+                              className="semester-assessments-grade-cell"
+                              role="cell"
+                              style={(() => {
+                                const finalValue = getStudentAssessmentFinalValue(student, momentGroups)
+                                const range = getFinalRange(finalValue)
+                                return range
+                                  ? { backgroundColor: range.backgroundColor, color: range.textColor }
+                                  : undefined
+                              })()}
+                            >
+                              {getFinalGrade(getStudentAssessmentFinalValue(student, momentGroups))}
                             </strong>
                           </div>
                         ))}

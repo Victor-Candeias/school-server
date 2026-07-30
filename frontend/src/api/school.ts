@@ -20,6 +20,7 @@ export type PercentageRange = {
   id: string
   min: number
   max: number
+  nota: number
   backgroundColor: string
   textColor: string
 }

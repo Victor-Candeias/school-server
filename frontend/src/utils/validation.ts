@@ -41,6 +41,7 @@ export function normalizePercentageRanges(value: unknown): PercentageRange[] {
       const rangeRecord = range as Record<string, unknown>
       const min = Number(rangeRecord.min)
       const max = Number(rangeRecord.max)
+      const nota = Number(rangeRecord.nota)
       const backgroundColor = rangeRecord.backgroundColor
       const textColor = rangeRecord.textColor
 
@@ -57,6 +58,7 @@ export function normalizePercentageRanges(value: unknown): PercentageRange[] {
         id: String(rangeRecord.id ?? `${min}-${max}`),
         min,
         max,
+        nota: Number.isFinite(nota) ? nota : 0,
         backgroundColor,
         textColor,
       }

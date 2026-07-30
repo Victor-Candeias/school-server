@@ -249,7 +249,7 @@ async def login(request: Request, response: Response):
             key="access_token",
             value=token,
             httponly=True,
-            secure=False,
+            secure=True,
             samesite="lax",
             path="/",
         )
@@ -268,7 +268,13 @@ async def login(request: Request, response: Response):
 async def logout(request: Request, response: Response):
     try:
         logout_response = JSONResponse(status_code=200, content={"message": "User logout realizado com sucesso."})
-        logout_response.delete_cookie("access_token", path="/")
+        logout_response.delete_cookie(
+            "access_token",
+            path="/",
+            secure=True,
+            httponly=True,
+            samesite="lax",
+        )
         return logout_response
 
     except Exception as e:

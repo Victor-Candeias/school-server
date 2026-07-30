@@ -20,4 +20,5 @@ status: active
 | DEPLOY-02 | Adicionar scripts para iniciar e parar o deployment | done | 2026-07-24 | victor | medium | 2026-07-24 |  |  |
 | DEPLOY-03 | Publicar alterações do menu principal | done | 2026-07-24 | victor | medium | 2026-07-24 |  |  |
 | DEPLOY-04 | Adicionar script de atualização do backend e frontend | done | 2026-07-29 | victor | medium | 2026-07-29 |  |  |
+| DEPLOY-05 | Publicar schoolhome.pt com Cloudflare Tunnel | in-progress | 2026-07-29 | developer | critical |  |  | [DEPLOY-05](../specs/deployment/deploy-05-spec.md) |
 <!-- /maestru:work-items-list -->

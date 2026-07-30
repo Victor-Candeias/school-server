@@ -1299,6 +1299,38 @@ h1 {
   padding-bottom: 0;
 }
 
+.semester-assessments-group-cell {
+  color: var(--assessment-group-color);
+  background: color-mix(in srgb, var(--assessment-group-color) 9%, transparent);
+}
+
+.semester-assessments-group-0 { --assessment-group-color: #2563eb; }
+.semester-assessments-group-1 { --assessment-group-color: #7c3aed; }
+.semester-assessments-group-2 { --assessment-group-color: #ea580c; }
+.semester-assessments-group-3 { --assessment-group-color: #0f766e; }
+
+.semester-assessments-group-toggle {
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  padding: 0;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  color: inherit;
+  background: transparent;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.semester-assessments-group-toggle:hover,
+.semester-assessments-group-toggle:focus-visible {
+  color: var(--text);
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
 .semester-assessments-subhead {
   padding-top: 0;
 }
@@ -1326,21 +1358,23 @@ h1 {
 
 .semester-assessments-average-head,
 .semester-assessments-average-cell {
-  color: var(--text);
-  background: color-mix(in srgb, var(--primary) 4%, transparent);
+  color: var(--assessment-group-color);
+  background: color-mix(in srgb, var(--assessment-group-color) 14%, transparent);
   font-weight: 800;
 }
 
 .semester-assessments-weighted-head,
 .semester-assessments-weighted-cell {
-  color: var(--primary);
-  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  color: var(--assessment-group-color);
+  background: color-mix(in srgb, var(--assessment-group-color) 18%, transparent);
   font-weight: 800;
 }
 
 .semester-assessments-final-head,
 .semester-assessments-final-subhead,
-.semester-assessments-final-cell {
+.semester-assessments-final-cell,
+.semester-assessments-grade-head,
+.semester-assessments-grade-cell {
   color: var(--success);
   background: color-mix(in srgb, var(--success) 10%, transparent);
   font-weight: 800;
@@ -1348,6 +1382,13 @@ h1 {
 }
 
 .semester-assessments-final-head {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.semester-assessments-grade-head {
   align-self: stretch;
   display: flex;
   align-items: center;
@@ -1952,7 +1993,7 @@ h1 {
 
 .settings-ranges-row {
   display: grid;
-  grid-template-columns: repeat(4, minmax(90px, 1fr)) 120px;
+  grid-template-columns: repeat(5, minmax(90px, 1fr)) 150px;
   gap: 8px;
   align-items: center;
   padding: 7px 10px;

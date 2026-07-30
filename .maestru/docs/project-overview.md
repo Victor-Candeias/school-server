@@ -357,8 +357,19 @@ O Nginx deve:
 - usar fallback para `index.html`, necessário para as rotas React;
 - encaminhar `/auth-api` para `127.0.0.1:8010`;
 - encaminhar `/school-api` para `127.0.0.1:8020`;
-- encaminhar `/db-api` para `127.0.0.1:8000`;
+- devolver 404 para `/db-api`, que é exclusivamente interno;
 - escutar na porta `80`, ou na porta `443` com HTTPS.
+
+### Publicação através da Cloudflare
+
+O domínio público é `https://schoolhome.pt`. Um Cloudflare Tunnel liga esse
+hostname ao Nginx em `http://localhost:80`, sem abrir portas de entrada no
+router. `www.schoolhome.pt` pode usar o mesmo túnel ou redirecionar para o
+domínio principal.
+
+O serviço `db_service` não é publicado pelo Nginx. `auth` e `school` continuam
+a aceder-lhe diretamente em `http://127.0.0.1:8000/db-api`. O procedimento de
+ligação, que não inclui credenciais, está em `deploy/cloudflare/README.md`.
 
 ### 6. Ativação dos serviços
 

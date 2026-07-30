@@ -184,7 +184,7 @@ function removeEvaluationMomentTemplate(templateId: string) {
 
 function updatePercentageRange(
     rangeId: string,
-    field: 'min' | 'max' | 'backgroundColor' | 'textColor',
+    field: 'min' | 'max' | 'nota' | 'backgroundColor' | 'textColor',
     value: string,
   ) {
     runtime.setPercentageRanges((currentRanges) =>
@@ -192,8 +192,8 @@ function updatePercentageRange(
         range.id === rangeId
           ? {
               ...range,
-              [field]: field === 'min' || field === 'max'
-                ? normalizeNonNegativeInteger(value, field === 'min' ? range.min : range.max)
+              [field]: field === 'min' || field === 'max' || field === 'nota'
+                ? normalizeNonNegativeInteger(value, field === 'min' ? range.min : field === 'max' ? range.max : range.nota)
                 : value,
             }
           : range,

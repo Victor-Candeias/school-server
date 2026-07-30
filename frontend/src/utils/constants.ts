@@ -25,12 +25,11 @@ export const DEFAULT_REGISTER_ROLE = 'user'
 export const INACTIVITY_EVENTS = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'] as const
 
 export const DEFAULT_PERCENTAGE_RANGES: PercentageRange[] = [
-  { id: 'very-low', min: 0, max: 10, backgroundColor: '#dc2626', textColor: '#ffffff' },
-  { id: 'low', min: 11, max: 39, backgroundColor: '#fdba74', textColor: '#7c2d12' },
-  { id: 'mid-low', min: 40, max: 49, backgroundColor: '#fde68a', textColor: '#713f12' },
-  { id: 'mid', min: 50, max: 69, backgroundColor: '#bbf7d0', textColor: '#14532d' },
-  { id: 'high', min: 70, max: 85, backgroundColor: '#15803d', textColor: '#ffffff' },
-  { id: 'very-high', min: 86, max: 100, backgroundColor: '#ddd6fe', textColor: '#4c1d95' },
+  { id: 'very-low', min: 0, max: 10, nota: 1, backgroundColor: '#dc2626', textColor: '#ffffff' },
+  { id: 'mid-low', min: 11, max: 49, nota: 2, backgroundColor: '#fde68a', textColor: '#713f12' },
+  { id: 'mid', min: 50, max: 69, nota: 3, backgroundColor: '#bbf7d0', textColor: '#14532d' },
+  { id: 'high', min: 70, max: 85, nota: 4, backgroundColor: '#15803d', textColor: '#ffffff' },
+  { id: 'very-high', min: 86, max: 100, nota: 5, backgroundColor: '#ddd6fe', textColor: '#4c1d95' },
 ]
 
 export const DEFAULT_EVALUATION_MOMENT_TEMPLATES: EvaluationMomentTemplate[] = []

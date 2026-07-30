@@ -83,7 +83,7 @@ async def register(request: Request):
 
     Returns:
         JSONResponse: A response indicating success or failure.
-    
+
     Possible Status Codes:
         - 201: User registered successfully.
         - 400: User already exists or invalid input.
@@ -242,9 +242,10 @@ async def login(request: Request, response: Response):
             key="access_token",
             value=token,
             httponly=True,
-            secure=False,  # True em produção com HTTPS
+            secure=True,
             samesite="Lax",
-            max_age=1800  # 30 min
+            max_age=1800,
+            path="/",
         )
 
         # Return the generated token
@@ -263,7 +264,13 @@ async def login(request: Request, response: Response):
 async def logout(request: Request, response: Response):
     try:
         logout_response = JSONResponse(status_code=200, content={"message": "User logout realizado com sucesso."})
-        logout_response.delete_cookie("access_token")
+        logout_response.delete_cookie(
+            "access_token",
+            path="/",
+            secure=True,
+            httponly=True,
+            samesite="lax",
+        )
         # Return the generated token
         return logout_response
     
@@ -329,4 +336,3 @@ async def get_users(request: Request):
         errMessage = f"Error message:{e}"
         utilities.add_log_to_db(api_client=api_client, source="get_users", method="login", message=errMessage)
         return JSONResponse(status_code=500, content={"message":errMessage})
-    

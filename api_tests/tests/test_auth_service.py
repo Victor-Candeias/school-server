@@ -17,6 +17,11 @@ def test_auth_register_login_list_delete_flow(client, auth_service_url):
     )
     assert login_response.status_code == 200
     assert login_response.json()["role"] == "tester"
+    set_cookie = login_response.headers["set-cookie"].lower()
+    assert "secure" in set_cookie
+    assert "httponly" in set_cookie
+    assert "samesite=lax" in set_cookie
+    assert "path=/" in set_cookie
 
     list_response = client.request(
         "GET",
@@ -32,4 +37,3 @@ def test_auth_register_login_list_delete_flow(client, auth_service_url):
         json={"email": email},
     )
     assert delete_response.status_code == 200
-
