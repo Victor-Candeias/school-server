@@ -1488,6 +1488,10 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
   color: #ffffff;
 }
 
+.semester-assessments-mobile-list {
+  display: none;
+}
+
 .assessment-percentage {
   display: inline-flex;
   align-items: center;
@@ -2279,6 +2283,10 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
 @media (max-width: 520px) {
   .app-shell { padding: 16px; }
 
+  .app-shell.dashboard-page {
+    padding: 0;
+  }
+
   .auth-page {
     align-items: start;
     padding:
@@ -2666,6 +2674,91 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
 
   .student-assessment-row + .student-assessment-row {
     border-top: 1px solid var(--border);
+  }
+
+  .semester-assessments-table {
+    display: none;
+  }
+
+  .semester-assessments-mobile-list {
+    display: grid;
+    gap: 12px;
+  }
+
+  .semester-assessments-mobile-card {
+    display: grid;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .semester-assessments-mobile-card h3 {
+    display: grid;
+    gap: 3px;
+    margin: 0;
+    color: var(--text-2);
+    font-size: 0.769rem;
+  }
+
+  .semester-assessments-mobile-card h3 span {
+    color: var(--text);
+    font-size: 0.889rem;
+  }
+
+  .semester-assessments-mobile-group {
+    display: grid;
+    gap: 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .semester-assessments-mobile-group-heading {
+    justify-content: space-between;
+    width: 100%;
+    min-height: 40px;
+    margin: 0;
+    border-color: transparent;
+    color: var(--assessment-group-text);
+    background: var(--assessment-group-background);
+  }
+
+  .semester-assessments-mobile-moments,
+  .semester-assessments-mobile-metrics,
+  .semester-assessments-mobile-final {
+    display: grid;
+    gap: 7px;
+  }
+
+  .semester-assessments-mobile-moments p,
+  .semester-assessments-mobile-metrics p,
+  .semester-assessments-mobile-final p {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 0;
+    padding: 8px 10px;
+    border: 1px solid var(--table-border);
+    border-radius: 6px;
+    color: var(--table-text);
+    background: var(--table-cell);
+    font-size: 0.769rem;
+  }
+
+  .semester-assessments-mobile-metrics p:first-child {
+    color: var(--assessment-group-text);
+    background: var(--assessment-group-average-background);
+  }
+
+  .semester-assessments-mobile-metrics p:last-child {
+    color: var(--assessment-group-text);
+    background: var(--assessment-group-weighted-background);
+  }
+
+  .semester-assessments-mobile-final {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .assessment-student-name-cell {

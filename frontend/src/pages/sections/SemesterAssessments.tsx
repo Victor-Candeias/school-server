@@ -110,6 +110,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                     ) : getStudentsForClass(selectedClass).length === 0 ? (
                       <p className="students-empty-state">Ainda não existem alunos nesta turma.</p>
                     ) : (
+                      <>
                       <div className="semester-assessments-table" role="table" aria-label="Avaliações por semestre">
                         <div className="semester-assessments-header" role="rowgroup">
                           <div
@@ -264,6 +265,74 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                           </div>
                         ))}
                       </div>
+                      <div className="semester-assessments-mobile-list" aria-label="Avaliações por semestre em mobile">
+                        {getStudentsForClass(selectedClass).map((student, studentIndex) => (
+                          <article
+                            className="semester-assessments-mobile-card"
+                            key={String(student._id ?? student.id ?? studentIndex)}
+                          >
+                            <h3>
+                              Aluno:
+                              <span>{getStringValue(student.name)}</span>
+                            </h3>
+                            {momentGroups.map((group, groupIndex) => {
+                              const metricsHidden = isGroupMetricsHidden(group.type)
+                              const groupClassName = getGroupClassName(groupIndex)
+                              return (
+                                <section
+                                  className={`semester-assessments-mobile-group ${groupClassName}`}
+                                  key={group.type}
+                                  aria-label={group.type}
+                                >
+                                  <button
+                                    className="semester-assessments-mobile-group-heading"
+                                    type="button"
+                                    aria-expanded={!metricsHidden}
+                                    aria-label={`${metricsHidden ? 'Mostrar' : 'Ocultar'} média e ponderação de ${group.type}`}
+                                    onClick={() => toggleGroupMetrics(group.type)}
+                                  >
+                                    <span>{group.type}</span>
+                                    <span aria-hidden="true">{metricsHidden ? '+' : '−'}</span>
+                                  </button>
+                                  <div className="semester-assessments-mobile-moments">
+                                    {group.moments.map((moment) => (
+                                      <p key={getDocumentId(moment) ?? getStringValue(moment.name)}>
+                                        <span>
+                                          {getStringValue(moment.name)} - Valor:
+                                        </span>
+                                        <strong>{getStudentSavedMomentTotal(student, moment)}</strong>
+                                      </p>
+                                    ))}
+                                  </div>
+                                  {!metricsHidden && (
+                                    <div className="semester-assessments-mobile-metrics">
+                                      <p>
+                                        <span>Média:</span>
+                                        <strong>{formatAssessmentValue(getStudentAssessmentGroupAverage(student, group))}</strong>
+                                      </p>
+                                      <p>
+                                        <span>Ponderação:</span>
+                                        <strong>{formatAssessmentValue(getStudentAssessmentGroupWeightedValue(student, group))}</strong>
+                                      </p>
+                                    </div>
+                                  )}
+                                </section>
+                              )
+                            })}
+                            <div className="semester-assessments-mobile-final">
+                              <p>
+                                <span>Final:</span>
+                                <strong>{formatAssessmentValue(getStudentAssessmentFinalValue(student, momentGroups))}</strong>
+                              </p>
+                              <p>
+                                <span>Nota:</span>
+                                <strong>{getFinalGrade(getStudentAssessmentFinalValue(student, momentGroups))}</strong>
+                              </p>
+                            </div>
+                          </article>
+                        ))}
+                      </div>
+                      </>
                     )}
                   </section>
                 )
