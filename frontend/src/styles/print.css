@@ -1,0 +1,38 @@
+/* ── Print styles (PDF export) ───────────────────────── */
+@page {
+  size: A4 landscape;
+  margin: 16mm;
+}
+
+@media print {
+  body * { visibility: hidden !important; }
+  .print-section,
+  .print-section * { visibility: visible !important; }
+  .print-section {
+    position: fixed !important;
+    inset: 0 !important;
+    padding: 16mm !important;
+    background: #fff !important;
+    border: none !important;
+    box-shadow: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  .chart-filters { display: none !important; }
+  .students-panel-heading-actions { display: none !important; }
+  .chart-container {
+    flex: 1 !important;
+    background: #fff !important;
+    border: none !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .chart-container .chart-responsive-container {
+    flex: 1 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+

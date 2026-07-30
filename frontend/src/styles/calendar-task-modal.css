@@ -1,0 +1,28 @@
+/* ── Calendar task modal ─────────────────────────────── */
+.calendar-task-modal-card { width: min(100%, 540px); }
+
+.calendar-task-summary { display: grid; gap: 10px; }
+
+.calendar-task-summary h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.923rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.calendar-task-summary-list { display: grid; gap: 6px; }
+
+.calendar-task-summary-card {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+
+.calendar-task-summary-card strong { color: var(--text); font-size: 0.846rem; }
+.calendar-task-summary-card span   { color: var(--success); font-size: 0.692rem; font-weight: 600; }
+.calendar-task-summary-card p      { margin: 0; color: var(--text-2); font-size: 0.769rem; }
+

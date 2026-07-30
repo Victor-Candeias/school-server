@@ -1,0 +1,333 @@
+/* ── Dark mode ───────────────────────────────────────── */
+html.dark {
+  --surface:        #1e293b;
+  --surface-2:      #0f172a;
+  --border:         #334155;
+  --border-strong:  #475569;
+  --text:           #f1f5f9;
+  --text-2:         #94a3b8;
+  --text-3:         #64748b;
+  --primary-light:  #1e3a8a33;
+  --danger-light:   #7f1d1d;
+  --success-light:  #14532d;
+  --shadow-sm:      0 1px 3px rgb(0 0 0 / 30%), 0 1px 2px rgb(0 0 0 / 20%);
+  --shadow:         0 4px 12px rgb(0 0 0 / 40%);
+  --shadow-lg:      0 8px 24px rgb(0 0 0 / 50%);
+  --table-surface:  #1e293b;
+  --table-head:     #0f172a;
+  --table-cell:     #334155;
+  --table-border:   #334155;
+  --table-text:     #f1f5f9;
+  --table-muted:    #cbd5e1;
+}
+
+html.dark .topbar {
+  background: #0f172a;
+  border-bottom-color: #334155;
+}
+
+html.dark .topbar-menu-toggle {
+  color: #cbd5e1;
+  background: #1e293b;
+  border-color: #334155;
+}
+
+html.dark .topbar-mobile-theme {
+  color: #cbd5e1;
+  background: #1e293b;
+  border-color: #334155;
+}
+
+html.dark .topbar-mobile-theme:hover:not(:disabled) {
+  color: #f8fafc;
+  background: #334155;
+  border-color: #475569;
+}
+
+html.dark .topbar-mobile-logout {
+  color: #fca5a5;
+  background: #451a1a;
+  border-color: #7f1d1d;
+}
+
+html.dark .topbar-mobile-logout:hover:not(:disabled) {
+  color: #fecaca;
+  background: #7f1d1d;
+}
+
+html.dark .topbar-menu-toggle:hover:not(:disabled) {
+  color: #f8fafc;
+  background: #334155;
+  border-color: #475569;
+}
+
+@media (max-width: 900px) {
+  html.dark .topbar-menu {
+    background: #0f172a;
+    border-top-color: #334155;
+  }
+}
+
+html.dark .topbar-nav-btn {
+  color: #94a3b8;
+}
+
+html.dark .topbar-nav-btn:hover:not(:disabled) {
+  color: inherit;
+  background: transparent;
+  border-bottom-color: transparent;
+}
+
+html.dark .topbar-nav-btn.active {
+  color: #f87171;
+  border-bottom-color: #c0392b;
+}
+
+html.dark .topbar-nav-btn.current,
+html.dark .topbar-nav-btn.current:disabled {
+  color: #f8fafc;
+  border-bottom-color: #ef4444;
+  background: #1e1a1a;
+  opacity: 1;
+}
+
+html.dark .topbar-nav-btn:disabled {
+  color: #475569;
+}
+
+html.dark .topbar-nav-btn.current:disabled {
+  color: #f8fafc;
+}
+
+html.dark .topbar-actions {
+  border-left-color: #334155;
+}
+
+@media (max-width: 900px) {
+  html.dark .topbar-nav {
+    border-top-color: #334155;
+  }
+
+  html.dark .topbar-actions {
+    border-top-color: #334155;
+  }
+
+  html.dark .topbar-action-btn {
+    border-color: #334155;
+  }
+}
+
+html.dark .topbar-user-email {
+  color: #94a3b8;
+  background: #1e293b;
+  border-color: #334155;
+}
+
+html.dark .topbar-user-role {
+  color: #cbd5e1;
+  background: #1e293b;
+  border-color: #334155;
+}
+
+html.dark .topbar-theme-toggle {
+  color: #cbd5e1;
+  background: #1e293b;
+  border-color: #334155;
+}
+
+html.dark .topbar-theme-toggle:hover:not(:disabled) {
+  color: #f8fafc;
+  background: #334155;
+  border-color: #475569;
+}
+
+html.dark .topbar-action-btn {
+  color: #94a3b8;
+}
+
+html.dark .topbar-action-btn:hover:not(:disabled) {
+  color: #f87171;
+  background: #1e1a1a;
+  border-bottom-color: #7f3c38;
+}
+
+html.dark .topbar-action-btn.active {
+  color: #f87171;
+  border-bottom-color: #c0392b;
+}
+
+html.dark .dashboard-content {
+  background: rgba(15, 23, 42, 0.92);
+}
+
+/* Assessment cells match the compact, separated cells used in the dashboard reference. */
+html.dark .student-assessment-table,
+html.dark .semester-assessments-table {
+  gap: 0;
+  padding: 0 8px 8px;
+  border-color: var(--table-border);
+  border-radius: 8px;
+  background: var(--table-surface);
+}
+
+html.dark .student-assessment-row,
+html.dark .semester-assessments-row {
+  gap: 8px;
+  padding: 7px 6px;
+  border-top: 0;
+}
+
+html.dark .semester-assessments-group-0 {
+  --assessment-group-background: #1e40af;
+  --assessment-group-average-background: #1d4ed8;
+  --assessment-group-weighted-background: #2563eb;
+  --assessment-group-text: #eff6ff;
+}
+
+html.dark .semester-assessments-group-1 {
+  --assessment-group-background: #5b21b6;
+  --assessment-group-average-background: #6d28d9;
+  --assessment-group-weighted-background: #7c3aed;
+  --assessment-group-text: #f5f3ff;
+}
+
+html.dark .semester-assessments-group-2 {
+  --assessment-group-background: #9a3412;
+  --assessment-group-average-background: #c2410c;
+  --assessment-group-weighted-background: #ea580c;
+  --assessment-group-text: #fff7ed;
+}
+
+html.dark .semester-assessments-group-3 {
+  --assessment-group-background: #115e59;
+  --assessment-group-average-background: #0f766e;
+  --assessment-group-weighted-background: #0d9488;
+  --assessment-group-text: #f0fdfa;
+}
+
+html.dark .student-assessment-table-head,
+html.dark .semester-assessments-group-head,
+html.dark .semester-assessments-subhead {
+  color: var(--table-muted);
+  background: var(--table-head);
+}
+
+html.dark .student-assessment-row input {
+  padding: 5px 7px;
+  border-color: #475569;
+  border-radius: 6px;
+  color: #f8fafc;
+  background: #334155;
+}
+
+html.dark .student-assessment-row input:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgb(96 165 250 / 18%);
+}
+
+html.dark .semester-assessments-row > span:not(.semester-assessments-group-cell),
+html.dark .semester-assessments-row > strong:not(.semester-assessments-group-cell) {
+  min-height: 30px;
+  padding: 6px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--table-cell);
+}
+
+html.dark .semester-assessments-group-head > span:not(.semester-assessments-group-cell),
+html.dark .semester-assessments-subhead > span:not(.semester-assessments-group-cell) {
+  border-color: var(--table-border);
+  background: var(--table-surface);
+}
+
+html.dark .semester-assessments-final-cell,
+html.dark .semester-assessments-grade-cell {
+  border-color: transparent;
+}
+
+html.dark .dashboard-header {
+  border-bottom-color: #334155;
+}
+
+html.dark .secondary-button {
+  color: var(--text);
+  background: #1e293b;
+  border-color: #334155;
+}
+
+html.dark .secondary-button:hover:not(:disabled) {
+  background: #334155;
+}
+
+html.dark .transparent-button {
+  color: var(--text-2);
+  border-color: #334155;
+}
+
+html.dark .transparent-button:hover:not(:disabled) {
+  background: #1e293b;
+}
+
+html.dark .icon-button {
+  color: var(--text-2);
+  background: #1e293b;
+  border-color: #334155;
+}
+
+html.dark .icon-button:hover:not(:disabled) {
+  color: var(--text);
+  background: #334155;
+}
+
+html.dark .student-calendar-weekdays span.weekend {
+  background: #14532d33;
+  color: #86efac;
+}
+
+html.dark .student-calendar-day.outside-month {
+  color: var(--text-3);
+  background: #0a0f1a;
+}
+
+html.dark .student-calendar-day.weekend {
+  background: #14532d1a;
+}
+
+html.dark .student-calendar-day.weekend.today {
+  color: #bbf7d0;
+  background: #14532d;
+}
+
+html.dark .students-dashboard .student-calendar-day.outside-month { background: #0a0f1a; }
+html.dark .students-dashboard .student-calendar-day.weekend        { background: #14532d1a; }
+html.dark .students-dashboard .student-calendar-day.weekend.today  { color: #bbf7d0; background: #14532d; }
+
+html.dark .student-calendar-task-title {
+  border-color: rgb(21 128 61 / 30%);
+  color: #86efac;
+  background: #14532d33;
+}
+
+html.dark .module-card.schools::before  { background: #1e3a8a44; }
+html.dark .module-card.years::before    { background: #14532d44; }
+html.dark .module-card.classes::before  { background: #78350f44; }
+html.dark .module-card.students::before { background: #831843; }
+
+/* ── Dark mode inputs ────────────────────────────────── */
+html.dark input:not([type='color']),
+html.dark select,
+html.dark textarea {
+  background: #334155 !important;
+  color: #f1f5f9 !important;
+  border-color: #475569 !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #64748b !important;
+}
+
+html.dark select option {
+  background: #1e293b;
+  color: #f1f5f9;
+}

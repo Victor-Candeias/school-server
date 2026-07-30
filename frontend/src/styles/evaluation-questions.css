@@ -1,0 +1,69 @@
+/* ── Evaluation questions ────────────────────────────── */
+.evaluation-questions-section {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+}
+
+.evaluation-questions-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.evaluation-questions-header h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.846rem;
+  font-weight: 700;
+}
+
+.evaluation-questions-header span {
+  color: var(--text-2);
+  font-size: 0.692rem;
+  font-weight: 600;
+}
+
+.evaluation-questions-table {
+  display: grid;
+  overflow: hidden;
+  border: 1px solid var(--table-border);
+  border-radius: var(--radius-lg);
+  background: var(--table-surface);
+}
+
+.evaluation-questions-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 100px 100px;
+  gap: 8px;
+  align-items: center;
+  padding: 7px 10px;
+  color: var(--table-text);
+  font-size: 0.692rem;
+  font-weight: 600;
+}
+
+.evaluation-questions-row + .evaluation-questions-row {
+  border-top: 1px solid var(--table-border);
+}
+
+.evaluation-questions-table-head {
+  color: var(--table-muted);
+  background: var(--table-head);
+  font-size: 0.615rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.evaluation-questions-row button {
+  width: auto;
+  margin: 0;
+  padding: 4px 8px;
+  font-size: 0.692rem;
+}
+

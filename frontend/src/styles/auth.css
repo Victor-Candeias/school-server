@@ -1,0 +1,189 @@
+/* ── Login / Auth ────────────────────────────────────── */
+.auth-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background:
+    radial-gradient(circle at 15% 15%, rgb(37 99 235 / 24%), transparent 32rem),
+    radial-gradient(circle at 85% 85%, rgb(14 165 233 / 14%), transparent 28rem),
+    #171a23;
+}
+
+.login-card {
+  width: min(100%, 430px);
+  padding: clamp(24px, 4vw, 36px);
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: var(--radius-xl);
+  background: rgb(30 41 59 / 96%);
+  box-shadow: var(--shadow-lg);
+}
+
+.register-card {
+  width: min(100%, 720px);
+}
+
+.login-heading {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.auth-eyebrow {
+  color: #60a5fa;
+  font-size: 0.769rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.login-heading p {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.769rem;
+  font-weight: 500;
+}
+
+h1 {
+  margin: 0;
+  color: #f1f5f9;
+  font-size: clamp(1.25rem, 3vw, 1.55rem);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.login-form {
+  display: grid;
+  gap: 16px;
+}
+
+.login-form label {
+  display: grid;
+  gap: 5px;
+  color: #94a3b8;
+  font-size: 0.769rem;
+  font-weight: 600;
+}
+
+.login-form input,
+.login-form select {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: var(--radius);
+  color: #f1f5f9;
+  background: rgb(255 255 255 / 6%);
+  font: inherit;
+  font-size: 0.846rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.login-form input:focus,
+.login-form select:focus {
+  border-color: var(--primary);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 20%);
+}
+
+.login-form select option {
+  background: #1e293b;
+  color: #f1f5f9;
+}
+
+.register-form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+}
+
+.register-form .login-heading {
+  grid-column: 1 / -1;
+}
+
+.register-form label {
+  gap: 5px;
+  font-size: 0.769rem;
+}
+
+.register-form input,
+.register-form select {
+  padding: 10px 12px;
+  font-size: 0.846rem;
+}
+
+.register-form > button {
+  grid-column: 1 / -1;
+  min-height: 44px;
+  padding: 10px 14px;
+  font-size: 0.846rem;
+}
+
+.register-form .auth-switch {
+  grid-column: 1 / -1;
+}
+
+.password-strength {
+  display: grid;
+  gap: 5px;
+  margin-top: 2px;
+  font-size: 0.692rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.password-strength-track {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 10%);
+}
+
+.password-strength-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  transition: width 0.2s ease, background 0.2s ease;
+}
+
+.password-strength.empty .password-strength-track span { background: #475569; }
+.password-strength.weak   { color: #f87171; }
+.password-strength.weak   .password-strength-track span { background: #ef4444; }
+.password-strength.medium { color: #fbbf24; }
+.password-strength.medium .password-strength-track span { background: #f59e0b; }
+.password-strength.strong { color: #4ade80; }
+.password-strength.strong .password-strength-track span { background: #22c55e; }
+
+.password-match-error {
+  color: #f87171;
+  font-size: 0.692rem;
+  font-weight: 600;
+}
+
+.auth-switch {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 0.769rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.auth-switch button {
+  display: inline;
+  width: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  color: #60a5fa;
+  background: transparent;
+  font-size: inherit;
+  font-weight: 700;
+}
+
+.auth-switch button:hover:not(:disabled) {
+  color: #93c5fd;
+  background: transparent;
+}
+

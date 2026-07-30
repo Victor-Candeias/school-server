@@ -1,0 +1,33 @@
+/* ── Variables ───────────────────────────────────────── */
+:root {
+  --primary:        #2563eb;
+  --primary-hover:  #1d4ed8;
+  --primary-light:  #eff6ff;
+  --surface:        #ffffff;
+  --surface-2:      #f8fafc;
+  --border:         #e2e8f0;
+  --border-strong:  #cbd5e1;
+  --text:           #0f172a;
+  --text-2:         #475569;
+  --text-3:         #94a3b8;
+  --danger:         #dc2626;
+  --danger-light:   #fee2e2;
+  --success:        #16a34a;
+  --success-light:  #dcfce7;
+  --popup-background-color: #15803d;
+  --popup-text-color: #ffffff;
+  --radius-sm:      6px;
+  --radius:         8px;
+  --radius-lg:      12px;
+  --radius-xl:      16px;
+  --shadow-sm:      0 1px 3px rgb(0 0 0 / 8%), 0 1px 2px rgb(0 0 0 / 5%);
+  --shadow:         0 4px 12px rgb(0 0 0 / 10%);
+  --shadow-lg:      0 8px 24px rgb(0 0 0 / 12%);
+  --table-surface:  #ffffff;
+  --table-head:     #f8fafc;
+  --table-cell:     #ffffff;
+  --table-border:   #e2e8f0;
+  --table-text:     #0f172a;
+  --table-muted:    #475569;
+}
+

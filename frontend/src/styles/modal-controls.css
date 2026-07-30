@@ -1,0 +1,23 @@
+/* ── Modal close ─────────────────────────────────────── */
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.modal-close:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--border);
+}
+

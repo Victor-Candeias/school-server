@@ -1,0 +1,50 @@
+/* ── Charts panel ────────────────────────────────────── */
+.charts-panel {
+  overflow: visible;
+  align-self: start;
+}
+
+.chart-student-select-label {
+  display: grid;
+  gap: 5px;
+  max-width: 320px;
+  color: var(--text-2);
+  font-size: 0.692rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.chart-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: end;
+}
+
+.chart-student-select-label select {
+  padding: 7px 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  color: var(--text);
+  background: var(--surface);
+  font: inherit;
+  font-size: 0.846rem;
+}
+
+.chart-container {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+}
+
+.chart-student-name {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 0.769rem;
+  font-weight: 600;
+}
+

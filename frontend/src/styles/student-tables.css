@@ -1,0 +1,97 @@
+/* ── Students table ──────────────────────────────────── */
+.students-table {
+  display: grid;
+  overflow: visible;
+  border: 1px solid var(--table-border);
+  border-radius: var(--radius-lg);
+  background: var(--table-surface);
+}
+
+.students-table-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 64px minmax(180px, 1fr) 100px 86px;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 10px;
+  color: var(--table-text);
+  font-size: 0.769rem;
+  font-weight: 600;
+}
+
+.students-table-row + .students-table-row { border-top: 1px solid var(--table-border); }
+
+.students-table-head {
+  z-index: 1;
+  color: var(--table-muted);
+  background: var(--table-head);
+  font-size: 0.615rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.student-cell-label {
+  display: none;
+}
+
+/* ── Student row actions ─────────────────────────────── */
+.student-row-actions {
+  position: relative;
+  display: inline-flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.icon-button {
+  width: 26px;
+  height: 26px;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font-size: 0.846rem;
+}
+
+.icon-button:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--border);
+}
+
+.student-more-actions { position: relative; }
+
+.student-action-menu {
+  position: absolute;
+  top: 30px;
+  right: 0;
+  z-index: 20;
+  display: grid;
+  width: 140px;
+  gap: 2px;
+  padding: 5px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.student-action-menu button {
+  justify-content: flex-start;
+  width: 100%;
+  margin: 0;
+  padding: 6px 9px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  background: transparent;
+  font-size: 0.769rem;
+  font-weight: 500;
+}
+
+.student-action-menu button:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+

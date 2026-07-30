@@ -1,0 +1,108 @@
+/* ── Modal ───────────────────────────────────────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(0 0 0 / 55%);
+  backdrop-filter: blur(6px);
+  z-index: 20;
+}
+
+.modal-card {
+  position: relative;
+  width: min(100%, 740px);
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.small-modal-card   { width: min(100%, 400px); }
+.class-modal-card   { width: min(100%, 960px); }
+.student-modal-card { width: min(100%, 700px); }
+
+.student-modal-backdrop { z-index: 30; }
+
+.modal-card h2 {
+  margin: 0 0 16px;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.modal-card form {
+  display: grid;
+  gap: 10px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.form-row.three-columns      { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.form-row.student-main-row   { grid-template-columns: 80px minmax(240px, 1fr) 120px; }
+
+.modal-card label {
+  display: grid;
+  gap: 4px;
+  color: var(--text-2);
+  font-size: 0.692rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.modal-card input,
+.modal-card select,
+.modal-card textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 7px 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  color: var(--text);
+  background: var(--surface);
+  font: inherit;
+  font-size: 0.846rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.modal-card input:focus,
+.modal-card select:focus,
+.modal-card textarea:focus {
+  border-color: var(--primary);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 12%);
+}
+
+.modal-card textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.modal-card input[readonly] {
+  color: var(--text-2);
+  background: var(--surface-2);
+}
+
+.modal-feedback {
+  margin: 0 0 10px;
+  padding: 9px 11px;
+  border-radius: var(--radius);
+  font-size: 0.769rem;
+  font-weight: 600;
+}
+
+.modal-feedback.error {
+  color: var(--danger);
+  background: var(--danger-light);
+  border: 1px solid rgb(220 38 38 / 20%);
+}
+
