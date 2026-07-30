@@ -1275,7 +1275,7 @@ h1 {
   padding: 8px;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  background: #1e293b;
+  background: whitesmoke;
 }
 
 .semester-assessments-row {
@@ -1426,7 +1426,7 @@ h1 {
   text-align: center;
 }
 
-/* Keep the reference layout's colour in the gaps around each white data cell. */
+/* Keep the light table readable while preserving each assessment group's colour. */
 html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):not(.semester-assessments-subhead) {
   color: #0f172a;
 }
@@ -1442,19 +1442,18 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
 }
 
 html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):not(.semester-assessments-subhead) > .semester-assessments-group-cell {
-  color: #0f172a;
-  background: #ffffff;
-  box-shadow: 0 0 0 4px var(--assessment-group-background);
+  color: var(--assessment-group-text);
+  background: var(--assessment-group-background);
 }
 
 html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):not(.semester-assessments-subhead) > .semester-assessments-average-cell {
-  background: #ffffff;
-  box-shadow: 0 0 0 4px var(--assessment-group-average-background);
+  color: var(--assessment-group-text);
+  background: var(--assessment-group-average-background);
 }
 
 html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):not(.semester-assessments-subhead) > .semester-assessments-weighted-cell {
-  background: #ffffff;
-  box-shadow: 0 0 0 4px var(--assessment-group-weighted-background);
+  color: var(--assessment-group-text);
+  background: var(--assessment-group-weighted-background);
 }
 
 .semester-assessments-final-head {
