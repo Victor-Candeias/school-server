@@ -1300,14 +1300,37 @@ h1 {
 }
 
 .semester-assessments-group-cell {
-  color: #ffffff;
-  background: color-mix(in srgb, var(--assessment-group-color) 9%, transparent);
+  color: var(--assessment-group-text);
+  background: var(--assessment-group-background);
 }
 
-.semester-assessments-group-0 { --assessment-group-color: #2563eb; }
-.semester-assessments-group-1 { --assessment-group-color: #7c3aed; }
-.semester-assessments-group-2 { --assessment-group-color: #ea580c; }
-.semester-assessments-group-3 { --assessment-group-color: #0f766e; }
+.semester-assessments-group-0 {
+  --assessment-group-background: #dbeafe;
+  --assessment-group-average-background: #bfdbfe;
+  --assessment-group-weighted-background: #93c5fd;
+  --assessment-group-text: #1e3a8a;
+}
+
+.semester-assessments-group-1 {
+  --assessment-group-background: #ede9fe;
+  --assessment-group-average-background: #ddd6fe;
+  --assessment-group-weighted-background: #c4b5fd;
+  --assessment-group-text: #4c1d95;
+}
+
+.semester-assessments-group-2 {
+  --assessment-group-background: #ffedd5;
+  --assessment-group-average-background: #fed7aa;
+  --assessment-group-weighted-background: #fdba74;
+  --assessment-group-text: #9a3412;
+}
+
+.semester-assessments-group-3 {
+  --assessment-group-background: #ccfbf1;
+  --assessment-group-average-background: #99f6e4;
+  --assessment-group-weighted-background: #5eead4;
+  --assessment-group-text: #115e59;
+}
 
 .semester-assessments-group-toggle {
   display: inline-flex;
@@ -1358,15 +1381,15 @@ h1 {
 
 .semester-assessments-average-head,
 .semester-assessments-average-cell {
-  color: #ffffff;
-  background: color-mix(in srgb, var(--assessment-group-color) 14%, transparent);
+  color: var(--assessment-group-text);
+  background: var(--assessment-group-average-background);
   font-weight: 800;
 }
 
 .semester-assessments-weighted-head,
 .semester-assessments-weighted-cell {
-  color: #ffffff;
-  background: color-mix(in srgb, var(--assessment-group-color) 18%, transparent);
+  color: var(--assessment-group-text);
+  background: var(--assessment-group-weighted-background);
   font-weight: 800;
 }
 
@@ -3235,6 +3258,34 @@ html.dark .semester-assessments-row {
   border-top: 0;
 }
 
+html.dark .semester-assessments-group-0 {
+  --assessment-group-background: #1e40af;
+  --assessment-group-average-background: #1d4ed8;
+  --assessment-group-weighted-background: #2563eb;
+  --assessment-group-text: #eff6ff;
+}
+
+html.dark .semester-assessments-group-1 {
+  --assessment-group-background: #5b21b6;
+  --assessment-group-average-background: #6d28d9;
+  --assessment-group-weighted-background: #7c3aed;
+  --assessment-group-text: #f5f3ff;
+}
+
+html.dark .semester-assessments-group-2 {
+  --assessment-group-background: #9a3412;
+  --assessment-group-average-background: #c2410c;
+  --assessment-group-weighted-background: #ea580c;
+  --assessment-group-text: #fff7ed;
+}
+
+html.dark .semester-assessments-group-3 {
+  --assessment-group-background: #115e59;
+  --assessment-group-average-background: #0f766e;
+  --assessment-group-weighted-background: #0d9488;
+  --assessment-group-text: #f0fdfa;
+}
+
 html.dark .student-assessment-table-head,
 html.dark .semester-assessments-group-head,
 html.dark .semester-assessments-subhead {
@@ -3255,8 +3306,8 @@ html.dark .student-assessment-row input:focus {
   box-shadow: 0 0 0 3px rgb(96 165 250 / 18%);
 }
 
-html.dark .semester-assessments-row > span,
-html.dark .semester-assessments-row > strong {
+html.dark .semester-assessments-row > span:not(.semester-assessments-group-cell),
+html.dark .semester-assessments-row > strong:not(.semester-assessments-group-cell) {
   min-height: 30px;
   padding: 6px 8px;
   border: 1px solid #475569;
@@ -3264,8 +3315,8 @@ html.dark .semester-assessments-row > strong {
   background: #334155;
 }
 
-html.dark .semester-assessments-group-head > span,
-html.dark .semester-assessments-subhead > span {
+html.dark .semester-assessments-group-head > span:not(.semester-assessments-group-cell),
+html.dark .semester-assessments-subhead > span:not(.semester-assessments-group-cell) {
   border-color: #334155;
   background: #1e293b;
 }
