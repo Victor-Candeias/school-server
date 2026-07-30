@@ -1300,7 +1300,7 @@ h1 {
 }
 
 .semester-assessments-group-cell {
-  color: var(--assessment-group-color);
+  color: #ffffff;
   background: color-mix(in srgb, var(--assessment-group-color) 9%, transparent);
 }
 
@@ -1358,14 +1358,14 @@ h1 {
 
 .semester-assessments-average-head,
 .semester-assessments-average-cell {
-  color: var(--assessment-group-color);
+  color: #ffffff;
   background: color-mix(in srgb, var(--assessment-group-color) 14%, transparent);
   font-weight: 800;
 }
 
 .semester-assessments-weighted-head,
 .semester-assessments-weighted-cell {
-  color: var(--assessment-group-color);
+  color: #ffffff;
   background: color-mix(in srgb, var(--assessment-group-color) 18%, transparent);
   font-weight: 800;
 }
@@ -1375,7 +1375,7 @@ h1 {
 .semester-assessments-final-cell,
 .semester-assessments-grade-head,
 .semester-assessments-grade-cell {
-  color: var(--success);
+  color: #ffffff;
   background: color-mix(in srgb, var(--success) 10%, transparent);
   font-weight: 800;
   text-align: center;
@@ -1400,6 +1400,10 @@ h1 {
 .question-max-value {
   color: var(--danger);
   font-size: 0.615rem;
+}
+
+.semester-assessments-table .question-max-value {
+  color: #ffffff;
 }
 
 .assessment-percentage {

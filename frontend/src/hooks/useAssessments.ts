@@ -341,9 +341,12 @@ function getAssessmentsSemesterMomentGroups() {
       const configuredWeightPercentage = runtime.evaluationMomentTemplates.find(
         (template) => template.type === type,
       )?.weightPercentage
-      const weightPercentage = Number.isFinite(storedWeightPercentage)
-        ? storedWeightPercentage
-        : configuredWeightPercentage ?? 0
+      const weightPercentage = configuredWeightPercentage !== undefined
+        && Number.isFinite(configuredWeightPercentage)
+        ? configuredWeightPercentage
+        : Number.isFinite(storedWeightPercentage)
+          ? storedWeightPercentage
+          : 0
 
       if (existingGroup) {
         existingGroup.moments.push(moment)

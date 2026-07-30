@@ -242,7 +242,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 const finalValue = getStudentAssessmentFinalValue(student, momentGroups)
                                 const range = getFinalRange(finalValue)
                                 return range
-                                  ? { backgroundColor: range.backgroundColor, color: range.textColor }
+                                  ? { backgroundColor: range.backgroundColor, color: '#ffffff' }
                                   : undefined
                               })()}
                             >
@@ -255,7 +255,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 const finalValue = getStudentAssessmentFinalValue(student, momentGroups)
                                 const range = getFinalRange(finalValue)
                                 return range
-                                  ? { backgroundColor: range.backgroundColor, color: range.textColor }
+                                  ? { backgroundColor: range.backgroundColor, color: '#ffffff' }
                                   : undefined
                               })()}
                             >
