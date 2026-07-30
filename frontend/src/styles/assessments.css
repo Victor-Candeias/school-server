@@ -177,31 +177,31 @@
 }
 
 .semester-assessments-group-0 {
-  --assessment-group-background: #dbeafe;
-  --assessment-group-average-background: #bfdbfe;
-  --assessment-group-weighted-background: #93c5fd;
-  --assessment-group-text: #1e3a8a;
+  --assessment-group-background: #1e40af;
+  --assessment-group-average-background: #1d4ed8;
+  --assessment-group-weighted-background: #2563eb;
+  --assessment-group-text: #eff6ff;
 }
 
 .semester-assessments-group-1 {
-  --assessment-group-background: #ede9fe;
-  --assessment-group-average-background: #ddd6fe;
-  --assessment-group-weighted-background: #c4b5fd;
-  --assessment-group-text: #4c1d95;
+  --assessment-group-background: #5b21b6;
+  --assessment-group-average-background: #6d28d9;
+  --assessment-group-weighted-background: #7c3aed;
+  --assessment-group-text: #f5f3ff;
 }
 
 .semester-assessments-group-2 {
-  --assessment-group-background: #ffedd5;
-  --assessment-group-average-background: #fed7aa;
-  --assessment-group-weighted-background: #fdba74;
-  --assessment-group-text: #9a3412;
+  --assessment-group-background: #9a3412;
+  --assessment-group-average-background: #c2410c;
+  --assessment-group-weighted-background: #ea580c;
+  --assessment-group-text: #fff7ed;
 }
 
 .semester-assessments-group-3 {
-  --assessment-group-background: #ccfbf1;
-  --assessment-group-average-background: #99f6e4;
-  --assessment-group-weighted-background: #5eead4;
-  --assessment-group-text: #115e59;
+  --assessment-group-background: #115e59;
+  --assessment-group-average-background: #0f766e;
+  --assessment-group-weighted-background: #0d9488;
+  --assessment-group-text: #f0fdfa;
 }
 
 .semester-assessments-group-toggle {
@@ -344,4 +344,3 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
   font-size: 0.692rem;
   font-weight: 700;
 }
-
