@@ -3293,6 +3293,23 @@ html.dark .dashboard-content {
   background: rgba(15, 23, 42, 0.92);
 }
 
+/* Assessment cells match the compact, separated cells used in the dashboard reference. */
+html.dark .student-assessment-table,
+html.dark .semester-assessments-table {
+  gap: 0;
+  padding: 0 8px 8px;
+  border-color: #334155;
+  border-radius: 8px;
+  background: #1e293b;
+}
+
+html.dark .student-assessment-row,
+html.dark .semester-assessments-row {
+  gap: 8px;
+  padding: 7px 6px;
+  border-top: 0;
+}
+
 html.dark .semester-assessments-group-0 {
   --assessment-group-background: #1e40af;
   --assessment-group-average-background: #1d4ed8;
@@ -3329,7 +3346,9 @@ html.dark .semester-assessments-subhead {
 }
 
 html.dark .student-assessment-row input {
+  padding: 5px 7px;
   border-color: #475569;
+  border-radius: 6px;
   color: #f8fafc;
   background: #334155;
 }
@@ -3341,6 +3360,8 @@ html.dark .student-assessment-row input:focus {
 
 html.dark .semester-assessments-row > span:not(.semester-assessments-group-cell),
 html.dark .semester-assessments-row > strong:not(.semester-assessments-group-cell) {
+  min-height: 30px;
+  padding: 6px 8px;
   border: 1px solid #475569;
   border-radius: 6px;
   background: #334155;

@@ -28,23 +28,23 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
     formatAssessmentValue,
   } = model
 
-  const [hiddenGroupMetrics, setHiddenGroupMetrics] = useState<Set<string>>(() => new Set())
+  const [visibleGroupMetrics, setVisibleGroupMetrics] = useState<Set<string>>(() => new Set())
 
   if (!selectedClass) return null
 
   const momentGroups = getAssessmentsSemesterMomentGroups()
   const getGroupClassName = (groupIndex: number) =>
     `semester-assessments-group-${groupIndex % 4}`
-  const isGroupMetricsHidden = (groupType: string) => hiddenGroupMetrics.has(groupType)
+  const isGroupMetricsHidden = (groupType: string) => !visibleGroupMetrics.has(groupType)
   const toggleGroupMetrics = (groupType: string) => {
-    setHiddenGroupMetrics((currentHiddenGroups) => {
-      const nextHiddenGroups = new Set(currentHiddenGroups)
-      if (nextHiddenGroups.has(groupType)) {
-        nextHiddenGroups.delete(groupType)
+    setVisibleGroupMetrics((currentVisibleGroups) => {
+      const nextVisibleGroups = new Set(currentVisibleGroups)
+      if (nextVisibleGroups.has(groupType)) {
+        nextVisibleGroups.delete(groupType)
       } else {
-        nextHiddenGroups.add(groupType)
+        nextVisibleGroups.add(groupType)
       }
-      return nextHiddenGroups
+      return nextVisibleGroups
     })
   }
   const assessmentColumnCount = 2 + momentGroups.reduce(
