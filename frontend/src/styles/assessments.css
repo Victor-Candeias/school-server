@@ -84,6 +84,10 @@
   justify-content: center;
 }
 
+.student-assessment-row:not(.student-assessment-table-head) > strong {
+  justify-content: center;
+}
+
 .student-assessment-table-head {
   color: var(--table-muted);
   background: var(--table-head);
@@ -103,6 +107,7 @@
   background: var(--surface);
   font: inherit;
   font-size: 0.692rem;
+  text-align: center;
 }
 
 .student-assessment-row input:focus {
