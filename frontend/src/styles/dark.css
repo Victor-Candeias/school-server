@@ -228,8 +228,8 @@ html.dark .student-assessment-row input:focus {
 
 html.dark .semester-assessments-row > span:not(.semester-assessments-group-cell),
 html.dark .semester-assessments-row > strong:not(.semester-assessments-group-cell) {
-  min-height: 30px;
-  padding: 6px 8px;
+  min-height: 40px;
+  padding: 8px 8px;
   border: 1px solid var(--border-strong);
   border-radius: 6px;
   background: var(--table-cell);

@@ -122,7 +122,7 @@
   display: grid;
   overflow: auto;
   gap: 0;
-  padding: 8px;
+  padding: 0 8px 8px;
   border: 1px solid var(--table-border);
   border-radius: var(--radius-lg);
   background: var(--table-surface);
@@ -133,7 +133,7 @@
   gap: 8px;
   align-items: center;
   min-width: max-content;
-  padding: 7px 10px;
+  padding: 7px 6px;
   color: var(--table-text);
   font-size: 0.769rem;
   font-weight: 600;
@@ -174,6 +174,15 @@
   color: var(--assessment-group-text);
   background: var(--assessment-group-background);
   border-radius: 6px;
+}
+
+.semester-assessments-group-head > .semester-assessments-group-cell,
+.semester-assessments-subhead > .semester-assessments-group-cell {
+  display: flex;
+  min-height: 30px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .semester-assessments-group-0 {
@@ -253,6 +262,7 @@
 
 .semester-assessments-average-head,
 .semester-assessments-average-cell {
+  min-height: 30px;
   color: var(--assessment-group-text);
   background: var(--assessment-group-average-background);
   font-weight: 800;
@@ -270,9 +280,11 @@
 .semester-assessments-final-cell,
 .semester-assessments-grade-head,
 .semester-assessments-grade-cell {
+  min-height: 30px;
   color: #ffffff;
-  background: color-mix(in srgb, var(--success) 10%, transparent);
+  background: #1c293d;
   font-weight: 800;
+  border-radius: 6px;
   text-align: center;
 }
 
@@ -281,14 +293,20 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
   color: var(--table-text);
 }
 
-html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):not(.semester-assessments-subhead) > span:not(.semester-assessments-group-cell),
-html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):not(.semester-assessments-subhead) > strong:not(.semester-assessments-group-cell) {
-  min-height: 30px;
-  padding: 6px 8px;
-  border: 1px solid var(--table-border);
+html:not(.dark) .semester-assessments-row > span:not(.semester-assessments-group-cell),
+html:not(.dark) .semester-assessments-row > strong:not(.semester-assessments-group-cell) {
+  min-height: 40px;
+  padding: 8px 8px;
+  border: 1px solid var(--border-strong);
   border-radius: 6px;
   color: var(--table-text);
   background: var(--table-cell);
+}
+
+html:not(.dark) .semester-assessments-group-head > span:not(.semester-assessments-group-cell),
+html:not(.dark) .semester-assessments-subhead > span:not(.semester-assessments-group-cell) {
+  border-color: var(--table-border);
+  background: var(--table-surface);
 }
 
 html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):not(.semester-assessments-subhead) > .semester-assessments-group-cell {
@@ -304,6 +322,11 @@ html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):
 html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):not(.semester-assessments-subhead) > .semester-assessments-weighted-cell {
   color: var(--assessment-group-text);
   background: var(--assessment-group-weighted-background);
+}
+
+html:not(.dark) .semester-assessments-final-cell,
+html:not(.dark) .semester-assessments-grade-cell {
+  border-color: transparent;
 }
 
 .semester-assessments-final-head {
