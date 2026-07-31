@@ -283,6 +283,11 @@ function getStudentMomentPercentage(student: SchoolDocument, moment: SchoolDocum
   }
 
 function getStudentMomentPercentageValue(student: SchoolDocument, moment: SchoolDocument) {
+    const processedPercentage = runtime.getStudentMomentProcessedPercentageValue(student, moment)
+    if (processedPercentage !== null) {
+      return processedPercentage
+    }
+
     const momentMaxValue = runtime.getEvaluationMomentMaxValue(moment)
     if (!momentMaxValue) {
       return 0

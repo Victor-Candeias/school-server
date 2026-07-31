@@ -5,7 +5,7 @@ import type { ApplicationActions, ApplicationRuntime, AssessmentMomentGroup } fr
 
 export function useAssessments(
   runtime: ApplicationRuntime,
-): Pick<ApplicationActions, 'loadAllStudentMomentValues' | 'getSelectedGradingMoment' | 'getStudentMomentValueKey' | 'getStudentMomentValueRecord' | 'isSameStudentMomentValue' | 'mergeStudentMomentValues' | 'hasStudentMomentValueRecord' | 'buildStudentMomentValuePayload' | 'handleSelectGradingMoment' | 'getSavedStudentMomentCellValue' | 'getStudentMomentCellValue' | 'getAssessmentChangePayloads' | 'hasUnsavedAssessmentChanges' | 'canLeaveAssessmentMoment' | 'removeAssessmentDraftsForMoment' | 'getStudentMomentTotal' | 'getAssessmentsSemesterMoments' | 'getAssessmentsSemesterMomentGroups' | 'getStudentSavedMomentTotal' | 'getStudentAssessmentGroupAverage' | 'getStudentAssessmentGroupWeightedValue' | 'getStudentAssessmentFinalValue' | 'formatAssessmentValue' | 'getAllStudentsForMomentData' | 'getAssessmentsDashboardRows' | 'buildSemesterEvaluationsPayload' | 'saveSemesterEvaluations' | 'getStudentMomentProjectedTotal' | 'getAssessmentCellValidationError' | 'updateAssessmentCellDraft' | 'saveAssessmentCell' | 'saveAssessmentChanges'> {
+): Pick<ApplicationActions, 'loadAllStudentMomentValues' | 'getSelectedGradingMoment' | 'getStudentMomentValueKey' | 'getStudentMomentValueRecord' | 'isSameStudentMomentValue' | 'mergeStudentMomentValues' | 'hasStudentMomentValueRecord' | 'buildStudentMomentValuePayload' | 'handleSelectGradingMoment' | 'getSavedStudentMomentCellValue' | 'getStudentMomentCellValue' | 'getAssessmentChangePayloads' | 'hasUnsavedAssessmentChanges' | 'canLeaveAssessmentMoment' | 'removeAssessmentDraftsForMoment' | 'getStudentMomentServerMetric' | 'getStudentMomentTotal' | 'getStudentMomentProcessedPercentageValue' | 'getAssessmentsSemesterMoments' | 'getAssessmentsSemesterMomentGroups' | 'getStudentSavedMomentTotal' | 'getStudentAssessmentGroupAverage' | 'getStudentAssessmentGroupWeightedValue' | 'getStudentAssessmentFinalValue' | 'formatAssessmentValue' | 'getAllStudentsForMomentData' | 'getAssessmentsDashboardRows' | 'buildSemesterEvaluationsPayload' | 'saveSemesterEvaluations' | 'getStudentMomentProjectedTotal' | 'getAssessmentCellValidationError' | 'updateAssessmentCellDraft' | 'saveAssessmentCell' | 'saveAssessmentChanges'> {
 async function loadAllStudentMomentValues() {
     try {
       const existingValues = await schoolApi.findStudentMomentValues({ userId: runtime.getLoggedUserId() })
@@ -240,6 +240,42 @@ function getStudentMomentCellValue(
     return getSavedStudentMomentCellValue(student, moment, question)
   }
 
+function hasStudentMomentDraft(student: SchoolDocument, moment: SchoolDocument) {
+    const momentId = runtime.getDocumentId(moment)
+    const studentId = runtime.getDocumentId(student)
+
+    if (!momentId || !studentId) {
+      return false
+    }
+
+    return Object.keys(runtime.assessmentCellDrafts).some((draftKey) =>
+      draftKey.startsWith(`${momentId}:${studentId}:`)
+    )
+  }
+
+function getStudentMomentServerMetric(
+    student: SchoolDocument,
+    moment: SchoolDocument,
+    metric: 'studentMomentTotal' | 'studentMomentPercentage',
+  ) {
+    if (hasStudentMomentDraft(student, moment)) {
+      return null
+    }
+
+    const momentId = runtime.getDocumentId(moment)
+    const studentId = runtime.getDocumentId(student)
+    if (!momentId || !studentId) {
+      return null
+    }
+
+    const matchingValue = runtime.allStudentMomentValues.find(
+      (value) => value.momentId === momentId && value.studentId === studentId && value[metric] !== undefined,
+    )
+    const processedValue = Number(matchingValue?.[metric])
+
+    return Number.isFinite(processedValue) ? processedValue : null
+  }
+
 function getAssessmentChangePayloads(moment = getSelectedGradingMoment()) {
     if (!moment || !runtime.selectedClass) {
       return []
@@ -316,10 +352,19 @@ function removeAssessmentDraftsForMoment(momentId: string) {
   }
 
 function getStudentMomentTotal(student: SchoolDocument, moment: SchoolDocument) {
+    const serverTotal = getStudentMomentServerMetric(student, moment, 'studentMomentTotal')
+    if (serverTotal !== null) {
+      return serverTotal
+    }
+
     return runtime.getEvaluationMomentQuestions(moment).reduce(
       (total, question) => total + (Number(getStudentMomentCellValue(student, moment, question)) || 0),
       0,
     )
+  }
+
+function getStudentMomentProcessedPercentageValue(student: SchoolDocument, moment: SchoolDocument) {
+    return getStudentMomentServerMetric(student, moment, 'studentMomentPercentage')
   }
 
 function getAssessmentsSemesterMoments() {
@@ -587,8 +632,9 @@ async function saveAssessmentCell(
 async function saveAssessmentChanges() {
     const moment = getSelectedGradingMoment()
     const momentId = moment ? runtime.getDocumentId(moment) : null
+    const classId = runtime.selectedClass ? runtime.getDocumentId(runtime.selectedClass) : null
     const valuePayloads = getAssessmentChangePayloads(moment)
-    if (!moment || !momentId || valuePayloads.length === 0) {
+    if (!moment || !momentId || !classId || valuePayloads.length === 0) {
       return
     }
 
@@ -602,15 +648,23 @@ async function saveAssessmentChanges() {
             isSameStudentMomentValue(currentValue, valuePayload)
           )
           const savedValue = await schoolApi.saveStudentMomentValue(valuePayload)
+          const savedDocument = savedValue.value ?? valuePayload
 
           return {
             ...valuePayload,
-            _id: savedValue.id ?? savedRecord?._id,
+            ...savedDocument,
+            _id: savedValue.id ?? savedDocument._id ?? savedRecord?._id,
           }
         }),
       )
 
       mergeStudentMomentValues(savedValues)
+      const refreshedValues = await schoolApi.findStudentMomentValues({
+        userId: runtime.getLoggedUserId(),
+        classId,
+        momentId,
+      })
+      mergeStudentMomentValues(refreshedValues)
       removeAssessmentDraftsForMoment(momentId)
       runtime.setMessage('Valores de avaliação gravados com sucesso.')
     } catch (saveError) {
@@ -636,7 +690,9 @@ async function saveAssessmentChanges() {
     hasUnsavedAssessmentChanges,
     canLeaveAssessmentMoment,
     removeAssessmentDraftsForMoment,
+    getStudentMomentServerMetric,
     getStudentMomentTotal,
+    getStudentMomentProcessedPercentageValue,
     getAssessmentsSemesterMoments,
     getAssessmentsSemesterMomentGroups,
     getStudentSavedMomentTotal,

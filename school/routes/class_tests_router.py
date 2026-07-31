@@ -188,6 +188,121 @@ def normalize_percentage_ranges(value):
     return normalized_ranges or DEFAULT_APP_SETTINGS["percentageRanges"]
 
 
+def to_float(value, default=0):
+    if isinstance(value, bool):
+        return default
+
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def format_number(value):
+    rounded_value = round(value, 2)
+    return int(rounded_value) if rounded_value.is_integer() else rounded_value
+
+
+def get_document_id(document):
+    return document.get("_id") or document.get("id")
+
+
+def get_moment_max_value(moment, value_documents):
+    if moment:
+        max_value = to_float(moment.get("totalValue"))
+        if max_value:
+            return max_value
+
+        questions = moment.get("questions")
+        if isinstance(questions, list):
+            questions_total = sum(
+                to_float(question.get("value")) for question in questions if isinstance(question, dict)
+            )
+            if questions_total:
+                return questions_total
+
+    question_values = {}
+    for value_document in value_documents:
+        question_number = value_document.get("questionNumber")
+        if question_number not in question_values:
+            question_values[question_number] = to_float(value_document.get("questionValue"))
+
+    return sum(question_values.values())
+
+
+def enrich_student_moment_values(value_documents, moments=None):
+    moments = moments or []
+    moments_by_id = {
+        str(moment_id): moment
+        for moment in moments
+        if isinstance(moment, dict)
+        for moment_id in [get_document_id(moment)]
+        if moment_id
+    }
+    groups = {}
+
+    for value_document in value_documents:
+        group_key = (value_document.get("momentId"), value_document.get("studentId"))
+        groups.setdefault(group_key, []).append(value_document)
+
+    enriched_documents = []
+    for (moment_id, student_id), group_documents in groups.items():
+        total = sum(to_float(value_document.get("value")) for value_document in group_documents)
+        moment = moments_by_id.get(str(moment_id))
+        max_value = get_moment_max_value(moment, group_documents)
+        percentage = (total / max_value) * 100 if max_value else 0
+        processed_fields = {
+            "studentMomentTotal": format_number(total),
+            "studentMomentMaxValue": format_number(max_value),
+            "studentMomentPercentage": round(percentage, 1),
+            "studentMomentPercentageText": f"{percentage:.1f}%",
+        }
+
+        enriched_documents.extend(
+            {
+                **value_document,
+                **processed_fields,
+            }
+            for value_document in group_documents
+        )
+
+    return enriched_documents
+
+
+async def find_moments_for_values(value_documents, query):
+    moment_query = {}
+
+    if query.get("userId"):
+        moment_query["userId"] = query.get("userId")
+    if query.get("classId"):
+        moment_query["classId"] = query.get("classId")
+
+    response = await api_client.find(
+        endpoint="find",
+        payload={"collection": MOMENTS_COLLECTION, "query": moment_query},
+    )
+    moments = response.get("documents") or []
+    moment_ids = {value_document.get("momentId") for value_document in value_documents}
+
+    return [
+        moment for moment in moments
+        if not moment_ids or get_document_id(moment) in moment_ids
+    ]
+
+
+async def find_enriched_moment_values(query):
+    response = await api_client.find(
+        endpoint="find",
+        payload={"collection": CLASS_MOMENTS_COLLECTION, "query": query},
+    )
+    value_documents = response.get("documents") or []
+    if not value_documents:
+        return []
+
+    moments = await find_moments_for_values(value_documents, query)
+    return enrich_student_moment_values(value_documents, moments)
+
+
 @school_tests_router.get("/app-settings")
 async def get_app_settings(_: None = Depends(utilities.verificar_token_cookie)):
     payload = {"collection": APP_SETTINGS_COLLECTION, "query": {"key": APP_SETTINGS_KEY}}
@@ -388,7 +503,22 @@ async def add_moments_class(request: Request,  _: None = Depends(utilities.verif
 @school_tests_router.get("/findmomentsclass")
 @school_tests_router.post("/findmomentsclass")
 async def find_moments_class(request: Request,  _: None = Depends(utilities.verificar_token_cookie)):
-    return await utilities.get_documents(api_client=api_client, endpoint="find", request=request, collection=CLASS_MOMENTS_COLLECTION, source="school_tests_router", method="find_moments_class")
+    try:
+        try:
+            query = await request.json()
+        except Exception:
+            query = {}
+
+        return JSONResponse(content=await find_enriched_moment_values(query), status_code=200)
+    except Exception as e:
+        await utilities.add_log_to_db(
+            api_client=api_client,
+            source="school_tests_router",
+            method="find_moments_class",
+            message=f"Get find_moments_class error: {e}",
+            error=True,
+        )
+        return JSONResponse(status_code=500, content={"message": f"Get find_moments_class error: {e}"})
 
 
 @school_tests_router.put("/addstudentscalendar")
@@ -460,7 +590,17 @@ async def upsert_moment_value(request: Request,  _: None = Depends(utilities.ver
             payload={"collection": CLASS_MOMENTS_COLLECTION, "query": query},
         )
         if existing.get("documents"):
-            return JSONResponse(content={"value": data}, status_code=200)
+            group_query = {field: body.get(field) for field in required_fields if field != "questionNumber"}
+            enriched_values = await find_enriched_moment_values(group_query)
+            current_value = next(
+                (
+                    value
+                    for value in enriched_values
+                    if value.get("questionNumber") == body.get("questionNumber")
+                ),
+                data,
+            )
+            return JSONResponse(content={"value": current_value}, status_code=200)
 
         created = await api_client.insert(
             endpoint="insert",
@@ -472,9 +612,29 @@ async def upsert_moment_value(request: Request,  _: None = Depends(utilities.ver
                 status_code=500,
                 content={"message": "Erro ao gravar valor do aluno."},
             )
-        return JSONResponse(content={"id": created_id, "value": data}, status_code=201)
+        group_query = {field: body.get(field) for field in required_fields if field != "questionNumber"}
+        enriched_values = await find_enriched_moment_values(group_query)
+        current_value = next(
+            (
+                value
+                for value in enriched_values
+                if value.get("questionNumber") == body.get("questionNumber")
+            ),
+            {**data, "_id": created_id},
+        )
+        return JSONResponse(content={"id": created_id, "value": current_value}, status_code=201)
 
-    return JSONResponse(content={"value": data}, status_code=200)
+    group_query = {field: body.get(field) for field in required_fields if field != "questionNumber"}
+    enriched_values = await find_enriched_moment_values(group_query)
+    current_value = next(
+        (
+            value
+            for value in enriched_values
+            if value.get("questionNumber") == body.get("questionNumber")
+        ),
+        data,
+    )
+    return JSONResponse(content={"value": current_value}, status_code=200)
 
 
 @school_tests_router.post("/moment-assessment-report")
