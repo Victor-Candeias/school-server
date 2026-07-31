@@ -230,6 +230,78 @@ def get_moment_max_value(moment, value_documents):
     return sum(question_values.values())
 
 
+def get_question_max_value(moment, question_number, fallback_value):
+    if moment:
+        questions = moment.get("questions")
+        if isinstance(questions, list):
+            for question in questions:
+                if (
+                    isinstance(question, dict)
+                    and str(question.get("number") or question.get("questionNumber")) == str(question_number)
+                ):
+                    return to_float(question.get("value"))
+
+    return to_float(fallback_value)
+
+
+def normalize_moment_value(value):
+    if value in (None, ""):
+        value = 0
+    if isinstance(value, str):
+        value = value.strip() or "0"
+    if isinstance(value, bool):
+        return None
+
+    try:
+        numeric_value = float(value)
+    except (TypeError, ValueError):
+        return None
+
+    return numeric_value if numeric_value >= 0 else None
+
+
+def build_projected_student_moment_values(existing_values, next_value):
+    projected_values = []
+    replaced = False
+
+    for existing_value in existing_values:
+        if existing_value.get("questionNumber") == next_value.get("questionNumber"):
+            projected_values.append(next_value)
+            replaced = True
+        else:
+            projected_values.append(existing_value)
+
+    if not replaced:
+        projected_values.append(next_value)
+
+    return projected_values
+
+
+async def find_moment_for_value(body):
+    moment_query = {}
+
+    if body.get("userId"):
+        moment_query["userId"] = body.get("userId")
+    if body.get("classId"):
+        moment_query["classId"] = body.get("classId")
+
+    response = await api_client.find(
+        endpoint="find",
+        payload={"collection": MOMENTS_COLLECTION, "query": moment_query},
+    )
+    moments = response.get("documents") or []
+    moment_id = str(body.get("momentId"))
+
+    return next(
+        (
+            moment
+            for moment in moments
+            if str(get_document_id(moment)) == moment_id
+        ),
+        None,
+    )
+
+
 def enrich_student_moment_values(value_documents, moments=None):
     moments = moments or []
     moments_by_id = {
@@ -564,7 +636,33 @@ async def upsert_moment_value(request: Request,  _: None = Depends(utilities.ver
             content={"message": f"Campos obrigatórios em falta: {', '.join(missing_fields)}."},
         )
 
+    numeric_value = normalize_moment_value(body.get("value"))
+    if numeric_value is None:
+        return JSONResponse(
+            status_code=400,
+            content={"message": "Insere um valor válido para a questão."},
+        )
+
     query = {field: body.get(field) for field in required_fields}
+    group_query = {field: body.get(field) for field in required_fields if field != "questionNumber"}
+    moment = await find_moment_for_value(body)
+    question_value = get_question_max_value(
+        moment,
+        body.get("questionNumber"),
+        body.get("questionValue"),
+    )
+
+    if question_value and numeric_value > question_value:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "message": (
+                    f"O valor da questão {body.get('questionNumber')} "
+                    f"não pode ultrapassar {format_number(question_value)}."
+                )
+            },
+        )
+
     data = {
         **query,
         "schoolName": body.get("schoolName"),
@@ -575,9 +673,29 @@ async def upsert_moment_value(request: Request,  _: None = Depends(utilities.ver
         "momentName": body.get("momentName"),
         "studentUniqueId": body.get("studentUniqueId"),
         "studentName": body.get("studentName"),
-        "questionValue": body.get("questionValue"),
-        "value": body.get("value"),
+        "questionValue": format_number(question_value),
+        "value": format_number(numeric_value),
     }
+
+    existing_group_response = await api_client.find(
+        endpoint="find",
+        payload={"collection": CLASS_MOMENTS_COLLECTION, "query": group_query},
+    )
+    existing_group_values = existing_group_response.get("documents") or []
+    projected_values = build_projected_student_moment_values(existing_group_values, data)
+    moment_max_value = get_moment_max_value(moment, projected_values)
+    projected_total = sum(to_float(value_document.get("value")) for value_document in projected_values)
+
+    if moment_max_value and projected_total > moment_max_value:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "message": (
+                    f"O total do aluno não pode ultrapassar {format_number(moment_max_value)}. "
+                    f"Total atual: {format_number(projected_total)}."
+                )
+            },
+        )
 
     response = await api_client.update(
         endpoint="update",
@@ -590,7 +708,6 @@ async def upsert_moment_value(request: Request,  _: None = Depends(utilities.ver
             payload={"collection": CLASS_MOMENTS_COLLECTION, "query": query},
         )
         if existing.get("documents"):
-            group_query = {field: body.get(field) for field in required_fields if field != "questionNumber"}
             enriched_values = await find_enriched_moment_values(group_query)
             current_value = next(
                 (
@@ -612,7 +729,6 @@ async def upsert_moment_value(request: Request,  _: None = Depends(utilities.ver
                 status_code=500,
                 content={"message": "Erro ao gravar valor do aluno."},
             )
-        group_query = {field: body.get(field) for field in required_fields if field != "questionNumber"}
         enriched_values = await find_enriched_moment_values(group_query)
         current_value = next(
             (
@@ -624,7 +740,6 @@ async def upsert_moment_value(request: Request,  _: None = Depends(utilities.ver
         )
         return JSONResponse(content={"id": created_id, "value": current_value}, status_code=201)
 
-    group_query = {field: body.get(field) for field in required_fields if field != "questionNumber"}
     enriched_values = await find_enriched_moment_values(group_query)
     current_value = next(
         (
