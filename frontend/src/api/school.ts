@@ -9,6 +9,8 @@ export type AppSettings = {
   messageTimeoutSeconds: number
   popupBackgroundColor: string
   popupTextColor: string
+  errorPopupBackgroundColor: string
+  errorPopupTextColor: string
   percentageRanges: PercentageRange[]
   evaluationMomentTemplates?: EvaluationMomentTemplate[]
   academicPeriodType?: string

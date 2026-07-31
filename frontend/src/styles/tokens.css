@@ -16,6 +16,8 @@
   --success-light:  #dcfce7;
   --popup-background-color: #15803d;
   --popup-text-color: #ffffff;
+  --error-popup-background-color: #fee2e2;
+  --error-popup-text-color: #dc2626;
   --radius-sm:      6px;
   --radius:         8px;
   --radius-lg:      12px;
@@ -30,4 +32,3 @@
   --table-text:     #0f172a;
   --table-muted:    #475569;
 }
-

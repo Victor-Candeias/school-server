@@ -69,10 +69,13 @@ export function DashboardPage({ model }: DashboardPageProps) {
     selectedAcademicYearDocument,
     selectedClass,
     schoolsError,
+    setSchoolsError,
     isCreateSchoolModalOpen,
     yearsError,
+    setYearsError,
     isCreateYearModalOpen,
     classesError,
+    setClassesError,
     isStudentModalOpen,
     isEvaluationMomentModalOpen,
     isCalendarTaskModalOpen,
@@ -84,6 +87,13 @@ export function DashboardPage({ model }: DashboardPageProps) {
     isEvaluationQuestionModalOpen,
     selectedStudentCalendarDay,
   } = model
+  const dashboardError = schoolsError ?? yearsError ?? classesError
+
+  function clearDashboardError() {
+    setSchoolsError(null)
+    setYearsError(null)
+    setClassesError(null)
+  }
 
   return (
     <main className={user ? 'app-shell dashboard-page' : 'app-shell auth-page'}>
@@ -135,27 +145,25 @@ export function DashboardPage({ model }: DashboardPageProps) {
               )}
             </Suspense>
 
-            {schoolsError && !isCreateSchoolModalOpen && <p className="dashboard-feedback">{schoolsError}</p>}
-            {yearsError && !isCreateYearModalOpen && <p className="dashboard-feedback">{yearsError}</p>}
-            {classesError && !isStudentModalOpen && !isEvaluationMomentModalOpen && !isCalendarTaskModalOpen && (
-              <p className="dashboard-feedback">{classesError}</p>
-            )}
             {message && <p className="dashboard-feedback success">{message}</p>}
             {isLoadingYears && <p className="dashboard-feedback info">A carregar anos letivos...</p>}
             {isLoadingClasses && <p className="dashboard-feedback info">A guardar turma...</p>}
 
-            {/* Toast global — sempre acima de tudo */}
-            <div className="toast-container" role="alert" aria-live="polite">
-              {schoolsError && isCreateSchoolModalOpen && (
-                <p className="toast error">{schoolsError}</p>
-              )}
-              {yearsError && isCreateYearModalOpen && (
-                <p className="toast error">{yearsError}</p>
-              )}
-              {classesError && (isStudentModalOpen || isEvaluationMomentModalOpen || isCalendarTaskModalOpen) && (
-                <p className="toast error">{classesError}</p>
-              )}
-            </div>
+            {dashboardError && (
+              <div className="modal-backdrop dashboard-error-backdrop" role="presentation">
+                <section
+                  className="modal-card small-modal-card dashboard-error-card"
+                  role="alertdialog"
+                  aria-modal="true"
+                  aria-labelledby="dashboard-error-title"
+                  aria-describedby="dashboard-error-description"
+                >
+                  <h2 id="dashboard-error-title">Erro ao gravar dados</h2>
+                  <p id="dashboard-error-description">{dashboardError}</p>
+                  <button type="button" onClick={clearDashboardError}>OK</button>
+                </section>
+              </div>
+            )}
 
             <Suspense fallback={<SectionLoader label="A carregar formulário..." />}>
               {isCreateSchoolModalOpen && (

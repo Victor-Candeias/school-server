@@ -38,12 +38,15 @@ DEFAULT_APP_SETTINGS = {
     "messageTimeoutSeconds": 5,
     "popupBackgroundColor": "#15803d",
     "popupTextColor": "#ffffff",
+    "errorPopupBackgroundColor": "#fee2e2",
+    "errorPopupTextColor": "#dc2626",
     "evaluationMomentTemplates": [],
     "percentageRanges": [
         {
             "id": "very-low",
             "min": 0,
             "max": 10,
+            "nota": 1,
             "backgroundColor": "#dc2626",
             "textColor": "#ffffff",
         },
@@ -51,6 +54,7 @@ DEFAULT_APP_SETTINGS = {
             "id": "low",
             "min": 11,
             "max": 39,
+            "nota": 2,
             "backgroundColor": "#fdba74",
             "textColor": "#7c2d12",
         },
@@ -58,6 +62,7 @@ DEFAULT_APP_SETTINGS = {
             "id": "mid-low",
             "min": 40,
             "max": 49,
+            "nota": 2,
             "backgroundColor": "#fde68a",
             "textColor": "#713f12",
         },
@@ -65,6 +70,7 @@ DEFAULT_APP_SETTINGS = {
             "id": "mid",
             "min": 50,
             "max": 69,
+            "nota": 3,
             "backgroundColor": "#bbf7d0",
             "textColor": "#14532d",
         },
@@ -72,6 +78,7 @@ DEFAULT_APP_SETTINGS = {
             "id": "high",
             "min": 70,
             "max": 85,
+            "nota": 4,
             "backgroundColor": "#15803d",
             "textColor": "#ffffff",
         },
@@ -79,6 +86,7 @@ DEFAULT_APP_SETTINGS = {
             "id": "very-high",
             "min": 86,
             "max": 100,
+            "nota": 5,
             "backgroundColor": "#ddd6fe",
             "textColor": "#4c1d95",
         },
@@ -167,6 +175,7 @@ def normalize_percentage_ranges(value):
         try:
             min_value = int(percentage_range.get("min"))
             max_value = int(percentage_range.get("max"))
+            nota = int(percentage_range.get("nota", 0))
         except (TypeError, ValueError):
             return DEFAULT_APP_SETTINGS["percentageRanges"]
 
@@ -180,6 +189,7 @@ def normalize_percentage_ranges(value):
                 "id": str(percentage_range.get("id") or f"{min_value}-{max_value}"),
                 "min": min_value,
                 "max": max_value,
+                "nota": max(0, nota),
                 "backgroundColor": background_color,
                 "textColor": text_color,
             }
@@ -408,6 +418,14 @@ async def get_app_settings(_: None = Depends(utilities.verificar_token_cookie)):
         settings.get("popupTextColor"),
         DEFAULT_APP_SETTINGS["popupTextColor"],
     )
+    settings["errorPopupBackgroundColor"] = normalize_hex_color(
+        settings.get("errorPopupBackgroundColor"),
+        DEFAULT_APP_SETTINGS["errorPopupBackgroundColor"],
+    )
+    settings["errorPopupTextColor"] = normalize_hex_color(
+        settings.get("errorPopupTextColor"),
+        DEFAULT_APP_SETTINGS["errorPopupTextColor"],
+    )
     settings["evaluationMomentTemplates"] = normalize_evaluation_moment_templates(
         settings.get("evaluationMomentTemplates"),
     )
@@ -416,6 +434,8 @@ async def get_app_settings(_: None = Depends(utilities.verificar_token_cookie)):
         documents[0].get("messageTimeoutSeconds") != settings["messageTimeoutSeconds"]
         or documents[0].get("popupBackgroundColor") != settings["popupBackgroundColor"]
         or documents[0].get("popupTextColor") != settings["popupTextColor"]
+        or documents[0].get("errorPopupBackgroundColor") != settings["errorPopupBackgroundColor"]
+        or documents[0].get("errorPopupTextColor") != settings["errorPopupTextColor"]
         or documents[0].get("evaluationMomentTemplates") != settings["evaluationMomentTemplates"]
         or documents[0].get("percentageRanges") != settings["percentageRanges"]
     ):
@@ -447,6 +467,14 @@ async def update_app_settings(request: Request, _: None = Depends(utilities.veri
         "popupTextColor": normalize_hex_color(
             body.get("popupTextColor"),
             DEFAULT_APP_SETTINGS["popupTextColor"],
+        ),
+        "errorPopupBackgroundColor": normalize_hex_color(
+            body.get("errorPopupBackgroundColor"),
+            DEFAULT_APP_SETTINGS["errorPopupBackgroundColor"],
+        ),
+        "errorPopupTextColor": normalize_hex_color(
+            body.get("errorPopupTextColor"),
+            DEFAULT_APP_SETTINGS["errorPopupTextColor"],
         ),
         "evaluationMomentTemplates": normalize_evaluation_moment_templates(
             body.get("evaluationMomentTemplates"),

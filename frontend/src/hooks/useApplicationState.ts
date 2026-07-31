@@ -19,6 +19,8 @@ import type { StudentsMenuOption } from '../types'
 import { CALENDAR_WEEKDAYS } from '../utils/constants'
 import { CALENDAR_WORK_WEEKDAY_COUNT } from '../utils/constants'
 import { DEFAULT_ACADEMIC_PERIOD_TYPE } from '../utils/constants'
+import { DEFAULT_ERROR_POPUP_BACKGROUND_COLOR } from '../utils/constants'
+import { DEFAULT_ERROR_POPUP_TEXT_COLOR } from '../utils/constants'
 import { DEFAULT_INACTIVITY_LOGOUT_MINUTES } from '../utils/constants'
 import { DEFAULT_EVALUATION_MOMENT_TEMPLATES } from '../utils/constants'
 import { DEFAULT_MESSAGE_TIMEOUT_SECONDS } from '../utils/constants'
@@ -116,6 +118,10 @@ const [popupBackgroundColor, setPopupBackgroundColor] = useState(
     DEFAULT_POPUP_BACKGROUND_COLOR,
   )
 const [popupTextColor, setPopupTextColor] = useState(DEFAULT_POPUP_TEXT_COLOR)
+const [errorPopupBackgroundColor, setErrorPopupBackgroundColor] = useState(
+    DEFAULT_ERROR_POPUP_BACKGROUND_COLOR,
+  )
+const [errorPopupTextColor, setErrorPopupTextColor] = useState(DEFAULT_ERROR_POPUP_TEXT_COLOR)
 const [percentageRanges, setPercentageRanges] = useState<PercentageRange[]>(
     DEFAULT_PERCENTAGE_RANGES,
   )
@@ -268,6 +274,10 @@ const isStudentCalendarFullWeek = studentCalendarWeekMode === 'full'
     setPopupBackgroundColor,
     popupTextColor,
     setPopupTextColor,
+    errorPopupBackgroundColor,
+    setErrorPopupBackgroundColor,
+    errorPopupTextColor,
+    setErrorPopupTextColor,
     percentageRanges,
     setPercentageRanges,
     evaluationMomentTemplates,

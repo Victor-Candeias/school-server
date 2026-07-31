@@ -101,8 +101,7 @@
 }
 
 .modal-feedback.error {
-  color: var(--danger);
-  background: var(--danger-light);
+  color: var(--error-popup-text-color);
+  background: var(--error-popup-background-color);
   border: 1px solid rgb(220 38 38 / 20%);
 }
-

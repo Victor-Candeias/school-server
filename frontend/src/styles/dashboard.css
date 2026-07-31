@@ -193,8 +193,8 @@
   margin: 0;
   padding: 10px 12px;
   border-radius: var(--radius);
-  color: var(--danger);
-  background: var(--danger-light);
+  color: var(--error-popup-text-color);
+  background: var(--error-popup-background-color);
   font-size: 0.769rem;
   font-weight: 600;
   border: 1px solid rgb(220 38 38 / 20%);
@@ -239,8 +239,8 @@
 }
 
 .toast.error {
-  color: var(--danger);
-  background: var(--danger-light);
+  color: var(--error-popup-text-color);
+  background: var(--error-popup-background-color);
   border-color: rgb(220 38 38 / 30%);
 }
 
@@ -254,6 +254,31 @@
   color: var(--primary);
   background: var(--primary-light);
   border-color: rgb(37 99 235 / 30%);
+}
+
+.dashboard-error-backdrop {
+  z-index: 10000;
+}
+
+.dashboard-error-card {
+  border-color: rgb(220 38 38 / 30%);
+  color: var(--error-popup-text-color);
+  background: var(--error-popup-background-color);
+}
+
+.dashboard-error-card h2 {
+  color: inherit;
+}
+
+.dashboard-error-card p {
+  margin: 0 0 16px;
+  font-size: 0.846rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.dashboard-error-card button {
+  margin: 0;
 }
 
 .dashboard-empty-state {
@@ -276,4 +301,3 @@
   color: var(--text-2);
   font-size: 0.769rem;
 }
-

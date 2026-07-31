@@ -8,6 +8,8 @@ import type { AcademicPeriodType } from '../types'
 import type { DashboardSection } from '../types'
 import type { EvaluationMomentTemplate } from '../types'
 import { DEFAULT_EVALUATION_MOMENT_TEMPLATES } from '../utils/constants'
+import { DEFAULT_ERROR_POPUP_BACKGROUND_COLOR } from '../utils/constants'
+import { DEFAULT_ERROR_POPUP_TEXT_COLOR } from '../utils/constants'
 import { DEFAULT_INACTIVITY_LOGOUT_MINUTES } from '../utils/constants'
 import { DEFAULT_MESSAGE_TIMEOUT_SECONDS } from '../utils/constants'
 import { DEFAULT_POPUP_BACKGROUND_COLOR } from '../utils/constants'
@@ -48,6 +50,8 @@ async function saveAppSettings() {
         messageTimeoutSeconds: runtime.messageTimeoutSeconds,
         popupBackgroundColor: runtime.popupBackgroundColor,
         popupTextColor: runtime.popupTextColor,
+        errorPopupBackgroundColor: runtime.errorPopupBackgroundColor,
+        errorPopupTextColor: runtime.errorPopupTextColor,
         evaluationMomentTemplates: runtime.evaluationMomentTemplates,
         percentageRanges: runtime.percentageRanges,
         academicPeriodType: runtime.academicPeriodType,
@@ -89,6 +93,14 @@ function normalizeAppSettings(settings: AppSettings): NormalizedAppSettings {
         settings.popupTextColor,
         DEFAULT_POPUP_TEXT_COLOR,
       ),
+      errorPopupBackgroundColor: normalizeHexColor(
+        settings.errorPopupBackgroundColor,
+        DEFAULT_ERROR_POPUP_BACKGROUND_COLOR,
+      ),
+      errorPopupTextColor: normalizeHexColor(
+        settings.errorPopupTextColor,
+        DEFAULT_ERROR_POPUP_TEXT_COLOR,
+      ),
       evaluationMomentTemplates: normalizeEvaluationMomentTemplates(
         settings.evaluationMomentTemplates,
       ),
@@ -113,6 +125,8 @@ function applyAppSettings(settings: NormalizedAppSettings) {
     runtime.setMessageTimeoutSeconds(settings.messageTimeoutSeconds)
     runtime.setPopupBackgroundColor(settings.popupBackgroundColor)
     runtime.setPopupTextColor(settings.popupTextColor)
+    runtime.setErrorPopupBackgroundColor(settings.errorPopupBackgroundColor)
+    runtime.setErrorPopupTextColor(settings.errorPopupTextColor)
     runtime.setEvaluationMomentTemplates(settings.evaluationMomentTemplates)
     runtime.setPercentageRanges(settings.percentageRanges)
     runtime.setAcademicPeriodType(settings.academicPeriodType)
@@ -130,6 +144,8 @@ function getCurrentAppSettings(): NormalizedAppSettings {
       messageTimeoutSeconds: runtime.messageTimeoutSeconds,
       popupBackgroundColor: runtime.popupBackgroundColor,
       popupTextColor: runtime.popupTextColor,
+      errorPopupBackgroundColor: runtime.errorPopupBackgroundColor,
+      errorPopupTextColor: runtime.errorPopupTextColor,
       evaluationMomentTemplates: runtime.evaluationMomentTemplates,
       percentageRanges: runtime.percentageRanges,
       academicPeriodType: runtime.academicPeriodType,
@@ -336,6 +352,8 @@ type NormalizedAppSettings = {
   messageTimeoutSeconds: number
   popupBackgroundColor: string
   popupTextColor: string
+  errorPopupBackgroundColor: string
+  errorPopupTextColor: string
   evaluationMomentTemplates: EvaluationMomentTemplate[]
   percentageRanges: AppSettings['percentageRanges']
   academicPeriodType: AcademicPeriodType

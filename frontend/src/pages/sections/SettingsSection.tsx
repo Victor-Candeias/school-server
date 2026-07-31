@@ -22,6 +22,10 @@ export function SettingsSection() {
     setPopupBackgroundColor,
     popupTextColor,
     setPopupTextColor,
+    errorPopupBackgroundColor,
+    setErrorPopupBackgroundColor,
+    errorPopupTextColor,
+    setErrorPopupTextColor,
     evaluationMomentTemplates,
     addEvaluationMomentTemplate,
     updateEvaluationMomentTemplate,
@@ -153,6 +157,40 @@ export function SettingsSection() {
                           }}
                         >
                           Exemplo de aviso
+                        </span>
+                      </div>
+                    </div>
+                  </section>
+                  <section className="settings-popup-colors" aria-label="Cores dos popups de erro">
+                    <div>
+                      <h3>Cores dos popups de erro</h3>
+                      <p>Define o fundo e a cor da letra usados nas mensagens de erro.</p>
+                    </div>
+                    <div className="settings-popup-colors-controls">
+                      <label>
+                        Cor de fundo
+                        <input
+                          type="color"
+                          value={errorPopupBackgroundColor}
+                          onChange={(event) => setErrorPopupBackgroundColor(event.target.value)}
+                        />
+                      </label>
+                      <label>
+                        Cor da letra
+                        <input
+                          type="color"
+                          value={errorPopupTextColor}
+                          onChange={(event) => setErrorPopupTextColor(event.target.value)}
+                        />
+                      </label>
+                      <div className="settings-popup-colors-preview">
+                        <span
+                          style={{
+                            backgroundColor: errorPopupBackgroundColor,
+                            color: errorPopupTextColor,
+                          }}
+                        >
+                          Exemplo de erro
                         </span>
                       </div>
                     </div>

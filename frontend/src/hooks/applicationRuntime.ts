@@ -149,6 +149,10 @@ export type ApplicationState = {
   setPopupBackgroundColor: import("react").Dispatch<import("react").SetStateAction<string>>
   popupTextColor: string
   setPopupTextColor: import("react").Dispatch<import("react").SetStateAction<string>>
+  errorPopupBackgroundColor: string
+  setErrorPopupBackgroundColor: import("react").Dispatch<import("react").SetStateAction<string>>
+  errorPopupTextColor: string
+  setErrorPopupTextColor: import("react").Dispatch<import("react").SetStateAction<string>>
   percentageRanges: PercentageRange[]
   setPercentageRanges: import("react").Dispatch<import("react").SetStateAction<PercentageRange[]>>
   evaluationMomentTemplates: EvaluationMomentTemplate[]

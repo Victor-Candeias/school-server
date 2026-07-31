@@ -56,6 +56,8 @@ export function useSchoolApplication() {
     messageTimeoutSeconds,
     popupBackgroundColor,
     popupTextColor,
+    errorPopupBackgroundColor,
+    errorPopupTextColor,
   } = state
   const runtime = state as ApplicationRuntime
   const useSchoolsActions = useSchools(runtime)
@@ -95,7 +97,9 @@ export function useSchoolApplication() {
   useEffect(() => {
     document.documentElement.style.setProperty('--popup-background-color', popupBackgroundColor)
     document.documentElement.style.setProperty('--popup-text-color', popupTextColor)
-  }, [popupBackgroundColor, popupTextColor])
+    document.documentElement.style.setProperty('--error-popup-background-color', errorPopupBackgroundColor)
+    document.documentElement.style.setProperty('--error-popup-text-color', errorPopupTextColor)
+  }, [popupBackgroundColor, popupTextColor, errorPopupBackgroundColor, errorPopupTextColor])
 
   useEffect(() => {
     if (!user) {
