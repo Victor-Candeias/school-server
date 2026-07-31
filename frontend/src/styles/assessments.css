@@ -293,13 +293,12 @@
   text-align: center;
 }
 
-/* Keep the light table readable while preserving each assessment group's colour. */
-html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):not(.semester-assessments-subhead) {
+.semester-assessments-row:not(.semester-assessments-group-head):not(.semester-assessments-subhead) {
   color: var(--table-text);
 }
 
-html:not(.dark) .semester-assessments-row > span:not(.semester-assessments-group-cell),
-html:not(.dark) .semester-assessments-row > strong:not(.semester-assessments-group-cell) {
+.semester-assessments-row > span:not(.semester-assessments-group-cell),
+.semester-assessments-row > strong:not(.semester-assessments-group-cell) {
   min-height: 40px;
   padding: 8px 8px;
   border: 1px solid var(--border-strong);
@@ -308,29 +307,29 @@ html:not(.dark) .semester-assessments-row > strong:not(.semester-assessments-gro
   background: var(--table-cell);
 }
 
-html:not(.dark) .semester-assessments-group-head > span:not(.semester-assessments-group-cell),
-html:not(.dark) .semester-assessments-subhead > span:not(.semester-assessments-group-cell) {
+.semester-assessments-group-head > span:not(.semester-assessments-group-cell),
+.semester-assessments-subhead > span:not(.semester-assessments-group-cell) {
   border-color: var(--table-border);
   background: var(--table-surface);
 }
 
-html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):not(.semester-assessments-subhead) > .semester-assessments-group-cell {
+.semester-assessments-row:not(.semester-assessments-group-head):not(.semester-assessments-subhead) > .semester-assessments-group-cell {
   color: var(--assessment-group-text);
   background: var(--assessment-group-background);
 }
 
-html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):not(.semester-assessments-subhead) > .semester-assessments-average-cell {
+.semester-assessments-row:not(.semester-assessments-group-head):not(.semester-assessments-subhead) > .semester-assessments-average-cell {
   color: var(--assessment-group-text);
   background: var(--assessment-group-average-background);
 }
 
-html:not(.dark) .semester-assessments-row:not(.semester-assessments-group-head):not(.semester-assessments-subhead) > .semester-assessments-weighted-cell {
+.semester-assessments-row:not(.semester-assessments-group-head):not(.semester-assessments-subhead) > .semester-assessments-weighted-cell {
   color: var(--assessment-group-text);
   background: var(--assessment-group-weighted-background);
 }
 
-html:not(.dark) .semester-assessments-final-cell,
-html:not(.dark) .semester-assessments-grade-cell {
+.semester-assessments-final-cell,
+.semester-assessments-grade-cell {
   border-color: transparent;
 }
 
