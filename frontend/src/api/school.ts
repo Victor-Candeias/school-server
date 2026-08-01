@@ -129,6 +129,15 @@ export const schoolApi = {
         body: document,
       },
     ),
+  calculateSemesterEvaluations: (document: SchoolDocument) =>
+    apiRequest<SchoolDocument>(
+      API_CONFIG.schoolBaseUrl,
+      '/config/semester-evaluations-summary',
+      {
+        method: 'POST',
+        body: document,
+      },
+    ),
   generateMomentAssessmentReport: (document: SchoolDocument) =>
     apiRequest<{ path: string; url: string }>(
       API_CONFIG.schoolBaseUrl,

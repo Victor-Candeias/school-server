@@ -304,15 +304,27 @@ function getStudentMomentPercentageValue(student: SchoolDocument, moment: School
       return processedPercentage
     }
 
-    const momentMaxValue = runtime.getEvaluationMomentMaxValue(moment)
-    if (!momentMaxValue) {
-      return 0
-    }
-
-    return (runtime.getStudentMomentTotal(student, moment) / momentMaxValue) * 100
+    return 0
   }
 
 function getStudentMomentPercentageStyle(student: SchoolDocument, moment: SchoolDocument) {
+    const momentId = runtime.getDocumentId(moment)
+    const studentId = runtime.getDocumentId(student)
+    const processedValue = runtime.allStudentMomentValues.find(
+      (value) =>
+        value.momentId === momentId &&
+        value.studentId === studentId &&
+        typeof value.studentMomentBackgroundColor === 'string' &&
+        typeof value.studentMomentTextColor === 'string',
+    )
+
+    if (processedValue) {
+      return {
+        backgroundColor: runtime.getStringValue(processedValue.studentMomentBackgroundColor),
+        color: runtime.getStringValue(processedValue.studentMomentTextColor),
+      }
+    }
+
     const percentage = getStudentMomentPercentageValue(student, moment)
     const matchingRange =
       runtime.percentageRanges.find((range) => percentage >= range.min && percentage <= range.max) ??

@@ -291,6 +291,7 @@ function openStudentsDashboard(schoolClass: SchoolDocument) {
     runtime.setActiveStudentsMenuOption(1)
     runtime.setSelectedGradingMomentId('')
     runtime.setSelectedAssessmentsSemester('')
+    runtime.setSemesterAssessmentSummary(null)
     runtime.setAssessmentCellDrafts({})
     runtime.setStudentCalendarTasks([])
     runtime.setActiveDashboard('students')

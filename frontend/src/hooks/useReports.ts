@@ -22,9 +22,8 @@ async function generateSemesterEvaluationsReport() {
 
     try {
       const report = await schoolApi.generateMomentAssessmentReport({
-        title: payload.title,
-        headers: payload.headers,
-        rows: payload.rows,
+        ...payload,
+        reportType: 'semester-evaluations',
       })
       window.open(schoolApi.getReportUrl(report.url), '_blank', 'noopener,noreferrer')
       runtime.setMessage(`Relatório criado em: ${report.path}`)
@@ -62,19 +61,11 @@ async function generateAssessmentReport(momentToReport?: SchoolDocument) {
 
     try {
       const report = await schoolApi.generateMomentAssessmentReport({
+        reportType: 'moment-assessment',
         title: runtime.getStringValue(moment.name),
-        headers: [
-          'Aluno',
-          ...questions.map((question) => `Q${question.questionNumber} (${runtime.getQuestionMaxValue(question)})`),
-          'Total',
-          '%',
-        ],
-        rows: students.map((student) => [
-          runtime.getStringValue(student.name),
-          ...questions.map((question) => runtime.getStudentMomentCellValue(student, moment, question) || '0'),
-          String(runtime.getStudentMomentTotal(student, moment)),
-          runtime.getStudentMomentPercentage(student, moment),
-        ]),
+        userId: runtime.getLoggedUserId(),
+        classId: runtime.getDocumentId(runtime.selectedClass),
+        momentId: runtime.getDocumentId(moment),
       })
       window.open(schoolApi.getReportUrl(report.url), '_blank', 'noopener,noreferrer')
       runtime.setMessage(`Relatório criado em: ${report.path}`)

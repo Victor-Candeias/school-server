@@ -16,6 +16,7 @@ from utils import utilities  # General utilities
 
 from utils.config import (
     BD_BASE_URL,
+    STUDENTS_COLLECTION,
     STUDENT_TESTES_COLLECTION,
     TESTS_COLLECTION,
     MOMENTS_COLLECTION,
@@ -198,6 +199,31 @@ def normalize_percentage_ranges(value):
     return normalized_ranges or DEFAULT_APP_SETTINGS["percentageRanges"]
 
 
+def get_percentage_range(percentage, percentage_ranges=None):
+    ranges = normalize_percentage_ranges(percentage_ranges or DEFAULT_APP_SETTINGS["percentageRanges"])
+    matching_range = next(
+        (
+            percentage_range
+            for percentage_range in ranges
+            if percentage >= percentage_range["min"] and percentage <= percentage_range["max"]
+        ),
+        None,
+    )
+
+    return matching_range or ranges[-1]
+
+
+def get_percentage_fields(percentage, percentage_ranges=None, prefix=""):
+    percentage_range = get_percentage_range(percentage, percentage_ranges)
+    return {
+        f"{prefix}Percentage": round(percentage, 1),
+        f"{prefix}PercentageText": f"{percentage:.1f}%",
+        f"{prefix}Grade": percentage_range.get("nota", 0),
+        f"{prefix}BackgroundColor": percentage_range.get("backgroundColor"),
+        f"{prefix}TextColor": percentage_range.get("textColor"),
+    }
+
+
 def to_float(value, default=0):
     if isinstance(value, bool):
         return default
@@ -215,6 +241,36 @@ def format_number(value):
 
 def get_document_id(document):
     return document.get("_id") or document.get("id")
+
+
+def get_string_value(value, default=""):
+    return value if isinstance(value, str) else default
+
+
+def get_student_name(student):
+    return get_string_value(student.get("name")) or "Aluno"
+
+
+def get_moment_name(moment):
+    return get_string_value(moment.get("name")) or "Momento de avaliação"
+
+
+def get_moment_type_label(moment):
+    moment_type = get_string_value(
+        moment.get("evaluationMomentTemplateType") or moment.get("type")
+    )
+
+    if moment_type == "questao-aula":
+        return "Questão aula"
+
+    if moment_type == "teste":
+        return "Teste"
+
+    return moment_type or "Sem tipo"
+
+
+def get_moment_semester(moment):
+    return "2" if str(moment.get("semester", "1")) == "2" else "1"
 
 
 def get_moment_max_value(moment, value_documents):
@@ -238,6 +294,23 @@ def get_moment_max_value(moment, value_documents):
             question_values[question_number] = to_float(value_document.get("questionValue"))
 
     return sum(question_values.values())
+
+
+def get_moment_weight_percentage(moment, templates):
+    moment_type = get_moment_type_label(moment)
+    configured_template = next(
+        (
+            template
+            for template in templates
+            if template.get("type") == moment_type
+        ),
+        None,
+    )
+
+    if configured_template:
+        return to_float(configured_template.get("weightPercentage"))
+
+    return to_float(moment.get("evaluationMomentTemplateWeightPercentage"))
 
 
 def get_question_max_value(moment, question_number, fallback_value):
@@ -287,6 +360,36 @@ def build_projected_student_moment_values(existing_values, next_value):
     return projected_values
 
 
+def validate_evaluation_moment_payload(data):
+    if not isinstance(data, dict):
+        return "Dados do momento de avaliação inválidos."
+
+    questions = data.get("questions")
+    if not isinstance(questions, list) or len(questions) == 0:
+        return None
+
+    question_total = 0
+    for question in questions:
+        if not isinstance(question, dict):
+            return "Preenche o número e o valor de todas as questões."
+
+        question_number = question.get("number") or question.get("questionNumber")
+        question_value = normalize_moment_value(question.get("value"))
+        if not question_number or question_value is None or question_value <= 0:
+            return "Preenche o número e o valor de todas as questões."
+
+        question_total += question_value
+
+    total_value = to_float(data.get("totalValue"))
+    if total_value and format_number(question_total) != format_number(total_value):
+        return (
+            f"O total das questões deve ser {format_number(total_value)}. "
+            f"Total atual: {format_number(question_total)}."
+        )
+
+    return None
+
+
 async def find_moment_for_value(body):
     moment_query = {}
 
@@ -312,8 +415,9 @@ async def find_moment_for_value(body):
     )
 
 
-def enrich_student_moment_values(value_documents, moments=None):
+def enrich_student_moment_values(value_documents, moments=None, percentage_ranges=None):
     moments = moments or []
+    percentage_ranges = percentage_ranges or DEFAULT_APP_SETTINGS["percentageRanges"]
     moments_by_id = {
         str(moment_id): moment
         for moment in moments
@@ -336,8 +440,7 @@ def enrich_student_moment_values(value_documents, moments=None):
         processed_fields = {
             "studentMomentTotal": format_number(total),
             "studentMomentMaxValue": format_number(max_value),
-            "studentMomentPercentage": round(percentage, 1),
-            "studentMomentPercentageText": f"{percentage:.1f}%",
+            **get_percentage_fields(percentage, percentage_ranges, "studentMoment"),
         }
 
         enriched_documents.extend(
@@ -349,6 +452,199 @@ def enrich_student_moment_values(value_documents, moments=None):
         )
 
     return enriched_documents
+
+
+def get_student_moment_total(enriched_values, student_id, moment_id):
+    matching_value = next(
+        (
+            value_document
+            for value_document in enriched_values
+            if str(value_document.get("studentId")) == str(student_id)
+            and str(value_document.get("momentId")) == str(moment_id)
+            and value_document.get("studentMomentTotal") is not None
+        ),
+        None,
+    )
+
+    return to_float(matching_value.get("studentMomentTotal")) if matching_value else 0
+
+
+def group_semester_moments(moments, templates):
+    groups = []
+
+    for moment in moments:
+        moment_type = get_moment_type_label(moment)
+        existing_group = next(
+            (group for group in groups if group["type"] == moment_type),
+            None,
+        )
+
+        if existing_group:
+            existing_group["moments"].append(moment)
+        else:
+            groups.append(
+                {
+                    "type": moment_type,
+                    "weightPercentage": format_number(
+                        get_moment_weight_percentage(moment, templates),
+                    ),
+                    "moments": [moment],
+                }
+            )
+
+    return groups
+
+
+def build_semester_evaluations_summary(metadata, students, moments, value_documents, settings):
+    percentage_ranges = normalize_percentage_ranges(settings.get("percentageRanges"))
+    templates = normalize_evaluation_moment_templates(settings.get("evaluationMomentTemplates"))
+    semester = str(metadata.get("semester"))
+    semester_moments = [
+        moment
+        for moment in moments
+        if get_moment_semester(moment) == semester
+    ]
+    groups = group_semester_moments(semester_moments, templates)
+    enriched_values = enrich_student_moment_values(
+        value_documents,
+        semester_moments,
+        percentage_ranges,
+    )
+    final_max_value = 0
+
+    for group in groups:
+        if not group["moments"]:
+            continue
+
+        group_max_average = sum(
+            get_moment_max_value(moment, [])
+            for moment in group["moments"]
+        ) / len(group["moments"])
+        final_max_value += group_max_average * (to_float(group["weightPercentage"]) / 100)
+
+    active_students = [student for student in students if student.get("active") is not False]
+    student_summaries = []
+
+    for student in active_students:
+        student_id = get_document_id(student)
+        student_groups = []
+        final_value = 0
+
+        for group in groups:
+            moment_summaries = [
+                {
+                    "id": get_document_id(moment),
+                    "name": get_moment_name(moment),
+                    "totalValue": format_number(get_moment_max_value(moment, [])),
+                    "studentTotal": format_number(
+                        get_student_moment_total(
+                            enriched_values,
+                            student_id,
+                            get_document_id(moment),
+                        )
+                    ),
+                }
+                for moment in group["moments"]
+            ]
+            group_average = (
+                sum(moment["studentTotal"] for moment in moment_summaries) / len(moment_summaries)
+                if moment_summaries
+                else 0
+            )
+            weighted_value = group_average * (to_float(group["weightPercentage"]) / 100)
+            final_value += weighted_value
+            student_groups.append(
+                {
+                    "type": group["type"],
+                    "weightPercentage": group["weightPercentage"],
+                    "moments": moment_summaries,
+                    "average": format_number(group_average),
+                    "weightedValue": format_number(weighted_value),
+                }
+            )
+
+        final_percentage = (final_value / final_max_value) * 100 if final_max_value else final_value
+        final_range = get_percentage_range(final_percentage, percentage_ranges)
+        student_summaries.append(
+            {
+                "studentId": student_id,
+                "studentName": get_student_name(student),
+                "groups": student_groups,
+                "finalValue": format_number(final_value),
+                "finalMaxValue": format_number(final_max_value),
+                "finalPercentage": round(final_percentage, 1),
+                "finalPercentageText": f"{final_percentage:.1f}%",
+                "finalGrade": final_range.get("nota", 0),
+                "finalBackgroundColor": final_range.get("backgroundColor"),
+                "finalTextColor": final_range.get("textColor"),
+            }
+        )
+
+    headers = [
+        "Aluno",
+        *[
+            header
+            for group in groups
+            for header in [
+                *[
+                    f"{get_moment_name(moment)} ({format_number(get_moment_max_value(moment, []))})"
+                    for moment in group["moments"]
+                ],
+                f"{group['type']} - Média",
+                f"{group['type']} - M*{format_number(group['weightPercentage'])}%",
+            ]
+        ],
+        "Final",
+        "Nota",
+    ]
+    rows = [
+        [
+            student_summary["studentName"],
+            *[
+                str(value)
+                for group in student_summary["groups"]
+                for value in [
+                    *[moment["studentTotal"] for moment in group["moments"]],
+                    group["average"],
+                    group["weightedValue"],
+                ]
+            ],
+            str(student_summary["finalValue"]),
+            str(student_summary["finalGrade"]),
+        ]
+        for student_summary in student_summaries
+    ]
+
+    return {
+        **metadata,
+        "title": metadata.get("title") or f"Avaliações - {semester}.º semestre",
+        "tests": [
+            {
+                "id": get_document_id(moment),
+                "name": get_moment_name(moment),
+                "totalValue": format_number(get_moment_max_value(moment, [])),
+            }
+            for moment in semester_moments
+        ],
+        "groups": [
+            {
+                "type": group["type"],
+                "weightPercentage": group["weightPercentage"],
+                "moments": [
+                    {
+                        "id": get_document_id(moment),
+                        "name": get_moment_name(moment),
+                        "totalValue": format_number(get_moment_max_value(moment, [])),
+                    }
+                    for moment in group["moments"]
+                ],
+            }
+            for group in groups
+        ],
+        "headers": headers,
+        "rows": rows,
+        "students": student_summaries,
+    }
 
 
 async def find_moments_for_values(value_documents, query):
@@ -372,6 +668,20 @@ async def find_moments_for_values(value_documents, query):
     ]
 
 
+async def get_normalized_app_settings():
+    response = await api_client.find(
+        endpoint="find",
+        payload={"collection": APP_SETTINGS_COLLECTION, "query": {"key": APP_SETTINGS_KEY}},
+    )
+    documents = response.get("documents") or []
+    settings = {**DEFAULT_APP_SETTINGS, **(documents[0] if documents else {})}
+    settings["evaluationMomentTemplates"] = normalize_evaluation_moment_templates(
+        settings.get("evaluationMomentTemplates"),
+    )
+    settings["percentageRanges"] = normalize_percentage_ranges(settings.get("percentageRanges"))
+    return settings
+
+
 async def find_enriched_moment_values(query):
     response = await api_client.find(
         endpoint="find",
@@ -382,7 +692,171 @@ async def find_enriched_moment_values(query):
         return []
 
     moments = await find_moments_for_values(value_documents, query)
-    return enrich_student_moment_values(value_documents, moments)
+    settings = await get_normalized_app_settings()
+    return enrich_student_moment_values(value_documents, moments, settings["percentageRanges"])
+
+
+async def get_semester_evaluations_summary(body):
+    required_fields = [
+        "userId",
+        "schoolId",
+        "yearId",
+        "classId",
+        "semester",
+    ]
+    missing_fields = [field for field in required_fields if body.get(field) in (None, "")]
+
+    if missing_fields:
+        return None, JSONResponse(
+            status_code=400,
+            content={"message": f"Campos obrigatórios em falta: {', '.join(missing_fields)}."},
+        )
+
+    class_id = body.get("classId")
+    user_id = body.get("userId")
+    class_query = {"userId": user_id, "classId": class_id}
+    students_response = await api_client.find(
+        endpoint="find",
+        payload={"collection": STUDENTS_COLLECTION, "query": class_query},
+    )
+    moments_response = await api_client.find(
+        endpoint="find",
+        payload={"collection": MOMENTS_COLLECTION, "query": class_query},
+    )
+    values_response = await api_client.find(
+        endpoint="find",
+        payload={"collection": CLASS_MOMENTS_COLLECTION, "query": class_query},
+    )
+    settings = await get_normalized_app_settings()
+    metadata = {
+        "userId": user_id,
+        "schoolId": body.get("schoolId"),
+        "schoolName": body.get("schoolName"),
+        "yearId": body.get("yearId"),
+        "academicYearId": body.get("academicYearId") or body.get("yearId"),
+        "academicYearName": body.get("academicYearName"),
+        "classId": class_id,
+        "className": body.get("className"),
+        "semester": str(body.get("semester")),
+        "title": body.get("title"),
+    }
+    summary = build_semester_evaluations_summary(
+        metadata,
+        students_response.get("documents") or [],
+        moments_response.get("documents") or [],
+        values_response.get("documents") or [],
+        settings,
+    )
+
+    return summary, None
+
+
+async def get_moment_assessment_report_data(body):
+    required_fields = ["userId", "classId", "momentId"]
+    missing_fields = [field for field in required_fields if body.get(field) in (None, "")]
+
+    if missing_fields:
+        return None, JSONResponse(
+            status_code=400,
+            content={"message": f"Campos obrigatórios em falta: {', '.join(missing_fields)}."},
+        )
+
+    class_query = {"userId": body.get("userId"), "classId": body.get("classId")}
+    moment_id = str(body.get("momentId"))
+    students_response = await api_client.find(
+        endpoint="find",
+        payload={"collection": STUDENTS_COLLECTION, "query": class_query},
+    )
+    moments_response = await api_client.find(
+        endpoint="find",
+        payload={"collection": MOMENTS_COLLECTION, "query": class_query},
+    )
+    values_response = await api_client.find(
+        endpoint="find",
+        payload={
+            "collection": CLASS_MOMENTS_COLLECTION,
+            "query": {**class_query, "momentId": body.get("momentId")},
+        },
+    )
+    moments = moments_response.get("documents") or []
+    moment = next(
+        (
+            moment
+            for moment in moments
+            if str(get_document_id(moment)) == moment_id
+        ),
+        None,
+    )
+
+    if not moment:
+        return None, JSONResponse(
+            status_code=404,
+            content={"message": "Momento de avaliação não encontrado."},
+        )
+
+    settings = await get_normalized_app_settings()
+    values = values_response.get("documents") or []
+    enriched_values = enrich_student_moment_values(values, [moment], settings["percentageRanges"])
+    questions = [
+        question
+        for question in moment.get("questions", [])
+        if isinstance(question, dict)
+    ]
+    active_students = [
+        student
+        for student in (students_response.get("documents") or [])
+        if student.get("active") is not False
+    ]
+    headers = [
+        "Aluno",
+        *[
+            f"Q{question.get('number') or question.get('questionNumber')} ({format_number(to_float(question.get('value')))})"
+            for question in questions
+        ],
+        "Total",
+        "%",
+        "Nota",
+    ]
+    rows = []
+
+    for student in active_students:
+        student_id = get_document_id(student)
+        student_values = [
+            next(
+                (
+                    value_document
+                    for value_document in values
+                    if str(value_document.get("studentId")) == str(student_id)
+                    and str(value_document.get("questionNumber"))
+                    == str(question.get("number") or question.get("questionNumber"))
+                ),
+                {},
+            )
+            for question in questions
+        ]
+        matching_enriched_value = next(
+            (
+                value_document
+                for value_document in enriched_values
+                if str(value_document.get("studentId")) == str(student_id)
+            ),
+            {},
+        )
+        rows.append(
+            [
+                get_student_name(student),
+                *[str(value_document.get("value", 0)) for value_document in student_values],
+                str(format_number(to_float(matching_enriched_value.get("studentMomentTotal")))),
+                matching_enriched_value.get("studentMomentPercentageText", "0.0%"),
+                str(matching_enriched_value.get("studentMomentGrade", 0)),
+            ]
+        )
+
+    return {
+        "title": body.get("title") or get_moment_name(moment),
+        "headers": headers,
+        "rows": rows,
+    }, None
 
 
 @school_tests_router.get("/app-settings")
@@ -534,7 +1008,37 @@ async def findbyid_class_to_test(request: Request,  _: None = Depends(utilities.
 # curl -X POST http://127.0.0.1:8020/config/addevaluationmoments -H "Content-Type: application/json" -d "{\"user\":\"user\", \"moments\":[{\"id\":\"1\",\"name\":\"name 1\",\"percentage\":12},{\"id\":\"2\",\"name\":\"name 2\",\"percentage\":30},{\"id\":\"3\",\"name\":\"name 3\",\"percentage\":40}]}"
 @school_tests_router.post("/addevaluationmoments")
 async def create_evoluation_moments(request: Request,  _: None = Depends(utilities.verificar_token_cookie)):
-    return await utilities.add_document(api_client=api_client, request=request, collection=MOMENTS_COLLECTION, source="school_tests_router", method="create_evoluation_moments")
+    body = await request.json()
+    validation_error = validate_evaluation_moment_payload(body)
+    if validation_error:
+        return JSONResponse(status_code=400, content={"message": validation_error})
+
+    response = await api_client.find(
+        endpoint="find",
+        payload={"collection": MOMENTS_COLLECTION, "query": body},
+    )
+    if response.get("documents"):
+        document_id = response.get("documents", [{}])[0].get("_id", "unknown")
+        return JSONResponse(
+            status_code=400,
+            content={"message": f"Document already exists: id={document_id}"},
+        )
+
+    created = await api_client.insert(
+        endpoint="insert",
+        payload={"collection": MOMENTS_COLLECTION, "data": body},
+    )
+    created_id = created.get("id")
+    if not created_id:
+        return JSONResponse(
+            status_code=404,
+            content={"message": f"Error creating create_evoluation_moments {body}"},
+        )
+
+    return JSONResponse(
+        content={"message": "Create_evoluation_moments added successfully", "id": created_id},
+        status_code=201,
+    )
 
 # curl -X GET http://127.0.0.1:8020/config/findevaluationmoments -H "Content-Type: application/json" -d "{\"user\":\"user\", \"moments\":[{\"id\":\"1\",\"name\":\"name 1\",\"percentage\":12},{\"id\":\"2\",\"name\":\"name 2\",\"percentage\":30},{\"id\":\"3\",\"name\":\"name 3\",\"percentage\":40}]}"
 @school_tests_router.post("/findevaluationmoments")
@@ -559,6 +1063,10 @@ async def update_evoluation_moments(request: Request,  _: None = Depends(utiliti
             status_code=400,
             content={"message": "Os campos 'id' e 'data' são obrigatórios."},
         )
+
+    validation_error = validate_evaluation_moment_payload(data)
+    if validation_error:
+        return JSONResponse(status_code=400, content={"message": validation_error})
 
     response = await api_client.update(
         endpoint="update",
@@ -619,6 +1127,16 @@ async def find_moments_class(request: Request,  _: None = Depends(utilities.veri
             error=True,
         )
         return JSONResponse(status_code=500, content={"message": f"Get find_moments_class error: {e}"})
+
+
+@school_tests_router.post("/semester-evaluations-summary")
+async def semester_evaluations_summary(request: Request, _: None = Depends(utilities.verificar_token_cookie)):
+    body = await request.json()
+    summary, error_response = await get_semester_evaluations_summary(body)
+    if error_response:
+        return error_response
+
+    return JSONResponse(content=summary, status_code=200)
 
 
 @school_tests_router.put("/addstudentscalendar")
@@ -783,6 +1301,21 @@ async def upsert_moment_value(request: Request,  _: None = Depends(utilities.ver
 @school_tests_router.post("/moment-assessment-report")
 async def create_moment_assessment_report(request: Request,  _: None = Depends(utilities.verificar_token_cookie)):
     body = await request.json()
+    if body.get("reportType") == "moment-assessment":
+        report_data, error_response = await get_moment_assessment_report_data(body)
+        if error_response:
+            return error_response
+        body = report_data
+    elif body.get("reportType") == "semester-evaluations":
+        summary, error_response = await get_semester_evaluations_summary(body)
+        if error_response:
+            return error_response
+        body = {
+            "title": summary["title"],
+            "headers": summary["headers"],
+            "rows": summary["rows"],
+        }
+
     title = body.get("title")
     headers = body.get("headers")
     rows = body.get("rows")
@@ -863,33 +1396,12 @@ async def open_moment_assessment_report(filename: str, _: None = Depends(utiliti
 @school_tests_router.put("/upsertsemesterevaluations")
 async def upsert_semester_evaluations(request: Request, _: None = Depends(utilities.verificar_token_cookie)):
     body = await request.json()
-    required_fields = [
-        "userId",
-        "schoolId",
-        "yearId",
-        "classId",
-        "semester",
-    ]
-    missing_fields = [field for field in required_fields if body.get(field) in (None, "")]
+    data, error_response = await get_semester_evaluations_summary(body)
+    if error_response:
+        return error_response
 
-    if missing_fields:
-        return JSONResponse(
-            status_code=400,
-            content={"message": f"Campos obrigatórios em falta: {', '.join(missing_fields)}."},
-        )
-
-    query = {field: body.get(field) for field in required_fields}
-    data = {
-        **query,
-        "schoolName": body.get("schoolName"),
-        "academicYearId": body.get("academicYearId") or body.get("yearId"),
-        "academicYearName": body.get("academicYearName"),
-        "className": body.get("className"),
-        "title": body.get("title"),
-        "tests": body.get("tests") or [],
-        "headers": body.get("headers") or [],
-        "rows": body.get("rows") or [],
-    }
+    required_fields = ["userId", "schoolId", "yearId", "classId", "semester"]
+    query = {field: data.get(field) for field in required_fields}
 
     response = await api_client.update(
         endpoint="update",

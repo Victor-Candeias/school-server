@@ -7,6 +7,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from routes.class_tests_router import normalize_evaluation_moment_templates
 from routes.class_tests_router import normalize_hex_color
 from routes.class_tests_router import enrich_student_moment_values
+from routes.class_tests_router import build_semester_evaluations_summary
+from routes.class_tests_router import validate_evaluation_moment_payload
 
 
 def test_normalize_evaluation_moment_templates_preserves_valid_templates():
@@ -102,6 +104,9 @@ def test_enrich_student_moment_values_adds_total_and_percentage():
             "studentMomentMaxValue": 20,
             "studentMomentPercentage": 80.0,
             "studentMomentPercentageText": "80.0%",
+            "studentMomentGrade": 4,
+            "studentMomentBackgroundColor": "#15803d",
+            "studentMomentTextColor": "#ffffff",
         },
         {
             "_id": "value-2",
@@ -114,6 +119,9 @@ def test_enrich_student_moment_values_adds_total_and_percentage():
             "studentMomentMaxValue": 20,
             "studentMomentPercentage": 80.0,
             "studentMomentPercentageText": "80.0%",
+            "studentMomentGrade": 4,
+            "studentMomentBackgroundColor": "#15803d",
+            "studentMomentTextColor": "#ffffff",
         },
     ]
 
@@ -141,3 +149,80 @@ def test_enrich_student_moment_values_falls_back_to_question_values():
     assert enriched_values[0]["studentMomentTotal"] == 7.5
     assert enriched_values[0]["studentMomentMaxValue"] == 10
     assert enriched_values[0]["studentMomentPercentage"] == 75.0
+    assert enriched_values[0]["studentMomentGrade"] == 4
+
+
+def test_validate_evaluation_moment_payload_requires_questions_total():
+    assert validate_evaluation_moment_payload(
+        {
+            "totalValue": 20,
+            "questions": [
+                {"number": "1", "value": 10},
+                {"number": "2", "value": 5},
+            ],
+        }
+    ) == "O total das questões deve ser 20. Total atual: 15."
+
+
+def test_build_semester_evaluations_summary_calculates_groups_and_final_grade():
+    summary = build_semester_evaluations_summary(
+        {
+            "userId": "user-1",
+            "schoolId": "school-1",
+            "yearId": "year-1",
+            "classId": "class-1",
+            "semester": "1",
+            "title": "Avaliações - 1.º semestre",
+        },
+        [
+            {"_id": "student-1", "name": "Ana", "active": True},
+            {"_id": "student-2", "name": "Bruno", "active": True},
+        ],
+        [
+            {
+                "_id": "moment-1",
+                "name": "Teste 1",
+                "semester": "1",
+                "type": "Teste",
+                "totalValue": 20,
+                "evaluationMomentTemplateWeightPercentage": 60,
+            },
+            {
+                "_id": "moment-2",
+                "name": "Questão aula 1",
+                "semester": "1",
+                "type": "Questão aula",
+                "totalValue": 20,
+                "evaluationMomentTemplateWeightPercentage": 40,
+            },
+        ],
+        [
+            {"momentId": "moment-1", "studentId": "student-1", "questionNumber": "1", "questionValue": 20, "value": 18},
+            {"momentId": "moment-2", "studentId": "student-1", "questionNumber": "1", "questionValue": 20, "value": 14},
+            {"momentId": "moment-1", "studentId": "student-2", "questionNumber": "1", "questionValue": 20, "value": 8},
+            {"momentId": "moment-2", "studentId": "student-2", "questionNumber": "1", "questionValue": 20, "value": 10},
+        ],
+        {
+            "evaluationMomentTemplates": [
+                {"type": "Teste", "weightPercentage": 60},
+                {"type": "Questão aula", "weightPercentage": 40},
+            ],
+            "percentageRanges": None,
+        },
+    )
+
+    assert summary["headers"] == [
+        "Aluno",
+        "Teste 1 (20)",
+        "Teste - Média",
+        "Teste - M*60%",
+        "Questão aula 1 (20)",
+        "Questão aula - Média",
+        "Questão aula - M*40%",
+        "Final",
+        "Nota",
+    ]
+    assert summary["rows"][0] == ["Ana", "18", "18", "10.8", "14", "14", "5.6", "16.4", "4"]
+    assert summary["rows"][1] == ["Bruno", "8", "8", "4.8", "10", "10", "4", "8.8", "2"]
+    assert summary["students"][0]["finalPercentage"] == 82.0
+    assert summary["students"][0]["finalGrade"] == 4

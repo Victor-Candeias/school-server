@@ -108,6 +108,8 @@ export type ApplicationState = {
   setSelectedGradingMomentId: import("react").Dispatch<import("react").SetStateAction<string>>
   selectedAssessmentsSemester: string
   setSelectedAssessmentsSemester: import("react").Dispatch<import("react").SetStateAction<string>>
+  semesterAssessmentSummary: SchoolDocument | null
+  setSemesterAssessmentSummary: import("react").Dispatch<import("react").SetStateAction<SchoolDocument | null>>
   assessmentCellDrafts: Record<string, string>
   setAssessmentCellDrafts: import("react").Dispatch<import("react").SetStateAction<Record<string, string>>>
   chartStudentId: string
@@ -302,12 +304,15 @@ export type ApplicationActions = {
   getStudentMomentPercentage: (student: SchoolDocument, moment: SchoolDocument) => string
   getStudentMomentPercentageValue: (student: SchoolDocument, moment: SchoolDocument) => number
   getStudentMomentPercentageStyle: (student: SchoolDocument, moment: SchoolDocument) => { backgroundColor: string; color: string; }
+  handleSelectAssessmentsSemester: (semester: string) => Promise<void>
   getAssessmentsSemesterMoments: () => SchoolDocument[]
   getAssessmentsSemesterMomentGroups: () => AssessmentMomentGroup[]
   getStudentSavedMomentTotal: (student: SchoolDocument, moment: SchoolDocument) => number
   getStudentAssessmentGroupAverage: (student: SchoolDocument, group: AssessmentMomentGroup) => number
   getStudentAssessmentGroupWeightedValue: (student: SchoolDocument, group: AssessmentMomentGroup) => number
   getStudentAssessmentFinalValue: (student: SchoolDocument, groups: AssessmentMomentGroup[]) => number
+  getStudentAssessmentFinalGrade: (student: SchoolDocument, groups: AssessmentMomentGroup[]) => number
+  getStudentAssessmentFinalStyle: (student: SchoolDocument, groups: AssessmentMomentGroup[]) => { backgroundColor: string; color: string; }
   formatAssessmentValue: (value: number) => string
   getChartData: (student: SchoolDocument) => { name: string; Nota: number; Máximo: number; '%': number; }[]
   getAllStudentsForMomentData: (students: SchoolDocument[], moment: SchoolDocument) => { name: string; Nota: number; Máximo: number; }[]
@@ -315,7 +320,7 @@ export type ApplicationActions = {
   nextChartType: () => void
   exportChartToPdf: () => void
   getAssessmentsDashboardRows: () => string[][]
-  buildSemesterEvaluationsPayload: () => { userId: string; schoolId: string; schoolName: string; yearId: string; academicYearId: string; academicYearName: string; classId: string; className: string; semester: string; title: string; tests: { id: string | null; name: string; totalValue: number; }[]; headers: string[]; rows: string[][]; } | null
+  buildSemesterEvaluationsPayload: () => SchoolDocument | null
   saveSemesterEvaluations: () => Promise<void>
   generateSemesterEvaluationsReport: () => Promise<void>
   getQuestionMaxValue: (question: EvaluationQuestionForm) => number

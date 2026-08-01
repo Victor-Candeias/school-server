@@ -5,7 +5,7 @@ import type { ApplicationActions, ApplicationRuntime, AssessmentMomentGroup } fr
 
 export function useAssessments(
   runtime: ApplicationRuntime,
-): Pick<ApplicationActions, 'loadAllStudentMomentValues' | 'getSelectedGradingMoment' | 'getStudentMomentValueKey' | 'getStudentMomentValueRecord' | 'isSameStudentMomentValue' | 'mergeStudentMomentValues' | 'hasStudentMomentValueRecord' | 'buildStudentMomentValuePayload' | 'handleSelectGradingMoment' | 'getSavedStudentMomentCellValue' | 'getStudentMomentCellValue' | 'getAssessmentChangePayloads' | 'hasUnsavedAssessmentChanges' | 'canLeaveAssessmentMoment' | 'removeAssessmentDraftsForMoment' | 'getStudentMomentServerMetric' | 'getStudentMomentTotal' | 'getStudentMomentProcessedPercentageValue' | 'getAssessmentsSemesterMoments' | 'getAssessmentsSemesterMomentGroups' | 'getStudentSavedMomentTotal' | 'getStudentAssessmentGroupAverage' | 'getStudentAssessmentGroupWeightedValue' | 'getStudentAssessmentFinalValue' | 'formatAssessmentValue' | 'getAllStudentsForMomentData' | 'getAssessmentsDashboardRows' | 'buildSemesterEvaluationsPayload' | 'saveSemesterEvaluations' | 'updateAssessmentCellDraft' | 'saveAssessmentCell' | 'saveAssessmentChanges'> {
+): Pick<ApplicationActions, 'loadAllStudentMomentValues' | 'getSelectedGradingMoment' | 'getStudentMomentValueKey' | 'getStudentMomentValueRecord' | 'isSameStudentMomentValue' | 'mergeStudentMomentValues' | 'hasStudentMomentValueRecord' | 'buildStudentMomentValuePayload' | 'handleSelectGradingMoment' | 'getSavedStudentMomentCellValue' | 'getStudentMomentCellValue' | 'getAssessmentChangePayloads' | 'hasUnsavedAssessmentChanges' | 'canLeaveAssessmentMoment' | 'removeAssessmentDraftsForMoment' | 'getStudentMomentServerMetric' | 'getStudentMomentTotal' | 'getStudentMomentProcessedPercentageValue' | 'handleSelectAssessmentsSemester' | 'getAssessmentsSemesterMoments' | 'getAssessmentsSemesterMomentGroups' | 'getStudentSavedMomentTotal' | 'getStudentAssessmentGroupAverage' | 'getStudentAssessmentGroupWeightedValue' | 'getStudentAssessmentFinalValue' | 'getStudentAssessmentFinalGrade' | 'getStudentAssessmentFinalStyle' | 'formatAssessmentValue' | 'getAllStudentsForMomentData' | 'getAssessmentsDashboardRows' | 'buildSemesterEvaluationsPayload' | 'saveSemesterEvaluations' | 'updateAssessmentCellDraft' | 'saveAssessmentCell' | 'saveAssessmentChanges'> {
 async function loadAllStudentMomentValues() {
     try {
       const existingValues = await schoolApi.findStudentMomentValues({ userId: runtime.getLoggedUserId() })
@@ -347,6 +347,64 @@ function getStudentMomentProcessedPercentageValue(student: SchoolDocument, momen
     return getStudentMomentServerMetric(student, moment, 'studentMomentPercentage')
   }
 
+function getSemesterEvaluationRequest(semester: string): SchoolDocument | null {
+    if (!runtime.selectedSchool || !runtime.selectedAcademicYearDocument || !runtime.selectedClass || !semester) {
+      runtime.setClassesError('Seleciona escola, ano letivo, turma e semestre antes de consultar avaliações.')
+      return null
+    }
+
+    const schoolId = runtime.getSchoolId(runtime.selectedSchool)
+    const yearId = runtime.getDocumentId(runtime.selectedAcademicYearDocument)
+    const classId = runtime.getDocumentId(runtime.selectedClass)
+
+    if (!schoolId || !yearId || !classId) {
+      runtime.setClassesError('Não foi possível identificar todos os dados para consultar avaliações.')
+      return null
+    }
+
+    return {
+      userId: runtime.getLoggedUserId(),
+      schoolId,
+      schoolName: runtime.getSchoolTitle(runtime.selectedSchool),
+      yearId,
+      academicYearId: yearId,
+      academicYearName: runtime.getAcademicYearTitle(runtime.selectedAcademicYearDocument),
+      classId,
+      className: runtime.getClassTitle(runtime.selectedClass),
+      semester,
+      title: `Avaliações - ${semester}.º semestre`,
+    }
+  }
+
+async function handleSelectAssessmentsSemester(semester: string) {
+    runtime.setSelectedAssessmentsSemester(semester)
+    runtime.setSemesterAssessmentSummary(null)
+
+    if (!semester) {
+      runtime.setClassesError(null)
+      return
+    }
+
+    const payload = getSemesterEvaluationRequest(semester)
+    if (!payload) {
+      return
+    }
+
+    runtime.setIsLoadingClasses(true)
+    runtime.setClassesError(null)
+
+    try {
+      const summary = await schoolApi.calculateSemesterEvaluations(payload)
+      runtime.setSemesterAssessmentSummary(summary)
+    } catch (summaryError) {
+      runtime.setClassesError(
+        summaryError instanceof Error ? summaryError.message : 'Erro ao calcular avaliações do semestre.',
+      )
+    } finally {
+      runtime.setIsLoadingClasses(false)
+    }
+  }
+
 function getAssessmentsSemesterMoments() {
     if (!runtime.selectedClass || !runtime.selectedAssessmentsSemester) {
       return []
@@ -359,6 +417,30 @@ function getAssessmentsSemesterMoments() {
   }
 
 function getAssessmentsSemesterMomentGroups() {
+    const summaryGroups = runtime.semesterAssessmentSummary?.groups
+    if (Array.isArray(summaryGroups)) {
+      return summaryGroups.flatMap((group) => {
+        if (!group || typeof group !== 'object' || Array.isArray(group)) {
+          return []
+        }
+
+        const groupRecord = group as Record<string, unknown>
+        const moments = Array.isArray(groupRecord.moments) ? groupRecord.moments : []
+
+        return [{
+          type: runtime.getStringValue(groupRecord.type) || 'Sem tipo',
+          weightPercentage: Number(groupRecord.weightPercentage) || 0,
+          moments: moments.map((moment) => {
+            const momentRecord = runtime.getRecordValue(moment)
+            const summaryMomentId = runtime.getStringValue(momentRecord.id)
+            return runtime.allEvaluationMoments.find((evaluationMoment) =>
+              runtime.getDocumentId(evaluationMoment) === summaryMomentId
+            ) ?? momentRecord
+          }),
+        }]
+      })
+    }
+
     return getAssessmentsSemesterMoments().reduce<AssessmentMomentGroup[]>((groups, moment) => {
       const type = runtime.getEvaluationMomentTypeLabel(moment) || 'Sem tipo'
       const existingGroup = groups.find((group) => group.type === type)
@@ -384,10 +466,80 @@ function getAssessmentsSemesterMomentGroups() {
   }
 
 function getStudentSavedMomentTotal(student: SchoolDocument, moment: SchoolDocument) {
+    const serverMoment = getStudentAssessmentSummaryMoment(student, moment)
+    if (serverMoment) {
+      return Number(serverMoment.studentTotal) || 0
+    }
+
     return getStudentMomentTotal(student, moment)
   }
 
+function getStudentAssessmentSummary(student: SchoolDocument) {
+    const summaryStudents = runtime.semesterAssessmentSummary?.students
+    const studentId = runtime.getDocumentId(student)
+
+    if (!Array.isArray(summaryStudents) || !studentId) {
+      return null
+    }
+
+    const matchingSummary = summaryStudents.find((summaryStudent) => {
+      const summaryRecord = runtime.getRecordValue(summaryStudent)
+      return runtime.getStringValue(summaryRecord.studentId) === studentId
+    })
+
+    return matchingSummary ? runtime.getRecordValue(matchingSummary) : null
+  }
+
+function getStudentAssessmentSummaryGroup(student: SchoolDocument, groupType: string) {
+    const studentSummary = getStudentAssessmentSummary(student)
+    const groups = studentSummary?.groups
+
+    if (!Array.isArray(groups)) {
+      return null
+    }
+
+    const matchingGroup = groups.find((group) => {
+      const groupRecord = runtime.getRecordValue(group)
+      return runtime.getStringValue(groupRecord.type) === groupType
+    })
+
+    return matchingGroup ? runtime.getRecordValue(matchingGroup) : null
+  }
+
+function getStudentAssessmentSummaryMoment(student: SchoolDocument, moment: SchoolDocument) {
+    const studentSummary = getStudentAssessmentSummary(student)
+    const groups = studentSummary?.groups
+    const momentId = runtime.getDocumentId(moment)
+
+    if (!Array.isArray(groups) || !momentId) {
+      return null
+    }
+
+    for (const group of groups) {
+      const groupRecord = runtime.getRecordValue(group)
+      const moments = groupRecord.moments
+      if (!Array.isArray(moments)) {
+        continue
+      }
+
+      const matchingMoment = moments.find((summaryMoment) => {
+        const summaryMomentRecord = runtime.getRecordValue(summaryMoment)
+        return runtime.getStringValue(summaryMomentRecord.id) === momentId
+      })
+      if (matchingMoment) {
+        return runtime.getRecordValue(matchingMoment)
+      }
+    }
+
+    return null
+  }
+
 function getStudentAssessmentGroupAverage(student: SchoolDocument, group: AssessmentMomentGroup) {
+    const serverGroup = getStudentAssessmentSummaryGroup(student, group.type)
+    if (serverGroup) {
+      return Number(serverGroup.average) || 0
+    }
+
     if (group.moments.length === 0) {
       return 0
     }
@@ -400,14 +552,50 @@ function getStudentAssessmentGroupAverage(student: SchoolDocument, group: Assess
   }
 
 function getStudentAssessmentGroupWeightedValue(student: SchoolDocument, group: AssessmentMomentGroup) {
+    const serverGroup = getStudentAssessmentSummaryGroup(student, group.type)
+    if (serverGroup) {
+      return Number(serverGroup.weightedValue) || 0
+    }
+
     return getStudentAssessmentGroupAverage(student, group) * (group.weightPercentage / 100)
   }
 
 function getStudentAssessmentFinalValue(student: SchoolDocument, groups: AssessmentMomentGroup[]) {
+    const serverStudent = getStudentAssessmentSummary(student)
+    if (serverStudent) {
+      return Number(serverStudent.finalValue) || 0
+    }
+
     return groups.reduce(
       (finalValue, group) => finalValue + getStudentAssessmentGroupWeightedValue(student, group),
       0,
     )
+  }
+
+function getStudentAssessmentFinalGrade(student: SchoolDocument, groups: AssessmentMomentGroup[]) {
+    const serverStudent = getStudentAssessmentSummary(student)
+    if (serverStudent) {
+      return Number(serverStudent.finalGrade) || 0
+    }
+
+    void groups
+    return 0
+  }
+
+function getStudentAssessmentFinalStyle(student: SchoolDocument, groups: AssessmentMomentGroup[]) {
+    const serverStudent = getStudentAssessmentSummary(student)
+    if (serverStudent) {
+      return {
+        backgroundColor: runtime.getStringValue(serverStudent.finalBackgroundColor) || '#ffffff',
+        color: runtime.getStringValue(serverStudent.finalTextColor) || '#0f172a',
+      }
+    }
+
+    void groups
+    return {
+      backgroundColor: '#ffffff',
+      color: '#0f172a',
+    }
   }
 
 function formatAssessmentValue(value: number) {
@@ -423,6 +611,11 @@ function getAllStudentsForMomentData(students: SchoolDocument[], moment: SchoolD
   }
 
 function getAssessmentsDashboardRows() {
+    const summaryRows = runtime.semesterAssessmentSummary?.rows
+    if (Array.isArray(summaryRows)) {
+      return summaryRows.map((row) => Array.isArray(row) ? row.map(String) : [])
+    }
+
     if (!runtime.selectedClass) {
       return []
     }
@@ -440,51 +633,7 @@ function getAssessmentsDashboardRows() {
   }
 
 function buildSemesterEvaluationsPayload() {
-    if (!runtime.selectedSchool || !runtime.selectedAcademicYearDocument || !runtime.selectedClass || !runtime.selectedAssessmentsSemester) {
-      runtime.setClassesError('Seleciona escola, ano letivo, turma e semestre antes de gravar avaliações.')
-      return null
-    }
-
-    const schoolId = runtime.getSchoolId(runtime.selectedSchool)
-    const yearId = runtime.getDocumentId(runtime.selectedAcademicYearDocument)
-    const classId = runtime.getDocumentId(runtime.selectedClass)
-
-    if (!schoolId || !yearId || !classId) {
-      runtime.setClassesError('Não foi possível identificar todos os dados para gravar avaliações.')
-      return null
-    }
-
-    const groups = getAssessmentsSemesterMomentGroups()
-    const moments = groups.flatMap((group) => group.moments)
-    const headers = [
-      'Aluno',
-      ...groups.flatMap((group) => [
-        ...group.moments.map((moment) => `${runtime.getStringValue(moment.name)} (${runtime.getEvaluationMomentMaxValue(moment)})`),
-        `${group.type} - Média`,
-        `${group.type} - M*${formatAssessmentValue(group.weightPercentage)}%`,
-      ]),
-      'Final',
-    ]
-
-    return {
-      userId: runtime.getLoggedUserId(),
-      schoolId,
-      schoolName: runtime.getSchoolTitle(runtime.selectedSchool),
-      yearId,
-      academicYearId: yearId,
-      academicYearName: runtime.getAcademicYearTitle(runtime.selectedAcademicYearDocument),
-      classId,
-      className: runtime.getClassTitle(runtime.selectedClass),
-      semester: runtime.selectedAssessmentsSemester,
-      title: `Avaliações - ${runtime.selectedAssessmentsSemester}.º semestre`,
-      tests: moments.map((moment) => ({
-        id: runtime.getDocumentId(moment),
-        name: runtime.getStringValue(moment.name),
-        totalValue: runtime.getEvaluationMomentMaxValue(moment),
-      })),
-      headers,
-      rows: getAssessmentsDashboardRows(),
-    }
+    return getSemesterEvaluationRequest(runtime.selectedAssessmentsSemester)
   }
 
 async function saveSemesterEvaluations() {
@@ -497,7 +646,8 @@ async function saveSemesterEvaluations() {
     runtime.setClassesError(null)
 
     try {
-      await schoolApi.saveSemesterEvaluations(payload)
+      const savedSummary = await schoolApi.saveSemesterEvaluations(payload)
+      runtime.setSemesterAssessmentSummary(savedSummary.value ?? payload)
       runtime.setMessage('Avaliações gravadas com sucesso.')
     } catch (saveError) {
       runtime.setClassesError(saveError instanceof Error ? saveError.message : 'Erro ao gravar avaliações.')
@@ -612,12 +762,15 @@ async function saveAssessmentChanges() {
     getStudentMomentServerMetric,
     getStudentMomentTotal,
     getStudentMomentProcessedPercentageValue,
+    handleSelectAssessmentsSemester,
     getAssessmentsSemesterMoments,
     getAssessmentsSemesterMomentGroups,
     getStudentSavedMomentTotal,
     getStudentAssessmentGroupAverage,
     getStudentAssessmentGroupWeightedValue,
     getStudentAssessmentFinalValue,
+    getStudentAssessmentFinalGrade,
+    getStudentAssessmentFinalStyle,
     formatAssessmentValue,
     getAllStudentsForMomentData,
     getAssessmentsDashboardRows,

@@ -88,6 +88,7 @@ const [newStudentCalendarTask, setNewStudentCalendarTask] =
     useState<StudentCalendarTaskForm>(EMPTY_STUDENT_CALENDAR_TASK_FORM)
 const [selectedGradingMomentId, setSelectedGradingMomentId] = useState('')
 const [selectedAssessmentsSemester, setSelectedAssessmentsSemester] = useState('')
+const [semesterAssessmentSummary, setSemesterAssessmentSummary] = useState<SchoolDocument | null>(null)
 const [assessmentCellDrafts, setAssessmentCellDrafts] = useState<Record<string, string>>({})
 const [chartStudentId, setChartStudentId] = useState('')
 const [chartType, setChartType] = useState<ChartType>('bar')
@@ -233,6 +234,8 @@ const isStudentCalendarFullWeek = studentCalendarWeekMode === 'full'
     setSelectedGradingMomentId,
     selectedAssessmentsSemester,
     setSelectedAssessmentsSemester,
+    semesterAssessmentSummary,
+    setSemesterAssessmentSummary,
     assessmentCellDrafts,
     setAssessmentCellDrafts,
     chartStudentId,

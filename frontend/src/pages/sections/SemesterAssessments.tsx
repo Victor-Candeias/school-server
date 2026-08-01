@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import type { SchoolApplicationModel } from '../../hooks/useSchoolApplication'
-import { DEFAULT_PERCENTAGE_RANGES } from '../../utils/constants'
 
 
 type SemesterAssessmentsProps = {
@@ -10,7 +9,7 @@ type SemesterAssessmentsProps = {
 export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
   const {
     selectedAssessmentsSemester,
-    setSelectedAssessmentsSemester,
+    handleSelectAssessmentsSemester,
     generateSemesterEvaluationsReport,
     isLoadingClasses,
     saveSemesterEvaluations,
@@ -25,7 +24,8 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
     getStudentAssessmentGroupAverage,
     getStudentAssessmentGroupWeightedValue,
     getStudentAssessmentFinalValue,
-    percentageRanges,
+    getStudentAssessmentFinalGrade,
+    getStudentAssessmentFinalStyle,
     formatAssessmentValue,
   } = model
 
@@ -56,41 +56,6 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
   )
   const assessmentGridColumns = `minmax(140px, 1.3fr) repeat(${assessmentColumnCount}, minmax(60px, 1fr))`
 
-  const finalMaxValue = momentGroups.reduce((total, group) => {
-    if (group.moments.length === 0) {
-      return total
-    }
-
-    const groupMaxAverage = group.moments.reduce(
-      (groupTotal, moment) => groupTotal + getEvaluationMomentMaxValue(moment),
-      0,
-    ) / group.moments.length
-
-    return total + groupMaxAverage * (group.weightPercentage / 100)
-  }, 0)
-
-  const getFinalPercentageValue = (value: number) =>
-    finalMaxValue ? (value / finalMaxValue) * 100 : value
-
-  const getFinalRange = (value: number) => {
-    const finalPercentage = getFinalPercentageValue(value)
-
-    return percentageRanges.find((range) => finalPercentage >= range.min && finalPercentage <= range.max)
-      ?? percentageRanges[percentageRanges.length - 1]
-      ?? DEFAULT_PERCENTAGE_RANGES[0]
-  }
-
-  const getFinalGrade = (value: number) => getFinalRange(value)?.nota ?? 0
-
-  const getFinalStyle = (value: number) => {
-    const range = getFinalRange(value)
-
-    return {
-      backgroundColor: range.backgroundColor,
-      color: range.textColor,
-    }
-  }
-
   return (
     (
                   <section className="students-panel" aria-label="Avaliações por semestre">
@@ -103,7 +68,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                         Semestre
                         <select
                           value={selectedAssessmentsSemester}
-                          onChange={(event) => setSelectedAssessmentsSemester(event.target.value)}
+                          onChange={(event) => void handleSelectAssessmentsSemester(event.target.value)}
                         >
                           <option value="">Selecionar semestre</option>
                           <option value="1">1.º semestre</option>
@@ -233,7 +198,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                         </div>
                         {getStudentsForClass(selectedClass).map((student, studentIndex) => {
                           const finalValue = getStudentAssessmentFinalValue(student, momentGroups)
-                          const finalStyle = getFinalStyle(finalValue)
+                          const finalStyle = getStudentAssessmentFinalStyle(student, momentGroups)
 
                           return (
                           <div
@@ -282,7 +247,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                               role="cell"
                               style={finalStyle}
                             >
-                              {getFinalGrade(finalValue)}
+                              {getStudentAssessmentFinalGrade(student, momentGroups)}
                             </strong>
                           </div>
                           )
@@ -291,7 +256,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                       <div className="semester-assessments-mobile-list" aria-label="Avaliações por semestre em mobile">
                         {getStudentsForClass(selectedClass).map((student, studentIndex) => {
                           const finalValue = getStudentAssessmentFinalValue(student, momentGroups)
-                          const finalStyle = getFinalStyle(finalValue)
+                          const finalStyle = getStudentAssessmentFinalStyle(student, momentGroups)
 
                           return (
                           <article
@@ -353,7 +318,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                               </p>
                               <p style={finalStyle}>
                                 <span>Nota:</span>
-                                <strong>{getFinalGrade(finalValue)}</strong>
+                                <strong>{getStudentAssessmentFinalGrade(student, momentGroups)}</strong>
                               </p>
                             </div>
                           </article>
