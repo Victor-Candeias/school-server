@@ -248,6 +248,21 @@
   line-height: 1;
 }
 
+.semester-assessments-weight-display {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  padding: 2px 5px;
+  border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+  border-radius: 4px;
+  color: inherit;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  font-size: 0.615rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
 .semester-assessments-group-toggle:hover,
 .semester-assessments-group-toggle:focus-visible {
   color: var(--text);
@@ -292,6 +307,10 @@
   color: var(--assessment-group-text);
   background: var(--assessment-group-weighted-background);
   font-weight: 800;
+}
+
+.semester-assessments-weighted-head {
+  gap: 6px;
 }
 
 .semester-assessments-empty-subhead {

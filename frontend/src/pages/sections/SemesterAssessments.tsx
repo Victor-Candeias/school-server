@@ -244,6 +244,9 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 }}
                               >
                                 {group.type}
+                                <span className="semester-assessments-weight-display">
+                                  {formatAssessmentValue(group.weightPercentage)}%
+                                </span>
                                 <button
                                   className="semester-assessments-group-toggle"
                                   type="button"
@@ -274,7 +277,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                           >
                             <span className="semester-assessments-empty-subhead" aria-hidden="true" />
                             {momentGroups.flatMap((group, groupIndex) => [
-                              ...group.moments.map((moment, momentIndex) => (
+                              ...group.moments.map((moment) => (
                                 <span
                                   className={`semester-assessments-group-cell ${getGroupClassName(groupIndex)}`}
                                   role="columnheader"
@@ -286,19 +289,6 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                       ({getEvaluationMomentMaxValue(moment)})
                                     </strong>
                                   </span>
-                                  {momentIndex === 0 && (
-                                    <label className="semester-assessments-weight-field">
-                                      <span className="semester-assessments-weight-label">%</span>
-                                      <input
-                                        type="text"
-                                        inputMode="decimal"
-                                        value={getAssessmentWeightInputValue(group.type, group.weightPercentage)}
-                                        onChange={(event) => updateAssessmentWeight(group.type, event.target.value)}
-                                        onFocus={(event) => event.currentTarget.select()}
-                                        aria-label={`Ponderação de ${group.type}`}
-                                      />
-                                    </label>
-                                  )}
                                 </span>
                               )),
                               ...(isGroupMetricsHidden(group.type) ? [] : [
@@ -316,6 +306,17 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 title={`Média × ${formatAssessmentValue(group.weightPercentage)}%`}
                               >
                                 M*
+                                <label className="semester-assessments-weight-field">
+                                  <span className="semester-assessments-weight-label">%</span>
+                                  <input
+                                    type="text"
+                                    inputMode="decimal"
+                                    value={getAssessmentWeightInputValue(group.type, group.weightPercentage)}
+                                    onChange={(event) => updateAssessmentWeight(group.type, event.target.value)}
+                                    onFocus={(event) => event.currentTarget.select()}
+                                    aria-label={`Ponderação de ${group.type}`}
+                                  />
+                                </label>
                               </span>,
                               ]),
                             ])}
@@ -414,6 +415,9 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                     onClick={() => toggleGroupMetrics(group.type)}
                                   >
                                     <span>{group.type}</span>
+                                    <span className="semester-assessments-mobile-weight-display">
+                                      {formatAssessmentValue(group.weightPercentage)}%
+                                    </span>
                                     <span aria-hidden="true">{metricsHidden ? '+' : '−'}</span>
                                   </button>
                                   <div className="semester-assessments-mobile-moments">
