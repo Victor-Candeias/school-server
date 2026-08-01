@@ -293,6 +293,33 @@
   font-weight: 800;
 }
 
+.semester-assessments-weight-field {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: inherit;
+}
+
+.semester-assessments-weight-field input {
+  width: 48px;
+  padding: 3px 4px;
+  border: 1px solid color-mix(in srgb, currentColor 45%, transparent);
+  border-radius: 4px;
+  color: var(--text);
+  background: var(--surface);
+  font: inherit;
+  font-size: 0.692rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.semester-assessments-weight-field input:focus {
+  border-color: var(--primary);
+  outline: 0;
+  box-shadow: 0 0 0 2px rgb(37 99 235 / 16%);
+}
+
 .semester-assessments-final-head,
 .semester-assessments-final-subhead,
 .semester-assessments-final-cell,

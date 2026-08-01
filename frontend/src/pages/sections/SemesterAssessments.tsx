@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type { SchoolDocument } from '../../api/school'
 import type { SchoolApplicationModel } from '../../hooks/useSchoolApplication'
 
 
@@ -14,7 +15,6 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
     handleSelectAssessmentsSemester,
     generateSemesterEvaluationsReport,
     isLoadingClasses,
-    saveSemesterEvaluations,
     getAssessmentsSemesterMoments,
     getAssessmentsSemesterMomentGroups,
     getStudentsForClass,
@@ -24,16 +24,85 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
     getEvaluationMomentMaxValue,
     getStudentSavedMomentTotal,
     getStudentAssessmentGroupAverage,
-    getStudentAssessmentGroupWeightedValue,
-    getStudentAssessmentFinalValue,
-    getStudentAssessmentFinalGrade,
-    getStudentAssessmentFinalStyle,
-    hasUnsavedSemesterEvaluationsChanges,
     formatAssessmentValue,
+    evaluationMomentTemplates,
+    percentageRanges,
   } = model
 
   const [visibleGroupMetrics, setVisibleGroupMetrics] = useState<Set<string>>(() => new Set())
   const [selectedAssessmentStudentId, setSelectedAssessmentStudentId] = useState(ALL_STUDENTS_VALUE)
+  const [assessmentWeightOverrides, setAssessmentWeightOverrides] = useState<Record<string, number>>({})
+
+  const initialMomentGroups = getAssessmentsSemesterMomentGroups()
+  const initialWeightsByType = Object.fromEntries(
+    initialMomentGroups.map((group) => {
+      const configuredWeight = evaluationMomentTemplates.find((template) => template.type === group.type)?.weightPercentage
+      return [
+        group.type,
+        Number.isFinite(configuredWeight) ? configuredWeight : group.weightPercentage,
+      ]
+    }),
+  )
+  const momentGroups = initialMomentGroups.map((group) => ({
+    ...group,
+    weightPercentage: assessmentWeightOverrides[group.type] ?? initialWeightsByType[group.type] ?? group.weightPercentage,
+  }))
+  const hasAssessmentWeightOverrides = Object.keys(assessmentWeightOverrides).length > 0
+  const updateAssessmentWeight = (groupType: string, value: string) => {
+    const parsedValue = Number(value)
+    if (!Number.isFinite(parsedValue)) {
+      return
+    }
+
+    setAssessmentWeightOverrides((currentOverrides) => ({
+      ...currentOverrides,
+      [groupType]: Math.min(100, Math.max(0, parsedValue)),
+    }))
+  }
+  const resetAssessmentWeights = () => setAssessmentWeightOverrides({})
+  const getStudentAssessmentGroupWeightedValue = (student: SchoolDocument, group: (typeof momentGroups)[number]) =>
+    getStudentAssessmentGroupAverage(student, group) * (group.weightPercentage / 100)
+  const getStudentAssessmentFinalValue = (student: SchoolDocument) =>
+    momentGroups.reduce(
+      (finalValue, group) => finalValue + getStudentAssessmentGroupWeightedValue(student, group),
+      0,
+    )
+  const getStudentAssessmentFinalMaxValue = () =>
+    momentGroups.reduce((finalMaxValue, group) => {
+      if (group.moments.length === 0) {
+        return finalMaxValue
+      }
+
+      const groupMaxAverage = group.moments.reduce(
+        (total, moment) => total + getEvaluationMomentMaxValue(moment),
+        0,
+      ) / group.moments.length
+      return finalMaxValue + (groupMaxAverage * (group.weightPercentage / 100))
+    }, 0)
+  const getStudentAssessmentFinalPercentage = (student: SchoolDocument) => {
+    const finalMaxValue = getStudentAssessmentFinalMaxValue()
+    const finalValue = getStudentAssessmentFinalValue(student)
+    return finalMaxValue ? (finalValue / finalMaxValue) * 100 : finalValue
+  }
+  const getStudentAssessmentFinalRange = (student: SchoolDocument) => {
+    const finalPercentage = getStudentAssessmentFinalPercentage(student)
+    return percentageRanges.find((range) => finalPercentage >= range.min && finalPercentage <= range.max)
+      ?? percentageRanges[percentageRanges.length - 1]
+  }
+  const getStudentAssessmentFinalGrade = (student: SchoolDocument) =>
+    getStudentAssessmentFinalRange(student)?.nota ?? 0
+  const getStudentAssessmentFinalStyle = (student: SchoolDocument) => {
+    const finalRange = getStudentAssessmentFinalRange(student)
+    return {
+      backgroundColor: finalRange?.backgroundColor ?? '#ffffff',
+      color: finalRange?.textColor ?? '#0f172a',
+    }
+  }
+  const handleAssessmentSemesterChange = (semester: string) => {
+    setAssessmentWeightOverrides({})
+    setSelectedAssessmentStudentId(ALL_STUDENTS_VALUE)
+    void handleSelectAssessmentsSemester(semester)
+  }
 
   if (!selectedClass) return null
 
@@ -43,7 +112,6 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
   const visibleStudents = activeAssessmentStudentId === ALL_STUDENTS_VALUE
     ? students
     : students.filter((student) => getDocumentId(student) === activeAssessmentStudentId)
-  const momentGroups = getAssessmentsSemesterMomentGroups()
   const getGroupClassName = (groupIndex: number) =>
     `semester-assessments-group-${groupIndex % 4}`
   const isGroupMetricsHidden = (groupType: string) => !visibleGroupMetrics.has(groupType)
@@ -78,7 +146,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                         Semestre
                         <select
                           value={selectedAssessmentsSemester}
-                          onChange={(event) => void handleSelectAssessmentsSemester(event.target.value)}
+                          onChange={(event) => handleAssessmentSemesterChange(event.target.value)}
                         >
                           <option value="">Selecionar semestre</option>
                           <option value="1">1.º semestre</option>
@@ -115,14 +183,16 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                             Relatório
                           </button>
                         )}
-                        <button
-                          type="button"
-                          className="assessment-action-button assessment-save-button"
-                          onClick={() => void saveSemesterEvaluations()}
-                          disabled={!hasUnsavedSemesterEvaluationsChanges() || isLoadingClasses}
-                        >
-                          Gravar
-                        </button>
+                        {selectedAssessmentsSemester && momentGroups.length > 0 && (
+                          <button
+                            type="button"
+                            className="assessment-action-button assessment-reset-button"
+                            onClick={resetAssessmentWeights}
+                            disabled={!hasAssessmentWeightOverrides}
+                          >
+                            Repor
+                          </button>
+                        )}
                       </div>
                     </div>
                     {!selectedAssessmentsSemester ? (
@@ -216,7 +286,19 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 key={`${group.type}-weighted`}
                                 title={`Média × ${formatAssessmentValue(group.weightPercentage)}%`}
                               >
-                                M*{formatAssessmentValue(group.weightPercentage)}%
+                                <label className="semester-assessments-weight-field">
+                                  <span>M*</span>
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    step="0.1"
+                                    value={group.weightPercentage}
+                                    onChange={(event) => updateAssessmentWeight(group.type, event.target.value)}
+                                    aria-label={`Ponderação de ${group.type}`}
+                                  />
+                                  <span>%</span>
+                                </label>
                               </span>,
                               ]),
                             ])}
@@ -228,8 +310,8 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                           </div>
                         </div>
                         {visibleStudents.map((student, studentIndex) => {
-                          const finalValue = getStudentAssessmentFinalValue(student, momentGroups)
-                          const finalStyle = getStudentAssessmentFinalStyle(student, momentGroups)
+                          const finalValue = getStudentAssessmentFinalValue(student)
+                          const finalStyle = getStudentAssessmentFinalStyle(student)
 
                           return (
                           <div
@@ -278,7 +360,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                               role="cell"
                               style={finalStyle}
                             >
-                              {getStudentAssessmentFinalGrade(student, momentGroups)}
+                              {getStudentAssessmentFinalGrade(student)}
                             </strong>
                           </div>
                           )
@@ -286,8 +368,8 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                       </div>
                       <div className="semester-assessments-mobile-list" aria-label="Avaliações por semestre em mobile">
                         {visibleStudents.map((student, studentIndex) => {
-                          const finalValue = getStudentAssessmentFinalValue(student, momentGroups)
-                          const finalStyle = getStudentAssessmentFinalStyle(student, momentGroups)
+                          const finalValue = getStudentAssessmentFinalValue(student)
+                          const finalStyle = getStudentAssessmentFinalStyle(student)
 
                           return (
                           <article
@@ -334,7 +416,21 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                         <strong>{formatAssessmentValue(getStudentAssessmentGroupAverage(student, group))}</strong>
                                       </p>
                                       <p>
-                                        <span>Ponderação:</span>
+                                        <label className="semester-assessments-mobile-weight-field">
+                                          <span>Ponderação:</span>
+                                          <span>
+                                            <input
+                                              type="number"
+                                              min="0"
+                                              max="100"
+                                              step="0.1"
+                                              value={group.weightPercentage}
+                                              onChange={(event) => updateAssessmentWeight(group.type, event.target.value)}
+                                              aria-label={`Ponderação de ${group.type}`}
+                                            />
+                                            %
+                                          </span>
+                                        </label>
                                         <strong>{formatAssessmentValue(getStudentAssessmentGroupWeightedValue(student, group))}</strong>
                                       </p>
                                     </div>
@@ -349,7 +445,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                               </p>
                               <p style={finalStyle}>
                                 <span>Nota:</span>
-                                <strong>{getStudentAssessmentFinalGrade(student, momentGroups)}</strong>
+                                <strong>{getStudentAssessmentFinalGrade(student)}</strong>
                               </p>
                             </div>
                           </article>
