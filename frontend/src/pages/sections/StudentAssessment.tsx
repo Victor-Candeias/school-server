@@ -60,6 +60,7 @@ export function StudentAssessment({ model }: StudentAssessmentProps) {
                         <div className="assessment-panel-actions">
                           <button
                             type="button"
+                            className="assessment-action-button"
                             onClick={() => generateAssessmentReport()}
                             disabled={isLoadingClasses}
                           >
@@ -67,6 +68,7 @@ export function StudentAssessment({ model }: StudentAssessmentProps) {
                           </button>
                           <button
                             type="button"
+                            className="assessment-action-button assessment-save-button"
                             onClick={() => void saveAssessmentChanges()}
                             disabled={!hasUnsavedAssessmentChanges() || isLoadingClasses}
                           >

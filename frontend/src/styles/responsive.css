@@ -410,6 +410,11 @@
     margin: 0;
   }
 
+  .assessment-panel-actions .assessment-action-button {
+    width: auto;
+    min-width: 0;
+  }
+
   .student-assessment-table {
     gap: 10px;
     overflow: visible;

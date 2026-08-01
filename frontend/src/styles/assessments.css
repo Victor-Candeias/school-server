@@ -48,6 +48,19 @@
   align-items: flex-start;
 }
 
+.assessment-panel-actions .assessment-action-button {
+  width: 112px;
+  min-width: 112px;
+}
+
+.assessment-panel-actions .assessment-save-button {
+  background: var(--success);
+}
+
+.assessment-panel-actions .assessment-save-button:hover:not(:disabled) {
+  background: #15803d;
+}
+
 /* ── Assessment table ────────────────────────────────── */
 .student-assessment-table {
   display: grid;

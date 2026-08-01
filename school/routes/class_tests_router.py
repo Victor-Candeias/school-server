@@ -647,6 +647,16 @@ def build_semester_evaluations_summary(metadata, students, moments, value_docume
     }
 
 
+def get_semester_evaluations_comparison_payload(document):
+    return {
+        "tests": document.get("tests") or [],
+        "groups": document.get("groups") or [],
+        "headers": document.get("headers") or [],
+        "rows": document.get("rows") or [],
+        "students": document.get("students") or [],
+    }
+
+
 async def find_moments_for_values(value_documents, query):
     moment_query = {}
 
@@ -746,6 +756,26 @@ async def get_semester_evaluations_summary(body):
         moments_response.get("documents") or [],
         values_response.get("documents") or [],
         settings,
+    )
+    saved_response = await api_client.find(
+        endpoint="find",
+        payload={
+            "collection": SEMESTER_EVALUATIONS_COLLECTION,
+            "query": {
+                "userId": user_id,
+                "schoolId": body.get("schoolId"),
+                "yearId": body.get("yearId"),
+                "classId": class_id,
+                "semester": str(body.get("semester")),
+            },
+        },
+    )
+    saved_documents = saved_response.get("documents") or []
+    saved_summary = saved_documents[0] if saved_documents else None
+    summary["hasUnsavedChanges"] = (
+        saved_summary is None
+        or get_semester_evaluations_comparison_payload(saved_summary)
+        != get_semester_evaluations_comparison_payload(summary)
     )
 
     return summary, None
@@ -1400,6 +1430,7 @@ async def upsert_semester_evaluations(request: Request, _: None = Depends(utilit
     if error_response:
         return error_response
 
+    data["hasUnsavedChanges"] = False
     required_fields = ["userId", "schoolId", "yearId", "classId", "semester"]
     query = {field: data.get(field) for field in required_fields}
 

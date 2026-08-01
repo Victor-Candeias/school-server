@@ -313,6 +313,7 @@ export type ApplicationActions = {
   getStudentAssessmentFinalValue: (student: SchoolDocument, groups: AssessmentMomentGroup[]) => number
   getStudentAssessmentFinalGrade: (student: SchoolDocument, groups: AssessmentMomentGroup[]) => number
   getStudentAssessmentFinalStyle: (student: SchoolDocument, groups: AssessmentMomentGroup[]) => { backgroundColor: string; color: string; }
+  hasUnsavedSemesterEvaluationsChanges: () => boolean
   formatAssessmentValue: (value: number) => string
   getChartData: (student: SchoolDocument) => { name: string; Nota: number; Máximo: number; '%': number; }[]
   getAllStudentsForMomentData: (students: SchoolDocument[], moment: SchoolDocument) => { name: string; Nota: number; Máximo: number; }[]

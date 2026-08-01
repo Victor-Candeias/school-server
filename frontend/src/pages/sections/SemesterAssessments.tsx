@@ -26,6 +26,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
     getStudentAssessmentFinalValue,
     getStudentAssessmentFinalGrade,
     getStudentAssessmentFinalStyle,
+    hasUnsavedSemesterEvaluationsChanges,
     formatAssessmentValue,
   } = model
 
@@ -79,6 +80,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                         {selectedAssessmentsSemester && (
                           <button
                             type="button"
+                            className="assessment-action-button"
                             onClick={() => void generateSemesterEvaluationsReport()}
                             disabled={isLoadingClasses}
                           >
@@ -87,8 +89,9 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                         )}
                         <button
                           type="button"
+                          className="assessment-action-button assessment-save-button"
                           onClick={() => void saveSemesterEvaluations()}
-                          disabled={!selectedAssessmentsSemester || isLoadingClasses}
+                          disabled={!hasUnsavedSemesterEvaluationsChanges() || isLoadingClasses}
                         >
                           Gravar
                         </button>
