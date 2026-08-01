@@ -1,4 +1,5 @@
 import type { SchoolApplicationModel } from '../../hooks/useSchoolApplication'
+import { normalizeDecimalInput } from '../../utils/validation'
 
 type EvaluationQuestionFormProps = {
   model: SchoolApplicationModel
@@ -29,12 +30,12 @@ export function EvaluationQuestionForm({ model }: EvaluationQuestionFormProps) {
                     <label>
                       Valor da questão
                       <input
-                        type="number"
-                        min="0"
-                        step="0.01"
+                        type="text"
+                        inputMode="decimal"
                         value={newEvaluationQuestion.value}
+                        onFocus={(event) => event.currentTarget.select()}
                         onChange={(event) =>
-                          updateNewEvaluationQuestion('value', event.target.value)
+                          updateNewEvaluationQuestion('value', normalizeDecimalInput(event.target.value))
                         }
                         placeholder="Ex: 5"
                         required

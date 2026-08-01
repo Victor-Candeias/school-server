@@ -1,6 +1,7 @@
 import { schoolApi } from '../api/school'
 import type { SchoolDocument } from '../api/school'
 import type { EvaluationQuestionForm } from '../types'
+import { normalizeDecimalInput } from '../utils/validation'
 import type { ApplicationActions, ApplicationRuntime, AssessmentMomentGroup } from './applicationRuntime'
 
 export function useAssessments(
@@ -676,7 +677,7 @@ function updateAssessmentCellDraft(
     runtime.setClassesError(null)
     runtime.setAssessmentCellDrafts((currentDrafts) => ({
       ...currentDrafts,
-      [getStudentMomentValueKey(momentId, studentId, question.questionNumber)]: value,
+      [getStudentMomentValueKey(momentId, studentId, question.questionNumber)]: normalizeDecimalInput(value),
     }))
   }
 
@@ -693,7 +694,7 @@ async function saveAssessmentCell(
       return
     }
 
-    const normalizedValue = value.trim() || '0'
+    const normalizedValue = normalizeDecimalInput(value).trim() || '0'
     const draftKey = getStudentMomentValueKey(momentId, studentId, question.questionNumber)
     runtime.setClassesError(null)
     runtime.setAssessmentCellDrafts((currentDrafts) => ({

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { SchoolApplicationModel } from '../../hooks/useSchoolApplication'
+import { normalizeDecimalInput } from '../../utils/validation'
 
 
 type StudentAssessmentProps = {
@@ -158,19 +159,18 @@ export function StudentAssessment({ model }: StudentAssessmentProps) {
                                   Q{question.questionNumber} ({getQuestionMaxValue(question)}):
                                 </span>
                                 <input
-                                  type="number"
-                                  min="0"
-                                  max={getQuestionMaxValue(question)}
-                                  step="0.01"
+                                  type="text"
+                                  inputMode="decimal"
                                   value={getStudentMomentCellValue(student, selectedMoment, question)}
                                   onChange={(event) =>
                                     updateAssessmentCellDraft(
                                       student,
                                       selectedMoment,
                                       question,
-                                      event.target.value,
+                                      normalizeDecimalInput(event.target.value),
                                     )
                                   }
+                                  onFocus={(event) => event.currentTarget.select()}
                                   onBlur={(event) =>
                                     void saveAssessmentCell(
                                       student,

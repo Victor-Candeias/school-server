@@ -77,3 +77,21 @@ export function normalizeNonNegativeInteger(value: unknown, fallback: number) {
   const numericValue = Number(value)
   return Number.isFinite(numericValue) && numericValue >= 0 ? Math.trunc(numericValue) : fallback
 }
+
+export function normalizeDecimalInput(value: string) {
+  const normalizedSeparatorValue = value.replace(',', '.')
+  const [integerPart = '', ...decimalParts] = normalizedSeparatorValue
+    .replace(/[^\d.]/g, '')
+    .split('.')
+  const normalizedIntegerPart = integerPart.replace(/^0+(?=\d)/, '')
+
+  if (decimalParts.length === 0) {
+    return normalizedIntegerPart
+  }
+
+  return `${normalizedIntegerPart || '0'}.${decimalParts.join('')}`
+}
+
+export function normalizeIntegerInput(value: string) {
+  return value.replace(/\D/g, '').replace(/^0+(?=\d)/, '')
+}

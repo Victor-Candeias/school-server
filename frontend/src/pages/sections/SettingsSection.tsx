@@ -1,5 +1,6 @@
 import { useAppSettingsContext } from '../../hooks/useAppSettingsContext'
 import type { AcademicPeriodType } from '../../hooks/useSchoolApplication'
+import { normalizeIntegerInput } from '../../utils/validation'
 
 export function SettingsSection() {
   const {
@@ -97,13 +98,14 @@ export function SettingsSection() {
                     <label>
                       Terminar sessão por inatividade (minutos)
                       <input
-                        type="number"
-                        min="1"
+                        type="text"
+                        inputMode="numeric"
                         value={inactiveLogoutMinutes}
+                        onFocus={(event) => event.currentTarget.select()}
                         onChange={(event) =>
                           setInactiveLogoutMinutes(
                             normalizePositiveInteger(
-                              event.target.value,
+                              normalizeIntegerInput(event.target.value),
                               DEFAULT_INACTIVITY_LOGOUT_MINUTES,
                             ),
                           )
@@ -113,13 +115,14 @@ export function SettingsSection() {
                     <label>
                       Tempo das mensagens no ecrã (segundos)
                       <input
-                        type="number"
-                        min="1"
+                        type="text"
+                        inputMode="numeric"
                         value={messageTimeoutSeconds}
+                        onFocus={(event) => event.currentTarget.select()}
                         onChange={(event) =>
                           setMessageTimeoutSeconds(
                             normalizePositiveInteger(
-                              event.target.value,
+                              normalizeIntegerInput(event.target.value),
                               DEFAULT_MESSAGE_TIMEOUT_SECONDS,
                             ),
                           )
@@ -252,17 +255,16 @@ export function SettingsSection() {
                             <label role="cell">
                               <span>Ponderação (%)</span>
                               <input
-                                type="number"
-                                min="0"
-                                max="100"
-                                step="1"
+                                type="text"
+                                inputMode="numeric"
                                 value={template.weightPercentage}
                                 required
+                                onFocus={(event) => event.currentTarget.select()}
                                 onChange={(event) =>
                                   updateEvaluationMomentTemplate(
                                     template.id,
                                     'weightPercentage',
-                                    event.target.value,
+                                    normalizeIntegerInput(event.target.value),
                                   )
                                 }
                               />
@@ -300,31 +302,31 @@ export function SettingsSection() {
                           <label role="cell">
                             <span>Mín.</span>
                             <input
-                              type="number"
-                              min="0"
-                              max="100"
+                              type="text"
+                              inputMode="numeric"
                               value={range.min}
-                              onChange={(event) => updatePercentageRange(range.id, 'min', event.target.value)}
+                              onFocus={(event) => event.currentTarget.select()}
+                              onChange={(event) => updatePercentageRange(range.id, 'min', normalizeIntegerInput(event.target.value))}
                             />
                           </label>
                           <label role="cell">
                             <span>Máx.</span>
                             <input
-                              type="number"
-                              min="0"
-                              max="100"
+                              type="text"
+                              inputMode="numeric"
                               value={range.max}
-                              onChange={(event) => updatePercentageRange(range.id, 'max', event.target.value)}
+                              onFocus={(event) => event.currentTarget.select()}
+                              onChange={(event) => updatePercentageRange(range.id, 'max', normalizeIntegerInput(event.target.value))}
                             />
                           </label>
                           <label role="cell">
                             <span>Nota</span>
                             <input
-                              type="number"
-                              min="0"
-                              max="20"
+                              type="text"
+                              inputMode="numeric"
                               value={range.nota}
-                              onChange={(event) => updatePercentageRange(range.id, 'nota', event.target.value)}
+                              onFocus={(event) => event.currentTarget.select()}
+                              onChange={(event) => updatePercentageRange(range.id, 'nota', normalizeIntegerInput(event.target.value))}
                             />
                           </label>
                           <label role="cell">

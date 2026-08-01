@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { SchoolDocument } from '../../api/school'
 import type { SchoolApplicationModel } from '../../hooks/useSchoolApplication'
+import { normalizeDecimalInput } from '../../utils/validation'
 
 
 type SemesterAssessmentsProps = {
@@ -31,7 +32,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
 
   const [visibleGroupMetrics, setVisibleGroupMetrics] = useState<Set<string>>(() => new Set())
   const [selectedAssessmentStudentId, setSelectedAssessmentStudentId] = useState(ALL_STUDENTS_VALUE)
-  const [assessmentWeightOverrides, setAssessmentWeightOverrides] = useState<Record<string, number>>({})
+  const [assessmentWeightOverrides, setAssessmentWeightOverrides] = useState<Record<string, string>>({})
 
   const initialMomentGroups = getAssessmentsSemesterMomentGroups()
   const initialWeightsByType = Object.fromEntries(
@@ -45,20 +46,33 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
   )
   const momentGroups = initialMomentGroups.map((group) => ({
     ...group,
-    weightPercentage: assessmentWeightOverrides[group.type] ?? initialWeightsByType[group.type] ?? group.weightPercentage,
+    weightPercentage: getAssessmentWeightValue(
+      assessmentWeightOverrides[group.type],
+      initialWeightsByType[group.type] ?? group.weightPercentage,
+    ),
   }))
   const hasAssessmentWeightOverrides = Object.keys(assessmentWeightOverrides).length > 0
   const updateAssessmentWeight = (groupType: string, value: string) => {
-    const parsedValue = Number(value)
-    if (!Number.isFinite(parsedValue)) {
-      return
-    }
+    const normalizedValue = normalizeDecimalInput(value)
+    const parsedValue = Number(normalizedValue)
 
     setAssessmentWeightOverrides((currentOverrides) => ({
       ...currentOverrides,
-      [groupType]: Math.min(100, Math.max(0, parsedValue)),
+      [groupType]: normalizedValue === '' || !Number.isFinite(parsedValue)
+        ? normalizedValue
+        : String(Math.min(100, Math.max(0, parsedValue))),
     }))
   }
+  function getAssessmentWeightValue(value: string | undefined, fallback: number) {
+    if (value === undefined) {
+      return fallback
+    }
+
+    const parsedValue = Number(value)
+    return Number.isFinite(parsedValue) ? parsedValue : 0
+  }
+  const getAssessmentWeightInputValue = (groupType: string, weightPercentage: number) =>
+    assessmentWeightOverrides[groupType] ?? formatAssessmentValue(weightPercentage)
   const resetAssessmentWeights = () => setAssessmentWeightOverrides({})
   const getStudentAssessmentGroupWeightedValue = (student: SchoolDocument, group: (typeof momentGroups)[number]) =>
     getStudentAssessmentGroupAverage(student, group) * (group.weightPercentage / 100)
@@ -258,18 +272,33 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                             role="row"
                             style={{ gridTemplateColumns: assessmentGridColumns }}
                           >
-                            <span aria-hidden="true" />
+                            <span className="semester-assessments-empty-subhead" aria-hidden="true" />
                             {momentGroups.flatMap((group, groupIndex) => [
-                              ...group.moments.map((moment) => (
+                              ...group.moments.map((moment, momentIndex) => (
                                 <span
                                   className={`semester-assessments-group-cell ${getGroupClassName(groupIndex)}`}
                                   role="columnheader"
                                   key={getDocumentId(moment) ?? getStringValue(moment.name)}
                                 >
-                                  {getStringValue(moment.name)}{' '}
-                                  <strong className="question-max-value">
-                                    ({getEvaluationMomentMaxValue(moment)})
-                                  </strong>
+                                  <span className="semester-assessments-moment-title">
+                                    {getStringValue(moment.name)}{' '}
+                                    <strong className="question-max-value">
+                                      ({getEvaluationMomentMaxValue(moment)})
+                                    </strong>
+                                  </span>
+                                  {momentIndex === 0 && (
+                                    <label className="semester-assessments-weight-field">
+                                      <span className="semester-assessments-weight-label">%</span>
+                                      <input
+                                        type="text"
+                                        inputMode="decimal"
+                                        value={getAssessmentWeightInputValue(group.type, group.weightPercentage)}
+                                        onChange={(event) => updateAssessmentWeight(group.type, event.target.value)}
+                                        onFocus={(event) => event.currentTarget.select()}
+                                        aria-label={`Ponderação de ${group.type}`}
+                                      />
+                                    </label>
+                                  )}
                                 </span>
                               )),
                               ...(isGroupMetricsHidden(group.type) ? [] : [
@@ -286,27 +315,15 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 key={`${group.type}-weighted`}
                                 title={`Média × ${formatAssessmentValue(group.weightPercentage)}%`}
                               >
-                                <label className="semester-assessments-weight-field">
-                                  <span>M*</span>
-                                  <input
-                                    type="number"
-                                    min="0"
-                                    max="100"
-                                    step="0.1"
-                                    value={group.weightPercentage}
-                                    onChange={(event) => updateAssessmentWeight(group.type, event.target.value)}
-                                    aria-label={`Ponderação de ${group.type}`}
-                                  />
-                                  <span>%</span>
-                                </label>
+                                M*
                               </span>,
                               ]),
                             ])}
                             <span
-                              className="semester-assessments-final-subhead"
+                              className="semester-assessments-empty-subhead"
                               aria-hidden="true"
                             />
-                            <span className="semester-assessments-final-subhead" aria-hidden="true" />
+                            <span className="semester-assessments-empty-subhead" aria-hidden="true" />
                           </div>
                         </div>
                         {visibleStudents.map((student, studentIndex) => {
@@ -420,12 +437,11 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                           <span>Ponderação:</span>
                                           <span>
                                             <input
-                                              type="number"
-                                              min="0"
-                                              max="100"
-                                              step="0.1"
-                                              value={group.weightPercentage}
+                                              type="text"
+                                              inputMode="decimal"
+                                              value={getAssessmentWeightInputValue(group.type, group.weightPercentage)}
                                               onChange={(event) => updateAssessmentWeight(group.type, event.target.value)}
+                                              onFocus={(event) => event.currentTarget.select()}
                                               aria-label={`Ponderação de ${group.type}`}
                                             />
                                             %

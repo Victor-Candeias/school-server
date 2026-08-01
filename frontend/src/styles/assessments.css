@@ -200,6 +200,7 @@
   min-height: 30px;
   align-items: center;
   justify-content: center;
+  gap: 5px;
   text-align: center;
 }
 
@@ -293,23 +294,41 @@
   font-weight: 800;
 }
 
+.semester-assessments-empty-subhead {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.semester-assessments-moment-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .semester-assessments-weight-field {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 3px;
   color: inherit;
+  white-space: nowrap;
+}
+
+.semester-assessments-weight-label {
+  font-size: 0.615rem;
+  font-weight: 800;
 }
 
 .semester-assessments-weight-field input {
-  width: 48px;
-  padding: 3px 4px;
+  width: 34px;
+  padding: 2px 3px;
   border: 1px solid color-mix(in srgb, currentColor 45%, transparent);
   border-radius: 4px;
   color: var(--text);
   background: var(--surface);
   font: inherit;
-  font-size: 0.692rem;
+  font-size: 0.615rem;
   font-weight: 800;
   text-align: center;
 }

@@ -1,4 +1,5 @@
 import type { SchoolApplicationModel } from '../../hooks/useSchoolApplication'
+import { normalizeIntegerInput } from '../../utils/validation'
 
 type ClassFormProps = {
   model: SchoolApplicationModel
@@ -21,12 +22,12 @@ export function ClassForm({ model }: ClassFormProps) {
                       <label>
                         Ano
                         <input
-                          type="number"
+                          type="text"
+                          inputMode="numeric"
                           value={newClass.classYear}
-                          onChange={(event) => updateNewClassField('classYear', event.target.value)}
+                          onFocus={(event) => event.currentTarget.select()}
+                          onChange={(event) => updateNewClassField('classYear', normalizeIntegerInput(event.target.value))}
                           placeholder="Ex: 7"
-                          min={1}
-                          max={12}
                           autoFocus
                           required
                         />

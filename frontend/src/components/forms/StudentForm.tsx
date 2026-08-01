@@ -18,7 +18,7 @@ export function StudentForm({ model }: StudentFormProps) {
                     <div className="form-row three-columns">
                       <label>
                         ID único
-                        <input type="number" value={newStudent.id} readOnly />
+                        <input type="text" inputMode="numeric" value={newStudent.id} readOnly />
                       </label>
                       <label>
                         Nome do aluno
