@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { SchoolApplicationModel } from '../../hooks/useSchoolApplication'
 
 
@@ -5,7 +6,10 @@ type StudentAssessmentProps = {
   model: SchoolApplicationModel
 }
 
+const ALL_STUDENTS_VALUE = '__all__'
+
 export function StudentAssessment({ model }: StudentAssessmentProps) {
+  const [selectedAssessmentStudentId, setSelectedAssessmentStudentId] = useState(ALL_STUDENTS_VALUE)
   const {
     selectedGradingMomentId,
     handleSelectGradingMoment,
@@ -30,6 +34,14 @@ export function StudentAssessment({ model }: StudentAssessmentProps) {
   } = model
 
   if (!selectedClass) return null
+  const selectedMoment = getSelectedGradingMoment()
+  const questions = selectedMoment ? getEvaluationMomentQuestions(selectedMoment) : []
+  const students = getStudentsForClass(selectedClass)
+  const hasSelectedStudent = students.some((student) => getDocumentId(student) === selectedAssessmentStudentId)
+  const activeAssessmentStudentId = hasSelectedStudent ? selectedAssessmentStudentId : ALL_STUDENTS_VALUE
+  const visibleStudents = activeAssessmentStudentId === ALL_STUDENTS_VALUE
+    ? students
+    : students.filter((student) => getDocumentId(student) === activeAssessmentStudentId)
 
   return (
     (
@@ -56,7 +68,26 @@ export function StudentAssessment({ model }: StudentAssessmentProps) {
                           ))}
                         </select>
                       </label>
-                      {getSelectedGradingMoment() && (
+                      {selectedMoment && (
+                        <label>
+                          Aluno
+                          <select
+                            value={activeAssessmentStudentId}
+                            onChange={(event) => setSelectedAssessmentStudentId(event.target.value)}
+                          >
+                            <option value={ALL_STUDENTS_VALUE}>Todos os alunos</option>
+                            {students.map((student, index) => (
+                              <option
+                                value={getDocumentId(student) ?? ''}
+                                key={String(student._id ?? student.id ?? index)}
+                              >
+                                {getStringValue(student.name)}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                      )}
+                      {selectedMoment && (
                         <div className="assessment-panel-actions">
                           <button
                             type="button"
@@ -77,15 +108,15 @@ export function StudentAssessment({ model }: StudentAssessmentProps) {
                         </div>
                       )}
                     </div>
-                    {!getSelectedGradingMoment() ? (
+                    {!selectedMoment ? (
                       <p className="students-empty-state">
                         Escolhe um momento de avaliação para ver a tabela de alunos.
                       </p>
-                    ) : getEvaluationMomentQuestions(getSelectedGradingMoment()!).length === 0 ? (
+                    ) : questions.length === 0 ? (
                       <p className="students-empty-state">
                         O momento selecionado ainda não tem questões.
                       </p>
-                    ) : getStudentsForClass(selectedClass).length === 0 ? (
+                    ) : students.length === 0 ? (
                       <p className="students-empty-state">Ainda não existem alunos nesta turma.</p>
                     ) : (
                       <div className="student-assessment-table" role="table" aria-label="Valores por aluno e questão">
@@ -93,11 +124,11 @@ export function StudentAssessment({ model }: StudentAssessmentProps) {
                           className="student-assessment-row student-assessment-table-head"
                           role="row"
                           style={{
-                            gridTemplateColumns: `minmax(180px, 1.4fr) repeat(${getEvaluationMomentQuestions(getSelectedGradingMoment()!).length}, minmax(84px, 1fr)) 90px 100px`,
+                            gridTemplateColumns: `minmax(180px, 1.4fr) repeat(${questions.length}, minmax(84px, 1fr)) 90px 100px`,
                           }}
                         >
                           <span role="columnheader">Aluno</span>
-                          {getEvaluationMomentQuestions(getSelectedGradingMoment()!).map((question) => (
+                          {questions.map((question) => (
                             <span role="columnheader" key={question.questionNumber}>
                               Q{question.questionNumber}{' '}
                               <strong className="question-max-value">
@@ -108,20 +139,20 @@ export function StudentAssessment({ model }: StudentAssessmentProps) {
                           <span role="columnheader">Total</span>
                           <span role="columnheader">%</span>
                         </div>
-                        {getStudentsForClass(selectedClass).map((student, studentIndex) => (
+                        {visibleStudents.map((student, studentIndex) => (
                           <div
                             className="student-assessment-row"
                             role="row"
                             key={String(student._id ?? student.id ?? studentIndex)}
                             style={{
-                              gridTemplateColumns: `minmax(180px, 1.4fr) repeat(${getEvaluationMomentQuestions(getSelectedGradingMoment()!).length}, minmax(84px, 1fr)) 90px 100px`,
+                              gridTemplateColumns: `minmax(180px, 1.4fr) repeat(${questions.length}, minmax(84px, 1fr)) 90px 100px`,
                             }}
                           >
                             <span className="assessment-student-name-cell" role="cell">
                               <span className="assessment-mobile-label" aria-hidden="true">Nome do aluno:</span>
                               {getStringValue(student.name)}
                             </span>
-                            {getEvaluationMomentQuestions(getSelectedGradingMoment()!).map((question) => (
+                            {questions.map((question) => (
                               <span className="assessment-question-cell" role="cell" key={question.questionNumber}>
                                 <span className="assessment-mobile-label" aria-hidden="true">
                                   Q{question.questionNumber} ({getQuestionMaxValue(question)}):
@@ -131,11 +162,11 @@ export function StudentAssessment({ model }: StudentAssessmentProps) {
                                   min="0"
                                   max={getQuestionMaxValue(question)}
                                   step="0.01"
-                                  value={getStudentMomentCellValue(student, getSelectedGradingMoment()!, question)}
+                                  value={getStudentMomentCellValue(student, selectedMoment, question)}
                                   onChange={(event) =>
                                     updateAssessmentCellDraft(
                                       student,
-                                      getSelectedGradingMoment()!,
+                                      selectedMoment,
                                       question,
                                       event.target.value,
                                     )
@@ -143,7 +174,7 @@ export function StudentAssessment({ model }: StudentAssessmentProps) {
                                   onBlur={(event) =>
                                     void saveAssessmentCell(
                                       student,
-                                      getSelectedGradingMoment()!,
+                                      selectedMoment,
                                       question,
                                       event.target.value,
                                     )
@@ -159,15 +190,15 @@ export function StudentAssessment({ model }: StudentAssessmentProps) {
                             ))}
                             <strong className="assessment-total-cell" role="cell">
                               <span className="assessment-mobile-label" aria-hidden="true">Total:</span>
-                              {getStudentMomentTotal(student, getSelectedGradingMoment()!)}
+                              {getStudentMomentTotal(student, selectedMoment)}
                             </strong>
                             <strong
                               role="cell"
                               className="assessment-percentage assessment-percentage-cell"
-                              style={getStudentMomentPercentageStyle(student, getSelectedGradingMoment()!)}
+                              style={getStudentMomentPercentageStyle(student, selectedMoment)}
                             >
                               <span className="assessment-mobile-label" aria-hidden="true">Total (%):</span>
-                              {getStudentMomentPercentage(student, getSelectedGradingMoment()!)}
+                              {getStudentMomentPercentage(student, selectedMoment)}
                             </strong>
                           </div>
                         ))}
