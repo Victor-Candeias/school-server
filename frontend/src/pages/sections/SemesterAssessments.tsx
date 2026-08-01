@@ -6,6 +6,8 @@ type SemesterAssessmentsProps = {
   model: SchoolApplicationModel
 }
 
+const ALL_STUDENTS_VALUE = '__all__'
+
 export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
   const {
     selectedAssessmentsSemester,
@@ -31,9 +33,16 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
   } = model
 
   const [visibleGroupMetrics, setVisibleGroupMetrics] = useState<Set<string>>(() => new Set())
+  const [selectedAssessmentStudentId, setSelectedAssessmentStudentId] = useState(ALL_STUDENTS_VALUE)
 
   if (!selectedClass) return null
 
+  const students = getStudentsForClass(selectedClass)
+  const hasSelectedStudent = students.some((student) => getDocumentId(student) === selectedAssessmentStudentId)
+  const activeAssessmentStudentId = hasSelectedStudent ? selectedAssessmentStudentId : ALL_STUDENTS_VALUE
+  const visibleStudents = activeAssessmentStudentId === ALL_STUDENTS_VALUE
+    ? students
+    : students.filter((student) => getDocumentId(student) === activeAssessmentStudentId)
   const momentGroups = getAssessmentsSemesterMomentGroups()
   const getGroupClassName = (groupIndex: number) =>
     `semester-assessments-group-${groupIndex % 4}`
@@ -76,6 +85,25 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                           <option value="2">2.º semestre</option>
                         </select>
                       </label>
+                      {selectedAssessmentsSemester && (
+                        <label>
+                          Aluno
+                          <select
+                            value={activeAssessmentStudentId}
+                            onChange={(event) => setSelectedAssessmentStudentId(event.target.value)}
+                          >
+                            <option value={ALL_STUDENTS_VALUE}>Todos os alunos</option>
+                            {students.map((student, index) => (
+                              <option
+                                value={getDocumentId(student) ?? ''}
+                                key={String(student._id ?? student.id ?? index)}
+                              >
+                                {getStringValue(student.name)}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                      )}
                       <div className="assessment-panel-actions">
                         {selectedAssessmentsSemester && (
                           <button
@@ -105,7 +133,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                       <p className="students-empty-state">
                         Ainda não existem momentos de avaliação no semestre selecionado.
                       </p>
-                    ) : getStudentsForClass(selectedClass).length === 0 ? (
+                    ) : students.length === 0 ? (
                       <p className="students-empty-state">Ainda não existem alunos nesta turma.</p>
                     ) : (
                       <>
@@ -199,7 +227,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                             <span className="semester-assessments-final-subhead" aria-hidden="true" />
                           </div>
                         </div>
-                        {getStudentsForClass(selectedClass).map((student, studentIndex) => {
+                        {visibleStudents.map((student, studentIndex) => {
                           const finalValue = getStudentAssessmentFinalValue(student, momentGroups)
                           const finalStyle = getStudentAssessmentFinalStyle(student, momentGroups)
 
@@ -257,7 +285,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                         })}
                       </div>
                       <div className="semester-assessments-mobile-list" aria-label="Avaliações por semestre em mobile">
-                        {getStudentsForClass(selectedClass).map((student, studentIndex) => {
+                        {visibleStudents.map((student, studentIndex) => {
                           const finalValue = getStudentAssessmentFinalValue(student, momentGroups)
                           const finalStyle = getStudentAssessmentFinalStyle(student, momentGroups)
 
