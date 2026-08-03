@@ -482,13 +482,45 @@
   }
 
   .semester-assessments-mobile-group-heading {
+    display: flex;
+    align-items: center;
     justify-content: space-between;
+    gap: 8px;
     width: 100%;
     min-height: 40px;
     margin: 0;
+    padding: 8px 10px;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
     border-color: transparent;
     color: var(--assessment-group-text);
     background: var(--assessment-group-background);
+    font-size: 0.846rem;
+    font-weight: 800;
+  }
+
+  .semester-assessments-mobile-group-heading > span:first-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .semester-assessments-mobile-group-toggle {
+    display: inline-flex;
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    color: inherit;
+    background: transparent;
+    font: inherit;
+    line-height: 1;
   }
 
   .semester-assessments-mobile-moments,
@@ -525,13 +557,13 @@
 
   .semester-assessments-mobile-weight-field {
     display: inline-flex;
-    flex-wrap: wrap;
-    gap: 6px;
+    flex: 0 0 auto;
+    gap: 3px;
     align-items: center;
   }
 
   .semester-assessments-mobile-weight-field input {
-    width: 58px;
+    width: 50px;
     padding: 4px 6px;
     border: 1px solid color-mix(in srgb, currentColor 45%, transparent);
     border-radius: 6px;
