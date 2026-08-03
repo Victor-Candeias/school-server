@@ -37,6 +37,10 @@ export function AppSettingsProvider({ model, children }: AppSettingsProviderProp
     addEvaluationMomentTemplate: model.addEvaluationMomentTemplate,
     updateEvaluationMomentTemplate: model.updateEvaluationMomentTemplate,
     removeEvaluationMomentTemplate: model.removeEvaluationMomentTemplate,
+    attitudeTemplates: model.attitudeTemplates,
+    addAttitudeTemplate: model.addAttitudeTemplate,
+    updateAttitudeTemplate: model.updateAttitudeTemplate,
+    removeAttitudeTemplate: model.removeAttitudeTemplate,
     percentageRanges: model.percentageRanges,
     updatePercentageRange: model.updatePercentageRange,
   }

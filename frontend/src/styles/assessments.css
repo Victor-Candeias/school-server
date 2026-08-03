@@ -146,6 +146,30 @@
   background: var(--table-surface);
 }
 
+.semester-assessments-visibility-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.semester-assessments-visibility-controls button {
+  width: auto;
+  margin: 0;
+  padding: 6px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  color: var(--text);
+  background: var(--surface);
+  font-size: 0.692rem;
+  font-weight: 700;
+}
+
+.semester-assessments-visibility-controls button[aria-pressed='true'] {
+  color: #ffffff;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
 .semester-assessments-row {
   display: grid;
   gap: 8px;
@@ -296,6 +320,30 @@
 
 .semester-assessments-weighted-head {
   gap: 6px;
+}
+
+.semester-assessments-attitude-head {
+  gap: 5px;
+}
+
+.semester-assessments-attitude-cell input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 4px 6px;
+  border: 1px solid color-mix(in srgb, currentColor 45%, transparent);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  background: var(--surface);
+  font: inherit;
+  font-size: 0.769rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.semester-assessments-attitude-cell input:focus {
+  border-color: var(--primary);
+  outline: 0;
+  box-shadow: 0 0 0 2px rgb(37 99 235 / 16%);
 }
 
 .semester-assessments-empty-subhead {

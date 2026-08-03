@@ -77,6 +77,16 @@ export type EvaluationMomentTemplate = {
   textColor: string
 }
 
+export type AttitudeTemplate = {
+  id: string
+  text: string
+  alias: string
+  weightPercentage: number
+  backgroundColor: string
+  weightedBackgroundColor: string
+  textColor: string
+}
+
 export type AcademicYearOption = {
   value: string
   label: string

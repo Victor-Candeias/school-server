@@ -5,6 +5,7 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from routes.class_tests_router import normalize_evaluation_moment_templates
+from routes.class_tests_router import normalize_attitude_templates
 from routes.class_tests_router import normalize_hex_color
 from routes.class_tests_router import enrich_student_moment_values
 from routes.class_tests_router import build_semester_evaluations_summary
@@ -87,6 +88,79 @@ def test_normalize_evaluation_moment_templates_discards_invalid_rows():
             None,
         ]
     ) == []
+
+
+def test_normalize_attitude_templates_preserves_valid_templates():
+    assert normalize_attitude_templates(
+        [
+            {
+                "id": "participacao",
+                "text": " Participação ",
+                "alias": " Part. ",
+                "weightPercentage": 20,
+                "backgroundColor": "#123ABC",
+                "weightedBackgroundColor": "#345CDE",
+                "textColor": "#456DEF",
+            },
+            {
+                "id": "comportamento",
+                "text": "Comportamento",
+                "alias": "Comp.",
+                "weightPercentage": "30",
+            },
+        ]
+    ) == [
+        {
+            "id": "participacao",
+            "text": "Participação",
+            "alias": "Part.",
+            "weightPercentage": 20,
+            "backgroundColor": "#123abc",
+            "weightedBackgroundColor": "#345cde",
+            "textColor": "#456def",
+        },
+        {
+            "id": "comportamento",
+            "text": "Comportamento",
+            "alias": "Comp.",
+            "weightPercentage": 30,
+            "backgroundColor": "#5b21b6",
+            "weightedBackgroundColor": "#7c3aed",
+            "textColor": "#f5f3ff",
+        },
+    ]
+
+
+def test_normalize_attitude_templates_limits_percentage_and_discards_invalid_rows():
+    assert normalize_attitude_templates(
+        [
+            {"id": "negative", "text": "Negativo", "alias": "Neg.", "weightPercentage": -10},
+            {"id": "above", "text": "Acima", "alias": "Ac.", "weightPercentage": 140},
+            {"text": "", "alias": "Sem texto", "weightPercentage": 20},
+            {"text": "Sem alias", "alias": "", "weightPercentage": 20},
+            {"text": "Sem percentagem", "alias": "Sem", "weightPercentage": "inválida"},
+            None,
+        ]
+    ) == [
+        {
+            "id": "negative",
+            "text": "Negativo",
+            "alias": "Neg.",
+            "weightPercentage": 0,
+            "backgroundColor": "#1e40af",
+            "weightedBackgroundColor": "#2563eb",
+            "textColor": "#eff6ff",
+        },
+        {
+            "id": "above",
+            "text": "Acima",
+            "alias": "Ac.",
+            "weightPercentage": 100,
+            "backgroundColor": "#5b21b6",
+            "weightedBackgroundColor": "#7c3aed",
+            "textColor": "#f5f3ff",
+        },
+    ]
 
 
 def test_normalize_hex_color_preserves_valid_color_in_lowercase():
@@ -203,8 +277,21 @@ def test_build_semester_evaluations_summary_calculates_groups_and_final_grade():
             "title": "Avaliações - 1.º semestre",
         },
         [
-            {"_id": "student-1", "name": "Ana", "active": True},
-            {"_id": "student-2", "name": "Bruno", "active": True},
+            {
+                "_id": "student-1",
+                "name": "Ana",
+                "active": True,
+                "attitudes": [
+                    {"templateId": "participacao", "value": 4},
+                    {"templateId": "comportamento", "value": 5},
+                ],
+            },
+            {
+                "_id": "student-2",
+                "name": "Bruno",
+                "active": True,
+                "attitudes": {"participacao": 3, "comportamento": 4},
+            },
         ],
         [
             {
@@ -235,6 +322,10 @@ def test_build_semester_evaluations_summary_calculates_groups_and_final_grade():
                 {"type": "Teste", "weightPercentage": 60},
                 {"type": "Questão aula", "weightPercentage": 40},
             ],
+            "attitudeTemplates": [
+                {"id": "participacao", "text": "Participação", "alias": "Part.", "weightPercentage": 10},
+                {"id": "comportamento", "text": "Comportamento", "alias": "Comp.", "weightPercentage": 15},
+            ],
             "percentageRanges": None,
         },
     )
@@ -247,11 +338,16 @@ def test_build_semester_evaluations_summary_calculates_groups_and_final_grade():
         "Questão aula 1 (20)",
         "Questão aula - Média",
         "Questão aula - M*40%",
+        "Part.",
+        "Comp.",
+        "Atitudes - 25%",
         "Final",
         "Nota",
     ]
-    assert summary["rows"][0] == ["Ana", "18", "18", "10.8", "14", "14", "5.6", "16.4", "4"]
-    assert summary["rows"][1] == ["Bruno", "8", "8", "4.8", "10", "10", "4", "8.8", "2"]
+    assert summary["rows"][0] == ["Ana", "18", "18", "10.8", "14", "14", "5.6", "4", "5", "2.25", "16.4", "4"]
+    assert summary["rows"][1] == ["Bruno", "8", "8", "4.8", "10", "10", "4", "3", "4", "1.75", "8.8", "2"]
+    assert summary["attitudesWeightPercentage"] == 25
+    assert summary["students"][0]["attitudesWeightedValue"] == 2.25
     assert summary["students"][0]["finalPercentage"] == 82.0
     assert summary["students"][0]["finalGrade"] == 4
 

@@ -1,5 +1,6 @@
 import { apiRequest } from './client'
 import { API_CONFIG } from './config'
+import type { AttitudeTemplate } from '../types'
 import type { EvaluationMomentTemplate } from '../types'
 
 export type SchoolDocument = Record<string, unknown>
@@ -13,6 +14,7 @@ export type AppSettings = {
   errorPopupTextColor: string
   percentageRanges: PercentageRange[]
   evaluationMomentTemplates?: EvaluationMomentTemplate[]
+  attitudeTemplates?: AttitudeTemplate[]
   academicPeriodType?: string
   semesterPeriods?: unknown[]
   trimesterPeriods?: unknown[]

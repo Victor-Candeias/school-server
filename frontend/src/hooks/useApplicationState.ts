@@ -4,6 +4,7 @@ import type { PercentageRange } from '../api/school'
 import type { SchoolDocument } from '../api/school'
 import type { AcademicPeriod } from '../types'
 import type { AcademicPeriodType } from '../types'
+import type { AttitudeTemplate } from '../types'
 import type { ChartType } from '../types'
 import type { ClassForm } from '../types'
 import type { DashboardSection } from '../types'
@@ -19,6 +20,7 @@ import type { StudentsMenuOption } from '../types'
 import { CALENDAR_WEEKDAYS } from '../utils/constants'
 import { CALENDAR_WORK_WEEKDAY_COUNT } from '../utils/constants'
 import { DEFAULT_ACADEMIC_PERIOD_TYPE } from '../utils/constants'
+import { DEFAULT_ATTITUDE_TEMPLATES } from '../utils/constants'
 import { DEFAULT_ERROR_POPUP_BACKGROUND_COLOR } from '../utils/constants'
 import { DEFAULT_ERROR_POPUP_TEXT_COLOR } from '../utils/constants'
 import { DEFAULT_INACTIVITY_LOGOUT_MINUTES } from '../utils/constants'
@@ -128,6 +130,8 @@ const [percentageRanges, setPercentageRanges] = useState<PercentageRange[]>(
   )
 const [evaluationMomentTemplates, setEvaluationMomentTemplates] =
     useState<EvaluationMomentTemplate[]>(DEFAULT_EVALUATION_MOMENT_TEMPLATES)
+const [attitudeTemplates, setAttitudeTemplates] =
+    useState<AttitudeTemplate[]>(DEFAULT_ATTITUDE_TEMPLATES)
 const [academicPeriodType, setAcademicPeriodType] = useState<AcademicPeriodType>(
     DEFAULT_ACADEMIC_PERIOD_TYPE,
   )
@@ -285,6 +289,8 @@ const isStudentCalendarFullWeek = studentCalendarWeekMode === 'full'
     setPercentageRanges,
     evaluationMomentTemplates,
     setEvaluationMomentTemplates,
+    attitudeTemplates,
+    setAttitudeTemplates,
     academicPeriodType,
     setAcademicPeriodType,
     semesterPeriods,

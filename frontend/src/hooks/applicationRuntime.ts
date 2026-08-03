@@ -5,6 +5,7 @@ import type { FormEvent } from 'react'
 import type {
   AcademicPeriod,
   AcademicPeriodType,
+  AttitudeTemplate,
   ChartType,
   ClassForm,
   DashboardSection,
@@ -159,6 +160,8 @@ export type ApplicationState = {
   setPercentageRanges: import("react").Dispatch<import("react").SetStateAction<PercentageRange[]>>
   evaluationMomentTemplates: EvaluationMomentTemplate[]
   setEvaluationMomentTemplates: import("react").Dispatch<import("react").SetStateAction<EvaluationMomentTemplate[]>>
+  attitudeTemplates: AttitudeTemplate[]
+  setAttitudeTemplates: import("react").Dispatch<import("react").SetStateAction<AttitudeTemplate[]>>
   academicPeriodType: AcademicPeriodType
   setAcademicPeriodType: import("react").Dispatch<import("react").SetStateAction<AcademicPeriodType>>
   semesterPeriods: AcademicPeriod[]
@@ -201,6 +204,9 @@ export type ApplicationActions = {
   addEvaluationMomentTemplate: () => void
   updateEvaluationMomentTemplate: (templateId: string, field: "type" | "weightPercentage" | "backgroundColor" | "averageBackgroundColor" | "weightedBackgroundColor" | "textColor", value: string) => void
   removeEvaluationMomentTemplate: (templateId: string) => void
+  addAttitudeTemplate: () => void
+  updateAttitudeTemplate: (templateId: string, field: "text" | "alias" | "weightPercentage" | "backgroundColor" | "weightedBackgroundColor" | "textColor", value: string) => void
+  removeAttitudeTemplate: (templateId: string) => void
   updatePercentageRange: (rangeId: string, field: "min" | "max" | "nota" | "backgroundColor" | "textColor", value: string) => void
   updatePeriodDate: (type: "semestres" | "trimestres", periodId: string, field: "startDate" | "endDate", value: string) => void
   handleCreateAcademicYear: (event: FormEvent<HTMLFormElement>) => Promise<void>
@@ -323,6 +329,9 @@ export type ApplicationActions = {
   getAssessmentsDashboardRows: () => string[][]
   buildSemesterEvaluationsPayload: () => SchoolDocument | null
   saveSemesterEvaluations: () => Promise<void>
+  getStudentAttitudeValueKey: (studentId: string, templateId: string) => string
+  updateStudentAttitudeDraft: (student: SchoolDocument, template: AttitudeTemplate, value: string) => void
+  saveStudentAttitudeCell: (student: SchoolDocument, template: AttitudeTemplate, value: string) => Promise<void>
   generateSemesterEvaluationsReport: () => Promise<void>
   getQuestionMaxValue: (question: EvaluationQuestionForm) => number
   getEvaluationMomentMaxValue: (moment: SchoolDocument) => number

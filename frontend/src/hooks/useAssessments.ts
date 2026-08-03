@@ -1,12 +1,12 @@
 import { schoolApi } from '../api/school'
 import type { SchoolDocument } from '../api/school'
-import type { EvaluationQuestionForm } from '../types'
+import type { AttitudeTemplate, EvaluationQuestionForm } from '../types'
 import { normalizeDecimalInput } from '../utils/validation'
 import type { ApplicationActions, ApplicationRuntime, AssessmentMomentGroup } from './applicationRuntime'
 
 export function useAssessments(
   runtime: ApplicationRuntime,
-): Pick<ApplicationActions, 'loadAllStudentMomentValues' | 'getSelectedGradingMoment' | 'getStudentMomentValueKey' | 'getStudentMomentValueRecord' | 'isSameStudentMomentValue' | 'mergeStudentMomentValues' | 'hasStudentMomentValueRecord' | 'buildStudentMomentValuePayload' | 'handleSelectGradingMoment' | 'getSavedStudentMomentCellValue' | 'getStudentMomentCellValue' | 'getAssessmentChangePayloads' | 'hasUnsavedAssessmentChanges' | 'canLeaveAssessmentMoment' | 'removeAssessmentDraftsForMoment' | 'getStudentMomentServerMetric' | 'getStudentMomentTotal' | 'getStudentMomentProcessedPercentageValue' | 'handleSelectAssessmentsSemester' | 'getAssessmentsSemesterMoments' | 'getAssessmentsSemesterMomentGroups' | 'getStudentSavedMomentTotal' | 'getStudentAssessmentGroupAverage' | 'getStudentAssessmentGroupWeightedValue' | 'getStudentAssessmentFinalValue' | 'getStudentAssessmentFinalGrade' | 'getStudentAssessmentFinalStyle' | 'hasUnsavedSemesterEvaluationsChanges' | 'formatAssessmentValue' | 'getAllStudentsForMomentData' | 'getAssessmentsDashboardRows' | 'buildSemesterEvaluationsPayload' | 'saveSemesterEvaluations' | 'updateAssessmentCellDraft' | 'saveAssessmentCell' | 'saveAssessmentChanges'> {
+): Pick<ApplicationActions, 'loadAllStudentMomentValues' | 'getSelectedGradingMoment' | 'getStudentMomentValueKey' | 'getStudentMomentValueRecord' | 'isSameStudentMomentValue' | 'mergeStudentMomentValues' | 'hasStudentMomentValueRecord' | 'buildStudentMomentValuePayload' | 'handleSelectGradingMoment' | 'getSavedStudentMomentCellValue' | 'getStudentMomentCellValue' | 'getAssessmentChangePayloads' | 'hasUnsavedAssessmentChanges' | 'canLeaveAssessmentMoment' | 'removeAssessmentDraftsForMoment' | 'getStudentMomentServerMetric' | 'getStudentMomentTotal' | 'getStudentMomentProcessedPercentageValue' | 'handleSelectAssessmentsSemester' | 'getAssessmentsSemesterMoments' | 'getAssessmentsSemesterMomentGroups' | 'getStudentSavedMomentTotal' | 'getStudentAssessmentGroupAverage' | 'getStudentAssessmentGroupWeightedValue' | 'getStudentAssessmentFinalValue' | 'getStudentAssessmentFinalGrade' | 'getStudentAssessmentFinalStyle' | 'hasUnsavedSemesterEvaluationsChanges' | 'formatAssessmentValue' | 'getAllStudentsForMomentData' | 'getAssessmentsDashboardRows' | 'buildSemesterEvaluationsPayload' | 'saveSemesterEvaluations' | 'getStudentAttitudeValueKey' | 'updateStudentAttitudeDraft' | 'saveStudentAttitudeCell' | 'updateAssessmentCellDraft' | 'saveAssessmentCell' | 'saveAssessmentChanges'> {
 async function loadAllStudentMomentValues() {
     try {
       const existingValues = await schoolApi.findStudentMomentValues({ userId: runtime.getLoggedUserId() })
@@ -28,6 +28,10 @@ function getSelectedGradingMoment() {
 
 function getStudentMomentValueKey(momentId: string, studentId: string, questionNumber: string) {
     return `${momentId}:${studentId}:${questionNumber}`
+  }
+
+function getStudentAttitudeValueKey(studentId: string, templateId: string) {
+    return `attitude:${studentId}:${templateId}`
   }
 
 function getStudentMomentValueRecord(
@@ -681,6 +685,125 @@ async function saveSemesterEvaluations() {
     }
   }
 
+function updateStudentAttitudeDraft(
+    student: SchoolDocument,
+    template: AttitudeTemplate,
+    value: string,
+  ) {
+    const studentId = runtime.getDocumentId(student)
+
+    if (!studentId) {
+      return
+    }
+
+    runtime.setClassesError(null)
+    runtime.setAssessmentCellDrafts((currentDrafts) => ({
+      ...currentDrafts,
+      [getStudentAttitudeValueKey(studentId, template.id)]: normalizeDecimalInput(value),
+    }))
+  }
+
+async function saveStudentAttitudeCell(
+    student: SchoolDocument,
+    template: AttitudeTemplate,
+    value: string,
+  ) {
+    const studentId = runtime.getDocumentId(student)
+
+    if (!studentId) {
+      runtime.setClassesError('Não foi possível identificar o aluno para gravar a atitude.')
+      return
+    }
+
+    const normalizedValue = normalizeDecimalInput(value).trim() || '0'
+    const numericValue = Number(normalizedValue)
+
+    if (!Number.isFinite(numericValue)) {
+      runtime.setClassesError('Introduz um valor numérico válido para a atitude.')
+      return
+    }
+
+    const currentStudent = runtime.allStudents.find(
+      (studentDocument) => runtime.getDocumentId(studentDocument) === studentId,
+    ) ?? student
+    const currentAttitudes = Array.isArray(currentStudent.attitudes)
+      ? currentStudent.attitudes
+      : []
+    const matchingKeys = new Set(
+      [template.id, template.alias, template.text].filter(Boolean),
+    )
+    let updatedExistingAttitude = false
+    const nextAttitudes = currentAttitudes.map((attitude) => {
+      const attitudeRecord = runtime.getRecordValue(attitude)
+      const attitudeKeys = [
+        runtime.getStringValue(attitudeRecord.id),
+        runtime.getStringValue(attitudeRecord.templateId),
+        runtime.getStringValue(attitudeRecord.alias),
+        runtime.getStringValue(attitudeRecord.text),
+      ]
+
+      if (!attitudeKeys.some((attitudeKey) => matchingKeys.has(attitudeKey))) {
+        return attitude
+      }
+
+      updatedExistingAttitude = true
+      return {
+        ...attitudeRecord,
+        id: runtime.getStringValue(attitudeRecord.id) || template.id,
+        templateId: template.id,
+        text: template.text,
+        alias: template.alias,
+        weightPercentage: template.weightPercentage,
+        value: numericValue,
+      }
+    })
+
+    if (!updatedExistingAttitude) {
+      nextAttitudes.push({
+        id: template.id,
+        templateId: template.id,
+        text: template.text,
+        alias: template.alias,
+        weightPercentage: template.weightPercentage,
+        value: numericValue,
+      })
+    }
+
+    const { _id, ...studentPayload } = currentStudent
+    const nextStudent = {
+      ...studentPayload,
+      attitudes: nextAttitudes,
+    }
+    const draftKey = getStudentAttitudeValueKey(studentId, template.id)
+
+    runtime.setIsLoadingClasses(true)
+    runtime.setClassesError(null)
+
+    try {
+      await schoolApi.updateStudent(studentId, nextStudent)
+      runtime.setAllStudents((currentStudents) =>
+        currentStudents.map((currentStudentDocument) =>
+          runtime.getDocumentId(currentStudentDocument) === studentId
+            ? { ...nextStudent, _id }
+            : currentStudentDocument,
+        ),
+      )
+      runtime.setAssessmentCellDrafts((currentDrafts) => {
+        const nextDrafts = { ...currentDrafts }
+        delete nextDrafts[draftKey]
+        return nextDrafts
+      })
+
+      if (runtime.selectedAssessmentsSemester) {
+        await handleSelectAssessmentsSemester(runtime.selectedAssessmentsSemester)
+      }
+    } catch (saveError) {
+      runtime.setClassesError(saveError instanceof Error ? saveError.message : 'Erro ao gravar atitude do aluno.')
+    } finally {
+      runtime.setIsLoadingClasses(false)
+    }
+  }
+
 function updateAssessmentCellDraft(
     student: SchoolDocument,
     moment: SchoolDocument,
@@ -802,6 +925,9 @@ async function saveAssessmentChanges() {
     getAssessmentsDashboardRows,
     buildSemesterEvaluationsPayload,
     saveSemesterEvaluations,
+    getStudentAttitudeValueKey,
+    updateStudentAttitudeDraft,
+    saveStudentAttitudeCell,
     updateAssessmentCellDraft,
     saveAssessmentCell,
     saveAssessmentChanges,

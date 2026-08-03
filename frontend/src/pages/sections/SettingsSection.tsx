@@ -31,6 +31,10 @@ export function SettingsSection() {
     addEvaluationMomentTemplate,
     updateEvaluationMomentTemplate,
     removeEvaluationMomentTemplate,
+    attitudeTemplates,
+    addAttitudeTemplate,
+    updateAttitudeTemplate,
+    removeAttitudeTemplate,
     percentageRanges,
     updatePercentageRange,
   } = useAppSettingsContext()
@@ -361,6 +365,172 @@ export function SettingsSection() {
                                 type="button"
                                 className="transparent-button"
                                 onClick={() => removeEvaluationMomentTemplate(template.id)}
+                              >
+                                Remover
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </section>
+                  <section
+                    className="settings-templates"
+                    aria-label="Atitudes"
+                  >
+                    <div className="settings-templates-heading">
+                      <div>
+                        <h3>Atitudes</h3>
+                        <p>
+                          Define os textos, aliases, ponderações e cores usados nas atitudes.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        className="secondary-button"
+                        onClick={addAttitudeTemplate}
+                      >
+                        Adicionar atitude
+                      </button>
+                    </div>
+                    {attitudeTemplates.length === 0 ? (
+                      <p className="settings-templates-empty">
+                        Ainda não existem atitudes configuradas.
+                      </p>
+                    ) : (
+                      <div
+                        className="settings-templates-table settings-attitudes-table"
+                        role="table"
+                        aria-label="Atitudes"
+                      >
+                        <div className="settings-templates-row settings-attitudes-row settings-templates-head" role="row">
+                          <span role="columnheader">Texto</span>
+                          <span role="columnheader">Alias</span>
+                          <span role="columnheader">Ponderação (%)</span>
+                          <span role="columnheader">Fundo</span>
+                          <span role="columnheader">Ponderação</span>
+                          <span role="columnheader">Texto</span>
+                          <span role="columnheader">Exemplo</span>
+                          <span role="columnheader">Ações</span>
+                        </div>
+                        {attitudeTemplates.map((template) => (
+                          <div className="settings-templates-row settings-attitudes-row" role="row" key={template.id}>
+                            <label role="cell">
+                              <span>Texto</span>
+                              <input
+                                type="text"
+                                value={template.text}
+                                maxLength={100}
+                                placeholder="Ex: Participação"
+                                required
+                                onChange={(event) =>
+                                  updateAttitudeTemplate(
+                                    template.id,
+                                    'text',
+                                    event.target.value,
+                                  )
+                                }
+                              />
+                            </label>
+                            <label role="cell">
+                              <span>Alias</span>
+                              <input
+                                type="text"
+                                value={template.alias}
+                                maxLength={30}
+                                placeholder="Ex: Part."
+                                required
+                                onChange={(event) =>
+                                  updateAttitudeTemplate(
+                                    template.id,
+                                    'alias',
+                                    event.target.value,
+                                  )
+                                }
+                              />
+                            </label>
+                            <label role="cell">
+                              <span>Ponderação (%)</span>
+                              <input
+                                type="text"
+                                inputMode="numeric"
+                                value={template.weightPercentage}
+                                required
+                                onFocus={(event) => event.currentTarget.select()}
+                                onChange={(event) =>
+                                  updateAttitudeTemplate(
+                                    template.id,
+                                    'weightPercentage',
+                                    normalizeIntegerInput(event.target.value),
+                                  )
+                                }
+                              />
+                            </label>
+                            <label role="cell">
+                              <span>Fundo</span>
+                              <input
+                                type="color"
+                                value={template.backgroundColor}
+                                onChange={(event) =>
+                                  updateAttitudeTemplate(
+                                    template.id,
+                                    'backgroundColor',
+                                    event.target.value,
+                                  )
+                                }
+                              />
+                            </label>
+                            <label role="cell">
+                              <span>Ponderação</span>
+                              <input
+                                type="color"
+                                value={template.weightedBackgroundColor}
+                                onChange={(event) =>
+                                  updateAttitudeTemplate(
+                                    template.id,
+                                    'weightedBackgroundColor',
+                                    event.target.value,
+                                  )
+                                }
+                              />
+                            </label>
+                            <label role="cell">
+                              <span>Texto</span>
+                              <input
+                                type="color"
+                                value={template.textColor}
+                                onChange={(event) =>
+                                  updateAttitudeTemplate(
+                                    template.id,
+                                    'textColor',
+                                    event.target.value,
+                                  )
+                                }
+                              />
+                            </label>
+                            <div className="settings-template-preview" role="cell">
+                              <span
+                                style={{
+                                  backgroundColor: template.backgroundColor,
+                                  color: template.textColor,
+                                }}
+                              >
+                                {template.alias || 'Alias'}
+                              </span>
+                              <span
+                                style={{
+                                  backgroundColor: template.weightedBackgroundColor,
+                                  color: template.textColor,
+                                }}
+                              >
+                                M*%
+                              </span>
+                            </div>
+                            <div className="settings-template-actions" role="cell">
+                              <button
+                                type="button"
+                                className="transparent-button"
+                                onClick={() => removeAttitudeTemplate(template.id)}
                               >
                                 Remover
                               </button>

@@ -30,6 +30,10 @@ export type AppSettingsContextValue = Pick<
   | 'addEvaluationMomentTemplate'
   | 'updateEvaluationMomentTemplate'
   | 'removeEvaluationMomentTemplate'
+  | 'attitudeTemplates'
+  | 'addAttitudeTemplate'
+  | 'updateAttitudeTemplate'
+  | 'removeAttitudeTemplate'
   | 'percentageRanges'
   | 'updatePercentageRange'
 >

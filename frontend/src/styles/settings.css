@@ -223,6 +223,10 @@
   color: var(--table-text);
 }
 
+.settings-attitudes-row {
+  grid-template-columns: minmax(160px, 1fr) minmax(90px, 120px) minmax(110px, 130px) repeat(3, minmax(70px, 90px)) minmax(140px, 180px) 100px;
+}
+
 .settings-templates-row + .settings-templates-row {
   border-top: 1px solid var(--table-border);
 }
@@ -249,6 +253,10 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 4px;
+}
+
+.settings-attitudes-row .settings-template-preview {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .settings-template-preview span {

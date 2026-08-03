@@ -5,8 +5,10 @@ import type { AppSettings } from '../api/school'
 import type { SchoolDocument } from '../api/school'
 import type { AcademicPeriod } from '../types'
 import type { AcademicPeriodType } from '../types'
+import type { AttitudeTemplate } from '../types'
 import type { DashboardSection } from '../types'
 import type { EvaluationMomentTemplate } from '../types'
+import { DEFAULT_ATTITUDE_TEMPLATES } from '../utils/constants'
 import { DEFAULT_EVALUATION_MOMENT_TEMPLATES } from '../utils/constants'
 import { getDefaultEvaluationMomentTemplateColors } from '../utils/constants'
 import { DEFAULT_ERROR_POPUP_BACKGROUND_COLOR } from '../utils/constants'
@@ -23,7 +25,7 @@ import type { ApplicationActions, ApplicationRuntime } from './applicationRuntim
 
 export function useAppSettings(
   runtime: ApplicationRuntime,
-): Pick<ApplicationActions, 'loadAppSettings' | 'saveAppSettings' | 'hasUnsavedAppSettingsChanges' | 'handleSettingsAction' | 'saveAndCloseSettings' | 'discardAndCloseSettings' | 'cancelSettingsClose' | 'addEvaluationMomentTemplate' | 'updateEvaluationMomentTemplate' | 'removeEvaluationMomentTemplate' | 'updatePercentageRange' | 'updatePeriodDate' | 'openSettingsDashboard' | 'openSettingsDashboardWithAssessmentGuard' | 'closeSettingsDashboard' | 'getStudentMomentPercentage' | 'getStudentMomentPercentageValue' | 'getStudentMomentPercentageStyle'> {
+): Pick<ApplicationActions, 'loadAppSettings' | 'saveAppSettings' | 'hasUnsavedAppSettingsChanges' | 'handleSettingsAction' | 'saveAndCloseSettings' | 'discardAndCloseSettings' | 'cancelSettingsClose' | 'addEvaluationMomentTemplate' | 'updateEvaluationMomentTemplate' | 'removeEvaluationMomentTemplate' | 'addAttitudeTemplate' | 'updateAttitudeTemplate' | 'removeAttitudeTemplate' | 'updatePercentageRange' | 'updatePeriodDate' | 'openSettingsDashboard' | 'openSettingsDashboardWithAssessmentGuard' | 'closeSettingsDashboard' | 'getStudentMomentPercentage' | 'getStudentMomentPercentageValue' | 'getStudentMomentPercentageStyle'> {
   const previousDashboardRef = useRef<Exclude<DashboardSection, 'settings'>>('schools')
 
 async function loadAppSettings() {
@@ -54,6 +56,7 @@ async function saveAppSettings() {
         errorPopupBackgroundColor: runtime.errorPopupBackgroundColor,
         errorPopupTextColor: runtime.errorPopupTextColor,
         evaluationMomentTemplates: runtime.evaluationMomentTemplates,
+        attitudeTemplates: runtime.attitudeTemplates,
         percentageRanges: runtime.percentageRanges,
         academicPeriodType: runtime.academicPeriodType,
         semesterPeriods: runtime.semesterPeriods,
@@ -105,6 +108,7 @@ function normalizeAppSettings(settings: AppSettings): NormalizedAppSettings {
       evaluationMomentTemplates: normalizeEvaluationMomentTemplates(
         settings.evaluationMomentTemplates,
       ),
+      attitudeTemplates: normalizeAttitudeTemplates(settings.attitudeTemplates),
       percentageRanges: normalizePercentageRanges(settings.percentageRanges),
       academicPeriodType:
         settings.academicPeriodType === 'semestres' || settings.academicPeriodType === 'trimestres'
@@ -129,6 +133,7 @@ function applyAppSettings(settings: NormalizedAppSettings) {
     runtime.setErrorPopupBackgroundColor(settings.errorPopupBackgroundColor)
     runtime.setErrorPopupTextColor(settings.errorPopupTextColor)
     runtime.setEvaluationMomentTemplates(settings.evaluationMomentTemplates)
+    runtime.setAttitudeTemplates(settings.attitudeTemplates)
     runtime.setPercentageRanges(settings.percentageRanges)
     runtime.setAcademicPeriodType(settings.academicPeriodType)
     runtime.setSemesterPeriods(settings.semesterPeriods)
@@ -148,6 +153,7 @@ function getCurrentAppSettings(): NormalizedAppSettings {
       errorPopupBackgroundColor: runtime.errorPopupBackgroundColor,
       errorPopupTextColor: runtime.errorPopupTextColor,
       evaluationMomentTemplates: runtime.evaluationMomentTemplates,
+      attitudeTemplates: runtime.attitudeTemplates,
       percentageRanges: runtime.percentageRanges,
       academicPeriodType: runtime.academicPeriodType,
       semesterPeriods: runtime.semesterPeriods,
@@ -196,6 +202,53 @@ function updateEvaluationMomentTemplate(
 
 function removeEvaluationMomentTemplate(templateId: string) {
     runtime.setEvaluationMomentTemplates((currentTemplates) =>
+      currentTemplates.filter((template) => template.id !== templateId),
+    )
+  }
+
+function addAttitudeTemplate() {
+    const templateId = globalThis.crypto?.randomUUID?.()
+      ?? `attitude-template-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+
+    runtime.setAttitudeTemplates((currentTemplates) => {
+      const defaultColors = getDefaultEvaluationMomentTemplateColors(currentTemplates.length)
+
+      return [
+        ...currentTemplates,
+        {
+          id: templateId,
+          text: '',
+          alias: '',
+          weightPercentage: 0,
+          backgroundColor: defaultColors.backgroundColor,
+          weightedBackgroundColor: defaultColors.weightedBackgroundColor,
+          textColor: defaultColors.textColor,
+        },
+      ]
+    })
+  }
+
+function updateAttitudeTemplate(
+    templateId: string,
+    field: 'text' | 'alias' | 'weightPercentage' | 'backgroundColor' | 'weightedBackgroundColor' | 'textColor',
+    value: string,
+  ) {
+    runtime.setAttitudeTemplates((currentTemplates) =>
+      currentTemplates.map((template) =>
+        template.id === templateId
+          ? {
+              ...template,
+              [field]: field === 'weightPercentage'
+                ? Math.min(100, normalizeNonNegativeInteger(value, template.weightPercentage))
+                : value,
+            }
+          : template,
+      ),
+    )
+  }
+
+function removeAttitudeTemplate(templateId: string) {
+    runtime.setAttitudeTemplates((currentTemplates) =>
       currentTemplates.filter((template) => template.id !== templateId),
     )
   }
@@ -350,6 +403,9 @@ function getStudentMomentPercentageStyle(student: SchoolDocument, moment: School
     addEvaluationMomentTemplate,
     updateEvaluationMomentTemplate,
     removeEvaluationMomentTemplate,
+    addAttitudeTemplate,
+    updateAttitudeTemplate,
+    removeAttitudeTemplate,
     updatePercentageRange,
     updatePeriodDate,
     openSettingsDashboard,
@@ -369,6 +425,7 @@ type NormalizedAppSettings = {
   errorPopupBackgroundColor: string
   errorPopupTextColor: string
   evaluationMomentTemplates: EvaluationMomentTemplate[]
+  attitudeTemplates: AttitudeTemplate[]
   percentageRanges: AppSettings['percentageRanges']
   academicPeriodType: AcademicPeriodType
   semesterPeriods: AcademicPeriod[]
@@ -411,6 +468,43 @@ function normalizeEvaluationMomentTemplates(value: unknown): EvaluationMomentTem
         record.averageBackgroundColor,
         defaultColors.averageBackgroundColor,
       ),
+      weightedBackgroundColor: normalizeHexColor(
+        record.weightedBackgroundColor,
+        defaultColors.weightedBackgroundColor,
+      ),
+      textColor: normalizeHexColor(record.textColor, defaultColors.textColor),
+    }]
+  })
+}
+
+function normalizeAttitudeTemplates(value: unknown): AttitudeTemplate[] {
+  if (!Array.isArray(value)) {
+    return DEFAULT_ATTITUDE_TEMPLATES
+  }
+
+  return value.flatMap((template, templateIndex) => {
+    if (!template || typeof template !== 'object' || Array.isArray(template)) {
+      return []
+    }
+
+    const record = template as Record<string, unknown>
+    const text = typeof record.text === 'string' ? record.text.trim() : ''
+    const alias = typeof record.alias === 'string' ? record.alias.trim() : ''
+    const weightPercentage = Number(record.weightPercentage)
+    const defaultColors = getDefaultEvaluationMomentTemplateColors(templateIndex)
+
+    if (!text || !alias || !Number.isFinite(weightPercentage)) {
+      return []
+    }
+
+    return [{
+      id: typeof record.id === 'string' && record.id
+        ? record.id
+        : `attitude-template-${templateIndex + 1}`,
+      text,
+      alias,
+      weightPercentage: Math.min(100, Math.max(0, Math.round(weightPercentage))),
+      backgroundColor: normalizeHexColor(record.backgroundColor, defaultColors.backgroundColor),
       weightedBackgroundColor: normalizeHexColor(
         record.weightedBackgroundColor,
         defaultColors.weightedBackgroundColor,

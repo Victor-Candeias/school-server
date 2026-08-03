@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { CSSProperties } from 'react'
 import type { SchoolDocument } from '../../api/school'
 import type { SchoolApplicationModel } from '../../hooks/useSchoolApplication'
+import type { AttitudeTemplate } from '../../types'
 import { getDefaultEvaluationMomentTemplateColors } from '../../utils/constants'
 import { normalizeDecimalInput } from '../../utils/validation'
 
@@ -29,10 +30,17 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
     getStudentAssessmentGroupAverage,
     formatAssessmentValue,
     evaluationMomentTemplates,
+    attitudeTemplates,
     percentageRanges,
+    getRecordValue,
+    assessmentCellDrafts,
+    getStudentAttitudeValueKey,
+    updateStudentAttitudeDraft,
+    saveStudentAttitudeCell,
   } = model
 
   const [visibleGroupMetrics, setVisibleGroupMetrics] = useState<Set<string>>(() => new Set())
+  const [hiddenAttitudeColumns, setHiddenAttitudeColumns] = useState<Set<string>>(() => new Set())
   const [selectedAssessmentStudentId, setSelectedAssessmentStudentId] = useState(ALL_STUDENTS_VALUE)
   const [assessmentWeightOverrides, setAssessmentWeightOverrides] = useState<Record<string, string>>({})
 
@@ -114,6 +122,173 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
       color: finalRange?.textColor ?? '#0f172a',
     }
   }
+  const visibleAttitudeTemplates = attitudeTemplates.filter(
+    (template) => !hiddenAttitudeColumns.has(template.id),
+  )
+  const totalAttitudeWeightPercentage = attitudeTemplates.reduce(
+    (total, template) => total + template.weightPercentage,
+    0,
+  )
+  const hasAttitudeTemplates = attitudeTemplates.length > 0
+  const hasVisibleAttitudeColumns = visibleAttitudeTemplates.length > 0
+  const getStudentSummaryRecord = (student: SchoolDocument) => {
+    const summaryStudents = model.semesterAssessmentSummary?.students
+    const studentId = getDocumentId(student)
+
+    if (!Array.isArray(summaryStudents) || !studentId) {
+      return null
+    }
+
+    const matchingSummary = summaryStudents.find((summaryStudent) => {
+      const summaryRecord = getRecordValue(summaryStudent)
+      return getStringValue(summaryRecord.studentId) === studentId
+    })
+
+    return matchingSummary ? getRecordValue(matchingSummary) : null
+  }
+  const getStudentAttitudeSummary = (student: SchoolDocument, template: AttitudeTemplate) => {
+    const studentSummary = getStudentSummaryRecord(student)
+    const attitudes = studentSummary?.attitudes
+
+    if (!Array.isArray(attitudes)) {
+      return null
+    }
+
+    const matchingAttitude = attitudes.find((attitude) => {
+      const attitudeRecord = getRecordValue(attitude)
+      return (
+        getStringValue(attitudeRecord.id) === template.id
+        || getStringValue(attitudeRecord.templateId) === template.id
+        || getStringValue(attitudeRecord.alias) === template.alias
+        || getStringValue(attitudeRecord.text) === template.text
+      )
+    })
+
+    return matchingAttitude ? getRecordValue(matchingAttitude) : null
+  }
+  const getNumericValue = (value: unknown) => {
+    const numericValue = Number(value)
+    return Number.isFinite(numericValue) ? numericValue : null
+  }
+  const getStudentAttitudeRecordValue = (student: SchoolDocument, template: AttitudeTemplate) => {
+    const studentRecord = getRecordValue(student)
+    const attitudeCollections = [
+      studentRecord.attitudes,
+      studentRecord.attitudeValues,
+      studentRecord.attitudeAssessments,
+    ]
+
+    for (const collection of attitudeCollections) {
+      if (Array.isArray(collection)) {
+        const matchingAttitude = collection.find((attitude) => {
+          const attitudeRecord = getRecordValue(attitude)
+          return (
+            getStringValue(attitudeRecord.id) === template.id
+            || getStringValue(attitudeRecord.templateId) === template.id
+            || getStringValue(attitudeRecord.alias) === template.alias
+            || getStringValue(attitudeRecord.text) === template.text
+          )
+        })
+        const matchingRecord = matchingAttitude ? getRecordValue(matchingAttitude) : null
+        const matchingValue = matchingRecord
+          ? getNumericValue(matchingRecord.value ?? matchingRecord.studentTotal ?? matchingRecord.total)
+          : null
+        if (matchingValue !== null) {
+          return matchingValue
+        }
+      }
+
+      if (collection && typeof collection === 'object' && !Array.isArray(collection)) {
+        const collectionRecord = getRecordValue(collection)
+        const matchingValue = getNumericValue(
+          collectionRecord[template.id]
+            ?? collectionRecord[template.alias]
+            ?? collectionRecord[template.text],
+        )
+        if (matchingValue !== null) {
+          return matchingValue
+        }
+      }
+    }
+
+    return getNumericValue(
+      studentRecord[template.id]
+        ?? studentRecord[template.alias]
+        ?? studentRecord[template.text],
+    ) ?? 0
+  }
+  const getStudentAttitudeValue = (student: SchoolDocument, template: AttitudeTemplate) => {
+    const summaryAttitude = getStudentAttitudeSummary(student, template)
+    const summaryValue = summaryAttitude
+      ? getNumericValue(summaryAttitude.value ?? summaryAttitude.studentTotal ?? summaryAttitude.total)
+      : null
+
+    return summaryValue ?? getStudentAttitudeRecordValue(student, template)
+  }
+  const getStudentAttitudeInputValue = (student: SchoolDocument, template: AttitudeTemplate) => {
+    const studentId = getDocumentId(student)
+    if (!studentId) {
+      return ''
+    }
+
+    const draftKey = getStudentAttitudeValueKey(studentId, template.id)
+    return draftKey in assessmentCellDrafts
+      ? assessmentCellDrafts[draftKey]
+      : formatAssessmentValue(getStudentAttitudeValue(student, template))
+  }
+  const getStudentAttitudesWeightedValue = (student: SchoolDocument) => {
+    const studentSummary = getStudentSummaryRecord(student)
+    const summaryValue = studentSummary
+      ? getNumericValue(studentSummary.attitudesWeightedValue)
+      : null
+
+    if (summaryValue !== null) {
+      return summaryValue
+    }
+
+    const attitudesTotal = attitudeTemplates.reduce(
+      (total, template) => total + getStudentAttitudeValue(student, template),
+      0,
+    )
+    return attitudesTotal * (totalAttitudeWeightPercentage / 100)
+  }
+  const getAttitudeStyle = (template: AttitudeTemplate): AssessmentGroupStyle => ({
+    '--assessment-group-background': template.backgroundColor,
+    '--assessment-group-average-background': template.weightedBackgroundColor,
+    '--assessment-group-weighted-background': template.weightedBackgroundColor,
+    '--assessment-group-text': template.textColor,
+  })
+  const getAttitudeTotalStyle = (): AssessmentGroupStyle => {
+    const firstTemplate = attitudeTemplates[0]
+    const defaultColors = getDefaultEvaluationMomentTemplateColors(momentGroups.length)
+
+    return {
+      '--assessment-group-background': firstTemplate?.weightedBackgroundColor ?? defaultColors.weightedBackgroundColor,
+      '--assessment-group-average-background': firstTemplate?.weightedBackgroundColor ?? defaultColors.weightedBackgroundColor,
+      '--assessment-group-weighted-background': firstTemplate?.weightedBackgroundColor ?? defaultColors.weightedBackgroundColor,
+      '--assessment-group-text': firstTemplate?.textColor ?? defaultColors.textColor,
+    }
+  }
+  const toggleAllAttitudeColumns = () => {
+    setHiddenAttitudeColumns((currentHiddenColumns) => {
+      if (currentHiddenColumns.size >= attitudeTemplates.length) {
+        return new Set()
+      }
+
+      return new Set(attitudeTemplates.map((template) => template.id))
+    })
+  }
+  const toggleAttitudeColumn = (templateId: string) => {
+    setHiddenAttitudeColumns((currentHiddenColumns) => {
+      const nextHiddenColumns = new Set(currentHiddenColumns)
+      if (nextHiddenColumns.has(templateId)) {
+        nextHiddenColumns.delete(templateId)
+      } else {
+        nextHiddenColumns.add(templateId)
+      }
+      return nextHiddenColumns
+    })
+  }
   const handleAssessmentSemesterChange = (semester: string) => {
     setAssessmentWeightOverrides({})
     setSelectedAssessmentStudentId(ALL_STUDENTS_VALUE)
@@ -160,7 +335,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
       + group.moments.length
       + (isGroupMetricsHidden(group.type) ? 0 : 2),
     0,
-  )
+  ) + (hasVisibleAttitudeColumns ? visibleAttitudeTemplates.length + 1 : 0)
   const assessmentGridColumns = `minmax(140px, 1.3fr) repeat(${assessmentColumnCount}, minmax(60px, 1fr))`
 
   return (
@@ -236,6 +411,23 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                       <p className="students-empty-state">Ainda não existem alunos nesta turma.</p>
                     ) : (
                       <>
+                      {hasAttitudeTemplates && (
+                        <div className="semester-assessments-visibility-controls" aria-label="Visibilidade das atitudes">
+                          <button type="button" onClick={toggleAllAttitudeColumns}>
+                            {hasVisibleAttitudeColumns ? 'Ocultar atitudes' : 'Mostrar atitudes'}
+                          </button>
+                          {attitudeTemplates.map((template) => (
+                            <button
+                              type="button"
+                              key={template.id}
+                              aria-pressed={!hiddenAttitudeColumns.has(template.id)}
+                              onClick={() => toggleAttitudeColumn(template.id)}
+                            >
+                              {hiddenAttitudeColumns.has(template.id) ? 'Mostrar' : 'Ocultar'} {template.alias}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                       <div className="semester-assessments-table" role="table" aria-label="Avaliações por semestre">
                         <div className="semester-assessments-header" role="rowgroup">
                           <div
@@ -285,6 +477,18 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                               </span>
                               )
                             })}
+                            {hasVisibleAttitudeColumns && (
+                              <span
+                                className="semester-assessments-type-head semester-assessments-group-cell semester-assessments-attitudes-head"
+                                role="columnheader"
+                                style={{
+                                  ...getAttitudeTotalStyle(),
+                                  gridColumn: `span ${visibleAttitudeTemplates.length + 1}`,
+                                }}
+                              >
+                                Atitudes
+                              </span>
+                            )}
                             <span
                               className="semester-assessments-final-head"
                               role="columnheader"
@@ -337,6 +541,36 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                               </span>,
                               ]),
                             ])}
+                            {visibleAttitudeTemplates.map((template) => (
+                              <span
+                                className="semester-assessments-group-cell semester-assessments-attitude-head"
+                                role="columnheader"
+                                key={template.id}
+                                title={template.text}
+                                style={getAttitudeStyle(template)}
+                              >
+                                <span>{template.alias}</span>
+                                <button
+                                  className="semester-assessments-group-toggle"
+                                  type="button"
+                                  aria-label={`Ocultar atitude ${template.alias}`}
+                                  title={`Ocultar ${template.alias}`}
+                                  onClick={() => toggleAttitudeColumn(template.id)}
+                                >
+                                  ×
+                                </button>
+                              </span>
+                            ))}
+                            {hasVisibleAttitudeColumns && (
+                              <span
+                                className="semester-assessments-weighted-head semester-assessments-group-cell"
+                                role="columnheader"
+                                title={`Soma das atitudes × ${formatAssessmentValue(totalAttitudeWeightPercentage)}%`}
+                                style={getAttitudeTotalStyle()}
+                              >
+                                {formatAssessmentValue(totalAttitudeWeightPercentage)}%
+                              </span>
+                            )}
                             <span
                               className="semester-assessments-empty-subhead"
                               aria-hidden="true"
@@ -386,6 +620,42 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                               </strong>,
                               ]),
                             ])}
+                            {visibleAttitudeTemplates.map((template) => (
+                              <span
+                                className="semester-assessments-group-cell semester-assessments-attitude-cell"
+                                role="cell"
+                                key={template.id}
+                                style={getAttitudeStyle(template)}
+                              >
+                                <input
+                                  type="text"
+                                  inputMode="decimal"
+                                  value={getStudentAttitudeInputValue(student, template)}
+                                  onChange={(event) =>
+                                    updateStudentAttitudeDraft(student, template, event.target.value)
+                                  }
+                                  onFocus={(event) => event.currentTarget.select()}
+                                  onBlur={(event) =>
+                                    void saveStudentAttitudeCell(student, template, event.target.value)
+                                  }
+                                  onKeyDown={(event) => {
+                                    if (event.key === 'Enter') {
+                                      event.currentTarget.blur()
+                                    }
+                                  }}
+                                  aria-label={`Valor de ${getStringValue(student.name)} em ${template.alias}`}
+                                />
+                              </span>
+                            ))}
+                            {hasVisibleAttitudeColumns && (
+                              <strong
+                                className="semester-assessments-weighted-cell semester-assessments-group-cell"
+                                role="cell"
+                                style={getAttitudeTotalStyle()}
+                              >
+                                {formatAssessmentValue(getStudentAttitudesWeightedValue(student))}
+                              </strong>
+                            )}
                             <strong
                               className="semester-assessments-final-cell"
                               role="cell"
@@ -477,6 +747,49 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 </section>
                               )
                             })}
+                            {hasVisibleAttitudeColumns && (
+                              <section
+                                className="semester-assessments-mobile-group semester-assessments-mobile-attitudes"
+                                aria-label="Atitudes"
+                                style={getAttitudeTotalStyle()}
+                              >
+                                <div className="semester-assessments-mobile-group-heading">
+                                  <span>Atitudes</span>
+                                  <strong>{formatAssessmentValue(totalAttitudeWeightPercentage)}%</strong>
+                                </div>
+                                <div className="semester-assessments-mobile-moments">
+                                  {visibleAttitudeTemplates.map((template) => (
+                                    <p key={template.id}>
+                                      <span>{template.alias}:</span>
+                                      <input
+                                        type="text"
+                                        inputMode="decimal"
+                                        value={getStudentAttitudeInputValue(student, template)}
+                                        onChange={(event) =>
+                                          updateStudentAttitudeDraft(student, template, event.target.value)
+                                        }
+                                        onFocus={(event) => event.currentTarget.select()}
+                                        onBlur={(event) =>
+                                          void saveStudentAttitudeCell(student, template, event.target.value)
+                                        }
+                                        onKeyDown={(event) => {
+                                          if (event.key === 'Enter') {
+                                            event.currentTarget.blur()
+                                          }
+                                        }}
+                                        aria-label={`Valor de ${getStringValue(student.name)} em ${template.alias}`}
+                                      />
+                                    </p>
+                                  ))}
+                                </div>
+                                <div className="semester-assessments-mobile-metrics">
+                                  <p>
+                                    <span>Total atitudes:</span>
+                                    <strong>{formatAssessmentValue(getStudentAttitudesWeightedValue(student))}</strong>
+                                  </p>
+                                </div>
+                              </section>
+                            )}
                             <div className="semester-assessments-mobile-final">
                               <p style={finalStyle}>
                                 <span>Final:</span>

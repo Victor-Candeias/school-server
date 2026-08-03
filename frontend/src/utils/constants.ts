@@ -2,6 +2,7 @@ import type { PercentageRange } from '../api/school'
 import type {
   AcademicPeriod,
   AcademicPeriodType,
+  AttitudeTemplate,
   ClassForm,
   EvaluationMomentTemplate,
   EvaluationMomentForm,
@@ -75,6 +76,8 @@ export function getDefaultEvaluationMomentTemplateColors(templateIndex: number) 
 }
 
 export const DEFAULT_EVALUATION_MOMENT_TEMPLATES: EvaluationMomentTemplate[] = []
+
+export const DEFAULT_ATTITUDE_TEMPLATES: AttitudeTemplate[] = []
 
 export const DEFAULT_ACADEMIC_PERIOD_TYPE: AcademicPeriodType = 'semestres'
 

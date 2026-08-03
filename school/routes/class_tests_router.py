@@ -42,6 +42,7 @@ DEFAULT_APP_SETTINGS = {
     "errorPopupBackgroundColor": "#fee2e2",
     "errorPopupTextColor": "#dc2626",
     "evaluationMomentTemplates": [],
+    "attitudeTemplates": [],
     "percentageRanges": [
         {
             "id": "very-low",
@@ -195,6 +196,58 @@ def normalize_evaluation_moment_templates(value):
                 "averageBackgroundColor": normalize_hex_color(
                     template.get("averageBackgroundColor"),
                     default_colors["averageBackgroundColor"],
+                ),
+                "weightedBackgroundColor": normalize_hex_color(
+                    template.get("weightedBackgroundColor"),
+                    default_colors["weightedBackgroundColor"],
+                ),
+                "textColor": normalize_hex_color(
+                    template.get("textColor"),
+                    default_colors["textColor"],
+                ),
+            }
+        )
+
+    return normalized_templates
+
+
+def normalize_attitude_templates(value):
+    if not isinstance(value, list):
+        return DEFAULT_APP_SETTINGS["attitudeTemplates"]
+
+    normalized_templates = []
+    for template_index, template in enumerate(value):
+        if not isinstance(template, dict):
+            continue
+
+        text = template.get("text")
+        alias = template.get("alias")
+        if not isinstance(text, str) or not text.strip():
+            continue
+        if not isinstance(alias, str) or not alias.strip():
+            continue
+
+        weight_percentage = template.get("weightPercentage")
+        if isinstance(weight_percentage, bool):
+            continue
+
+        try:
+            normalized_weight = round(float(weight_percentage))
+        except (TypeError, ValueError):
+            continue
+        default_colors = DEFAULT_EVALUATION_MOMENT_TEMPLATE_COLORS[
+            template_index % len(DEFAULT_EVALUATION_MOMENT_TEMPLATE_COLORS)
+        ]
+
+        normalized_templates.append(
+            {
+                "id": str(template.get("id") or f"attitude-template-{template_index + 1}"),
+                "text": text.strip(),
+                "alias": alias.strip(),
+                "weightPercentage": min(100, max(0, normalized_weight)),
+                "backgroundColor": normalize_hex_color(
+                    template.get("backgroundColor"),
+                    default_colors["backgroundColor"],
                 ),
                 "weightedBackgroundColor": normalize_hex_color(
                     template.get("weightedBackgroundColor"),
@@ -541,6 +594,49 @@ def get_student_moment_total(enriched_values, student_id, moment_id):
     return to_float(matching_value.get("studentMomentTotal")) if matching_value else 0
 
 
+def get_student_attitude_value(student, template):
+    matching_keys = [
+        str(template.get("id") or ""),
+        get_string_value(template.get("alias")),
+        get_string_value(template.get("text")),
+    ]
+    matching_keys = [key for key in matching_keys if key]
+
+    for collection_key in ("attitudes", "attitudeValues", "attitudeAssessments"):
+        collection = student.get(collection_key)
+
+        if isinstance(collection, list):
+            for attitude in collection:
+                if not isinstance(attitude, dict):
+                    continue
+
+                attitude_keys = [
+                    str(attitude.get("id") or ""),
+                    str(attitude.get("templateId") or ""),
+                    get_string_value(attitude.get("alias")),
+                    get_string_value(attitude.get("text")),
+                ]
+                if any(key in matching_keys for key in attitude_keys):
+                    return to_float(
+                        attitude.get("value")
+                        if attitude.get("value") is not None
+                        else attitude.get("studentTotal")
+                        if attitude.get("studentTotal") is not None
+                        else attitude.get("total")
+                    )
+
+        if isinstance(collection, dict):
+            for key in matching_keys:
+                if key in collection:
+                    return to_float(collection.get(key))
+
+    for key in matching_keys:
+        if key in student:
+            return to_float(student.get(key))
+
+    return 0
+
+
 def group_semester_moments(moments, templates):
     groups = []
 
@@ -570,6 +666,11 @@ def group_semester_moments(moments, templates):
 def build_semester_evaluations_summary(metadata, students, moments, value_documents, settings):
     percentage_ranges = normalize_percentage_ranges(settings.get("percentageRanges"))
     templates = normalize_evaluation_moment_templates(settings.get("evaluationMomentTemplates"))
+    attitude_templates = normalize_attitude_templates(settings.get("attitudeTemplates"))
+    total_attitude_weight_percentage = sum(
+        to_float(template.get("weightPercentage"))
+        for template in attitude_templates
+    )
     semester = str(metadata.get("semester"))
     semester_moments = [
         moment
@@ -635,6 +736,19 @@ def build_semester_evaluations_summary(metadata, students, moments, value_docume
                 }
             )
 
+        attitude_summaries = [
+            {
+                "id": template["id"],
+                "text": template["text"],
+                "alias": template["alias"],
+                "weightPercentage": template["weightPercentage"],
+                "value": format_number(get_student_attitude_value(student, template)),
+            }
+            for template in attitude_templates
+        ]
+        attitudes_weighted_value = sum(
+            attitude["value"] for attitude in attitude_summaries
+        ) * (total_attitude_weight_percentage / 100)
         final_percentage = (final_value / final_max_value) * 100 if final_max_value else final_value
         final_range = get_percentage_range(final_percentage, percentage_ranges)
         student_summaries.append(
@@ -642,6 +756,9 @@ def build_semester_evaluations_summary(metadata, students, moments, value_docume
                 "studentId": student_id,
                 "studentName": get_student_name(student),
                 "groups": student_groups,
+                "attitudes": attitude_summaries,
+                "attitudesWeightPercentage": format_number(total_attitude_weight_percentage),
+                "attitudesWeightedValue": format_number(attitudes_weighted_value),
                 "finalValue": format_number(final_value),
                 "finalMaxValue": format_number(final_max_value),
                 "finalPercentage": round(final_percentage, 1),
@@ -666,6 +783,15 @@ def build_semester_evaluations_summary(metadata, students, moments, value_docume
                 f"{group['type']} - M*{format_number(group['weightPercentage'])}%",
             ]
         ],
+        *[
+            attitude["alias"]
+            for attitude in attitude_templates
+        ],
+        *(
+            [f"Atitudes - {format_number(total_attitude_weight_percentage)}%"]
+            if attitude_templates
+            else []
+        ),
         "Final",
         "Nota",
     ]
@@ -681,6 +807,15 @@ def build_semester_evaluations_summary(metadata, students, moments, value_docume
                     group["weightedValue"],
                 ]
             ],
+            *[
+                str(attitude["value"])
+                for attitude in student_summary["attitudes"]
+            ],
+            *(
+                [str(student_summary["attitudesWeightedValue"])]
+                if student_summary["attitudes"]
+                else []
+            ),
             str(student_summary["finalValue"]),
             str(student_summary["finalGrade"]),
         ]
@@ -713,6 +848,16 @@ def build_semester_evaluations_summary(metadata, students, moments, value_docume
             }
             for group in groups
         ],
+        "attitudes": [
+            {
+                "id": template["id"],
+                "text": template["text"],
+                "alias": template["alias"],
+                "weightPercentage": template["weightPercentage"],
+            }
+            for template in attitude_templates
+        ],
+        "attitudesWeightPercentage": format_number(total_attitude_weight_percentage),
         "headers": headers,
         "rows": rows,
         "students": student_summaries,
@@ -760,6 +905,7 @@ async def get_normalized_app_settings():
     settings["evaluationMomentTemplates"] = normalize_evaluation_moment_templates(
         settings.get("evaluationMomentTemplates"),
     )
+    settings["attitudeTemplates"] = normalize_attitude_templates(settings.get("attitudeTemplates"))
     settings["percentageRanges"] = normalize_percentage_ranges(settings.get("percentageRanges"))
     return settings
 
@@ -1005,6 +1151,7 @@ async def get_app_settings(_: None = Depends(utilities.verificar_token_cookie)):
     settings["evaluationMomentTemplates"] = normalize_evaluation_moment_templates(
         settings.get("evaluationMomentTemplates"),
     )
+    settings["attitudeTemplates"] = normalize_attitude_templates(settings.get("attitudeTemplates"))
     settings["percentageRanges"] = normalize_percentage_ranges(settings.get("percentageRanges"))
     if (
         documents[0].get("messageTimeoutSeconds") != settings["messageTimeoutSeconds"]
@@ -1013,6 +1160,7 @@ async def get_app_settings(_: None = Depends(utilities.verificar_token_cookie)):
         or documents[0].get("errorPopupBackgroundColor") != settings["errorPopupBackgroundColor"]
         or documents[0].get("errorPopupTextColor") != settings["errorPopupTextColor"]
         or documents[0].get("evaluationMomentTemplates") != settings["evaluationMomentTemplates"]
+        or documents[0].get("attitudeTemplates") != settings["attitudeTemplates"]
         or documents[0].get("percentageRanges") != settings["percentageRanges"]
     ):
         await api_client.update(
@@ -1055,6 +1203,7 @@ async def update_app_settings(request: Request, _: None = Depends(utilities.veri
         "evaluationMomentTemplates": normalize_evaluation_moment_templates(
             body.get("evaluationMomentTemplates"),
         ),
+        "attitudeTemplates": normalize_attitude_templates(body.get("attitudeTemplates")),
         "percentageRanges": normalize_percentage_ranges(body.get("percentageRanges")),
     }
     payload = {
