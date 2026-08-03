@@ -226,3 +226,49 @@ def test_build_semester_evaluations_summary_calculates_groups_and_final_grade():
     assert summary["rows"][1] == ["Bruno", "8", "8", "4.8", "10", "10", "4", "8.8", "2"]
     assert summary["students"][0]["finalPercentage"] == 82.0
     assert summary["students"][0]["finalGrade"] == 4
+
+
+def test_build_semester_evaluations_summary_uses_current_template_label_by_id():
+    summary = build_semester_evaluations_summary(
+        {
+            "userId": "user-1",
+            "schoolId": "school-1",
+            "yearId": "year-1",
+            "classId": "class-1",
+            "semester": "1",
+            "title": "Avaliações - 1.º semestre",
+        },
+        [{"_id": "student-1", "name": "Ana", "active": True}],
+        [
+            {
+                "_id": "moment-1",
+                "name": "Teste 1",
+                "semester": "1",
+                "type": "Testes escritos - 45%",
+                "evaluationMomentTemplateId": "template-1",
+                "evaluationMomentTemplateType": "Testes escritos - 45%",
+                "evaluationMomentTemplateWeightPercentage": 45,
+                "totalValue": 20,
+            },
+        ],
+        [
+            {
+                "momentId": "moment-1",
+                "studentId": "student-1",
+                "questionNumber": "1",
+                "questionValue": 20,
+                "value": 18,
+            },
+        ],
+        {
+            "evaluationMomentTemplates": [
+                {"id": "template-1", "type": "Testes escritos", "weightPercentage": 35},
+            ],
+            "percentageRanges": None,
+        },
+    )
+
+    assert summary["groups"][0]["type"] == "Testes escritos"
+    assert summary["groups"][0]["weightPercentage"] == 35
+    assert "Testes escritos - Média" in summary["headers"]
+    assert "Testes escritos - M*35%" in summary["headers"]

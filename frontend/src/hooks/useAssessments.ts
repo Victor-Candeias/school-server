@@ -418,6 +418,30 @@ function getAssessmentsSemesterMoments() {
   }
 
 function getAssessmentsSemesterMomentGroups() {
+    const getMomentGroupType = (moment: SchoolDocument) => {
+      const templateId = runtime.getStringValue(moment.evaluationMomentTemplateId)
+      const matchingTemplate = runtime.evaluationMomentTemplates.find((template) =>
+        template.id === templateId
+      )
+
+      return matchingTemplate?.type || runtime.getEvaluationMomentTypeLabel(moment) || 'Sem tipo'
+    }
+
+    const getMomentGroupWeightPercentage = (moment: SchoolDocument, type: string) => {
+      const templateId = runtime.getStringValue(moment.evaluationMomentTemplateId)
+      const configuredWeightPercentage = runtime.evaluationMomentTemplates.find((template) =>
+        template.id === templateId || (!templateId && template.type === type)
+      )?.weightPercentage
+      const storedWeightPercentage = Number(moment.evaluationMomentTemplateWeightPercentage)
+
+      return configuredWeightPercentage !== undefined
+        && Number.isFinite(configuredWeightPercentage)
+        ? configuredWeightPercentage
+        : Number.isFinite(storedWeightPercentage)
+          ? storedWeightPercentage
+          : 0
+    }
+
     const summaryGroups = runtime.semesterAssessmentSummary?.groups
     if (Array.isArray(summaryGroups)) {
       return summaryGroups.flatMap((group) => {
@@ -426,35 +450,31 @@ function getAssessmentsSemesterMomentGroups() {
         }
 
         const groupRecord = group as Record<string, unknown>
-        const moments = Array.isArray(groupRecord.moments) ? groupRecord.moments : []
+        const summaryMoments = Array.isArray(groupRecord.moments) ? groupRecord.moments : []
+        const moments = summaryMoments.map((moment) => {
+          const momentRecord = runtime.getRecordValue(moment)
+          const summaryMomentId = runtime.getStringValue(momentRecord.id)
+          return runtime.allEvaluationMoments.find((evaluationMoment) =>
+            runtime.getDocumentId(evaluationMoment) === summaryMomentId
+          ) ?? momentRecord
+        })
+        const firstMoment = moments[0]
+        const type = firstMoment ? getMomentGroupType(firstMoment) : runtime.getStringValue(groupRecord.type) || 'Sem tipo'
 
         return [{
-          type: runtime.getStringValue(groupRecord.type) || 'Sem tipo',
-          weightPercentage: Number(groupRecord.weightPercentage) || 0,
-          moments: moments.map((moment) => {
-            const momentRecord = runtime.getRecordValue(moment)
-            const summaryMomentId = runtime.getStringValue(momentRecord.id)
-            return runtime.allEvaluationMoments.find((evaluationMoment) =>
-              runtime.getDocumentId(evaluationMoment) === summaryMomentId
-            ) ?? momentRecord
-          }),
+          type,
+          weightPercentage: firstMoment
+            ? getMomentGroupWeightPercentage(firstMoment, type)
+            : Number(groupRecord.weightPercentage) || 0,
+          moments,
         }]
       })
     }
 
     return getAssessmentsSemesterMoments().reduce<AssessmentMomentGroup[]>((groups, moment) => {
-      const type = runtime.getEvaluationMomentTypeLabel(moment) || 'Sem tipo'
+      const type = getMomentGroupType(moment)
       const existingGroup = groups.find((group) => group.type === type)
-      const storedWeightPercentage = Number(moment.evaluationMomentTemplateWeightPercentage)
-      const configuredWeightPercentage = runtime.evaluationMomentTemplates.find(
-        (template) => template.type === type,
-      )?.weightPercentage
-      const weightPercentage = configuredWeightPercentage !== undefined
-        && Number.isFinite(configuredWeightPercentage)
-        ? configuredWeightPercentage
-        : Number.isFinite(storedWeightPercentage)
-          ? storedWeightPercentage
-          : 0
+      const weightPercentage = getMomentGroupWeightPercentage(moment, type)
 
       if (existingGroup) {
         existingGroup.moments.push(moment)

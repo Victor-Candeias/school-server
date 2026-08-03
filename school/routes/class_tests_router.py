@@ -269,6 +269,40 @@ def get_moment_type_label(moment):
     return moment_type or "Sem tipo"
 
 
+def get_moment_template(moment, templates):
+    template_id = get_string_value(moment.get("evaluationMomentTemplateId"))
+    if template_id:
+        matching_template = next(
+            (
+                template
+                for template in templates
+                if get_string_value(template.get("id")) == template_id
+            ),
+            None,
+        )
+
+        if matching_template:
+            return matching_template
+
+    moment_type = get_moment_type_label(moment)
+    return next(
+        (
+            template
+            for template in templates
+            if template.get("type") == moment_type
+        ),
+        None,
+    )
+
+
+def get_moment_group_type_label(moment, templates):
+    matching_template = get_moment_template(moment, templates)
+    if matching_template:
+        return get_string_value(matching_template.get("type")) or "Sem tipo"
+
+    return get_moment_type_label(moment)
+
+
 def get_moment_semester(moment):
     return "2" if str(moment.get("semester", "1")) == "2" else "1"
 
@@ -297,15 +331,7 @@ def get_moment_max_value(moment, value_documents):
 
 
 def get_moment_weight_percentage(moment, templates):
-    moment_type = get_moment_type_label(moment)
-    configured_template = next(
-        (
-            template
-            for template in templates
-            if template.get("type") == moment_type
-        ),
-        None,
-    )
+    configured_template = get_moment_template(moment, templates)
 
     if configured_template:
         return to_float(configured_template.get("weightPercentage"))
@@ -473,7 +499,7 @@ def group_semester_moments(moments, templates):
     groups = []
 
     for moment in moments:
-        moment_type = get_moment_type_label(moment)
+        moment_type = get_moment_group_type_label(moment, templates)
         existing_group = next(
             (group for group in groups if group["type"] == moment_type),
             None,
