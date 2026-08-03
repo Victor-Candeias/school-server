@@ -36,6 +36,44 @@ export const DEFAULT_PERCENTAGE_RANGES: PercentageRange[] = [
   { id: 'very-high', min: 86, max: 100, nota: 5, backgroundColor: '#ddd6fe', textColor: '#4c1d95' },
 ]
 
+export const DEFAULT_EVALUATION_MOMENT_TEMPLATE_COLORS = [
+  {
+    backgroundColor: '#1e40af',
+    averageBackgroundColor: '#1d4ed8',
+    weightedBackgroundColor: '#2563eb',
+    textColor: '#eff6ff',
+  },
+  {
+    backgroundColor: '#5b21b6',
+    averageBackgroundColor: '#6d28d9',
+    weightedBackgroundColor: '#7c3aed',
+    textColor: '#f5f3ff',
+  },
+  {
+    backgroundColor: '#9a3412',
+    averageBackgroundColor: '#c2410c',
+    weightedBackgroundColor: '#ea580c',
+    textColor: '#fff7ed',
+  },
+  {
+    backgroundColor: '#115e59',
+    averageBackgroundColor: '#0f766e',
+    weightedBackgroundColor: '#0d9488',
+    textColor: '#f0fdfa',
+  },
+] satisfies Array<
+  Pick<
+    EvaluationMomentTemplate,
+    'backgroundColor' | 'averageBackgroundColor' | 'weightedBackgroundColor' | 'textColor'
+  >
+>
+
+export function getDefaultEvaluationMomentTemplateColors(templateIndex: number) {
+  return DEFAULT_EVALUATION_MOMENT_TEMPLATE_COLORS[
+    templateIndex % DEFAULT_EVALUATION_MOMENT_TEMPLATE_COLORS.length
+  ]
+}
+
 export const DEFAULT_EVALUATION_MOMENT_TEMPLATES: EvaluationMomentTemplate[] = []
 
 export const DEFAULT_ACADEMIC_PERIOD_TYPE: AcademicPeriodType = 'semestres'

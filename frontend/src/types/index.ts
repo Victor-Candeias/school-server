@@ -71,6 +71,10 @@ export type EvaluationMomentTemplate = {
   id: string
   type: string
   weightPercentage: number
+  backgroundColor: string
+  averageBackgroundColor: string
+  weightedBackgroundColor: string
+  textColor: string
 }
 
 export type AcademicYearOption = {

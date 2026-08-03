@@ -8,6 +8,7 @@ import type { AcademicPeriodType } from '../types'
 import type { DashboardSection } from '../types'
 import type { EvaluationMomentTemplate } from '../types'
 import { DEFAULT_EVALUATION_MOMENT_TEMPLATES } from '../utils/constants'
+import { getDefaultEvaluationMomentTemplateColors } from '../utils/constants'
 import { DEFAULT_ERROR_POPUP_BACKGROUND_COLOR } from '../utils/constants'
 import { DEFAULT_ERROR_POPUP_TEXT_COLOR } from '../utils/constants'
 import { DEFAULT_INACTIVITY_LOGOUT_MINUTES } from '../utils/constants'
@@ -169,13 +170,14 @@ function addEvaluationMomentTemplate() {
         id: templateId,
         type: '',
         weightPercentage: 0,
+        ...getDefaultEvaluationMomentTemplateColors(currentTemplates.length),
       },
     ])
   }
 
 function updateEvaluationMomentTemplate(
     templateId: string,
-    field: 'type' | 'weightPercentage',
+    field: 'type' | 'weightPercentage' | 'backgroundColor' | 'averageBackgroundColor' | 'weightedBackgroundColor' | 'textColor',
     value: string,
   ) {
     runtime.setEvaluationMomentTemplates((currentTemplates) =>
@@ -392,6 +394,7 @@ function normalizeEvaluationMomentTemplates(value: unknown): EvaluationMomentTem
     const record = template as Record<string, unknown>
     const type = typeof record.type === 'string' ? record.type.trim() : ''
     const weightPercentage = Number(record.weightPercentage)
+    const defaultColors = getDefaultEvaluationMomentTemplateColors(templateIndex)
 
     if (!type || !Number.isFinite(weightPercentage)) {
       return []
@@ -403,6 +406,16 @@ function normalizeEvaluationMomentTemplates(value: unknown): EvaluationMomentTem
         : `evaluation-template-${templateIndex + 1}`,
       type,
       weightPercentage: Math.min(100, Math.max(0, Math.round(weightPercentage))),
+      backgroundColor: normalizeHexColor(record.backgroundColor, defaultColors.backgroundColor),
+      averageBackgroundColor: normalizeHexColor(
+        record.averageBackgroundColor,
+        defaultColors.averageBackgroundColor,
+      ),
+      weightedBackgroundColor: normalizeHexColor(
+        record.weightedBackgroundColor,
+        defaultColors.weightedBackgroundColor,
+      ),
+      textColor: normalizeHexColor(record.textColor, defaultColors.textColor),
     }]
   })
 }

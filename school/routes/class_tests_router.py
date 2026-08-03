@@ -94,6 +94,33 @@ DEFAULT_APP_SETTINGS = {
     ],
 }
 
+DEFAULT_EVALUATION_MOMENT_TEMPLATE_COLORS = [
+    {
+        "backgroundColor": "#1e40af",
+        "averageBackgroundColor": "#1d4ed8",
+        "weightedBackgroundColor": "#2563eb",
+        "textColor": "#eff6ff",
+    },
+    {
+        "backgroundColor": "#5b21b6",
+        "averageBackgroundColor": "#6d28d9",
+        "weightedBackgroundColor": "#7c3aed",
+        "textColor": "#f5f3ff",
+    },
+    {
+        "backgroundColor": "#9a3412",
+        "averageBackgroundColor": "#c2410c",
+        "weightedBackgroundColor": "#ea580c",
+        "textColor": "#fff7ed",
+    },
+    {
+        "backgroundColor": "#115e59",
+        "averageBackgroundColor": "#0f766e",
+        "weightedBackgroundColor": "#0d9488",
+        "textColor": "#f0fdfa",
+    },
+]
+
 
 def safe_report_filename(value):
     normalized = re.sub(r"[^A-Za-z0-9_-]+", "_", value.strip())
@@ -152,12 +179,31 @@ def normalize_evaluation_moment_templates(value):
             normalized_weight = round(float(weight_percentage))
         except (TypeError, ValueError):
             continue
+        default_colors = DEFAULT_EVALUATION_MOMENT_TEMPLATE_COLORS[
+            template_index % len(DEFAULT_EVALUATION_MOMENT_TEMPLATE_COLORS)
+        ]
 
         normalized_templates.append(
             {
                 "id": str(template.get("id") or f"evaluation-template-{template_index + 1}"),
                 "type": moment_type.strip(),
                 "weightPercentage": min(100, max(0, normalized_weight)),
+                "backgroundColor": normalize_hex_color(
+                    template.get("backgroundColor"),
+                    default_colors["backgroundColor"],
+                ),
+                "averageBackgroundColor": normalize_hex_color(
+                    template.get("averageBackgroundColor"),
+                    default_colors["averageBackgroundColor"],
+                ),
+                "weightedBackgroundColor": normalize_hex_color(
+                    template.get("weightedBackgroundColor"),
+                    default_colors["weightedBackgroundColor"],
+                ),
+                "textColor": normalize_hex_color(
+                    template.get("textColor"),
+                    default_colors["textColor"],
+                ),
             }
         )
 

@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import type { CSSProperties } from 'react'
 import type { SchoolDocument } from '../../api/school'
 import type { SchoolApplicationModel } from '../../hooks/useSchoolApplication'
+import { getDefaultEvaluationMomentTemplateColors } from '../../utils/constants'
 import { normalizeDecimalInput } from '../../utils/validation'
 
 
@@ -128,6 +130,19 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
     : students.filter((student) => getDocumentId(student) === activeAssessmentStudentId)
   const getGroupClassName = (groupIndex: number) =>
     `semester-assessments-group-${groupIndex % 4}`
+  const getGroupStyle = (groupType: string, groupIndex: number): AssessmentGroupStyle => {
+    const matchingTemplate = evaluationMomentTemplates.find((template) => template.type === groupType)
+    const defaultColors = getDefaultEvaluationMomentTemplateColors(groupIndex)
+
+    return {
+      '--assessment-group-background': matchingTemplate?.backgroundColor ?? defaultColors.backgroundColor,
+      '--assessment-group-average-background':
+        matchingTemplate?.averageBackgroundColor ?? defaultColors.averageBackgroundColor,
+      '--assessment-group-weighted-background':
+        matchingTemplate?.weightedBackgroundColor ?? defaultColors.weightedBackgroundColor,
+      '--assessment-group-text': matchingTemplate?.textColor ?? defaultColors.textColor,
+    }
+  }
   const isGroupMetricsHidden = (groupType: string) => !visibleGroupMetrics.has(groupType)
   const toggleGroupMetrics = (groupType: string) => {
     setVisibleGroupMetrics((currentVisibleGroups) => {
@@ -234,12 +249,14 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                             {momentGroups.map((group, groupIndex) => {
                               const metricsHidden = isGroupMetricsHidden(group.type)
                               const groupClassName = getGroupClassName(groupIndex)
+                              const groupStyle = getGroupStyle(group.type, groupIndex)
                               return (
                               <span
                                 className={`semester-assessments-type-head semester-assessments-group-cell ${groupClassName}`}
                                 role="columnheader"
                                 key={group.type}
                                 style={{
+                                  ...groupStyle,
                                   gridColumn: `span ${group.moments.length + (metricsHidden ? 0 : 2)}`,
                                 }}
                               >
@@ -290,6 +307,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                   className={`semester-assessments-group-cell ${getGroupClassName(groupIndex)}`}
                                   role="columnheader"
                                   key={getDocumentId(moment) ?? getStringValue(moment.name)}
+                                  style={getGroupStyle(group.type, groupIndex)}
                                 >
                                   <span className="semester-assessments-moment-title">
                                     {getStringValue(moment.name)}{' '}
@@ -304,6 +322,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 className={`semester-assessments-average-head semester-assessments-group-cell ${getGroupClassName(groupIndex)}`}
                                 role="columnheader"
                                 key={`${group.type}-average`}
+                                style={getGroupStyle(group.type, groupIndex)}
                               >
                                 Média
                               </span>,
@@ -312,6 +331,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 role="columnheader"
                                 key={`${group.type}-weighted`}
                                 title={`Média × ${formatAssessmentValue(group.weightPercentage)}%`}
+                                style={getGroupStyle(group.type, groupIndex)}
                               >
                                 M*{formatAssessmentValue(group.weightPercentage)}%
                               </span>,
@@ -342,6 +362,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                   className={`semester-assessments-group-cell ${getGroupClassName(groupIndex)}`}
                                   role="cell"
                                   key={getDocumentId(moment) ?? getStringValue(moment.name)}
+                                  style={getGroupStyle(group.type, groupIndex)}
                                 >
                                   {getStudentSavedMomentTotal(student, moment)}
                                 </strong>
@@ -351,6 +372,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 className={`semester-assessments-average-cell semester-assessments-group-cell ${getGroupClassName(groupIndex)}`}
                                 role="cell"
                                 key={`${group.type}-average`}
+                                style={getGroupStyle(group.type, groupIndex)}
                               >
                                 {formatAssessmentValue(getStudentAssessmentGroupAverage(student, group))}
                               </strong>,
@@ -358,6 +380,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 className={`semester-assessments-weighted-cell semester-assessments-group-cell ${getGroupClassName(groupIndex)}`}
                                 role="cell"
                                 key={`${group.type}-weighted`}
+                                style={getGroupStyle(group.type, groupIndex)}
                               >
                                 {formatAssessmentValue(getStudentAssessmentGroupWeightedValue(student, group))}
                               </strong>,
@@ -398,11 +421,13 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                             {momentGroups.map((group, groupIndex) => {
                               const metricsHidden = isGroupMetricsHidden(group.type)
                               const groupClassName = getGroupClassName(groupIndex)
+                              const groupStyle = getGroupStyle(group.type, groupIndex)
                               return (
                                 <section
                                   className={`semester-assessments-mobile-group ${groupClassName}`}
                                   key={group.type}
                                   aria-label={group.type}
+                                  style={groupStyle}
                                 >
                                   <div className="semester-assessments-mobile-group-heading">
                                     <span>{group.type}</span>
@@ -471,4 +496,11 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                   </section>
                 )
   )
+}
+
+type AssessmentGroupStyle = CSSProperties & {
+  '--assessment-group-background': string
+  '--assessment-group-average-background': string
+  '--assessment-group-weighted-background': string
+  '--assessment-group-text': string
 }

@@ -231,6 +231,11 @@ export function SettingsSection() {
                         <div className="settings-templates-row settings-templates-head" role="row">
                           <span role="columnheader">Tipo de momento de avaliação</span>
                           <span role="columnheader">Ponderação (%)</span>
+                          <span role="columnheader">Fundo</span>
+                          <span role="columnheader">Média</span>
+                          <span role="columnheader">Ponderação</span>
+                          <span role="columnheader">Texto</span>
+                          <span role="columnheader">Exemplo</span>
                           <span role="columnheader">Ações</span>
                         </div>
                         {evaluationMomentTemplates.map((template) => (
@@ -269,6 +274,88 @@ export function SettingsSection() {
                                 }
                               />
                             </label>
+                            <label role="cell">
+                              <span>Fundo</span>
+                              <input
+                                type="color"
+                                value={template.backgroundColor}
+                                onChange={(event) =>
+                                  updateEvaluationMomentTemplate(
+                                    template.id,
+                                    'backgroundColor',
+                                    event.target.value,
+                                  )
+                                }
+                              />
+                            </label>
+                            <label role="cell">
+                              <span>Média</span>
+                              <input
+                                type="color"
+                                value={template.averageBackgroundColor}
+                                onChange={(event) =>
+                                  updateEvaluationMomentTemplate(
+                                    template.id,
+                                    'averageBackgroundColor',
+                                    event.target.value,
+                                  )
+                                }
+                              />
+                            </label>
+                            <label role="cell">
+                              <span>Ponderação</span>
+                              <input
+                                type="color"
+                                value={template.weightedBackgroundColor}
+                                onChange={(event) =>
+                                  updateEvaluationMomentTemplate(
+                                    template.id,
+                                    'weightedBackgroundColor',
+                                    event.target.value,
+                                  )
+                                }
+                              />
+                            </label>
+                            <label role="cell">
+                              <span>Texto</span>
+                              <input
+                                type="color"
+                                value={template.textColor}
+                                onChange={(event) =>
+                                  updateEvaluationMomentTemplate(
+                                    template.id,
+                                    'textColor',
+                                    event.target.value,
+                                  )
+                                }
+                              />
+                            </label>
+                            <div className="settings-template-preview" role="cell">
+                              <span
+                                style={{
+                                  backgroundColor: template.backgroundColor,
+                                  color: template.textColor,
+                                }}
+                              >
+                                Tipo
+                              </span>
+                              <span
+                                style={{
+                                  backgroundColor: template.averageBackgroundColor,
+                                  color: template.textColor,
+                                }}
+                              >
+                                Média
+                              </span>
+                              <span
+                                style={{
+                                  backgroundColor: template.weightedBackgroundColor,
+                                  color: template.textColor,
+                                }}
+                              >
+                                M*%
+                              </span>
+                            </div>
                             <div className="settings-template-actions" role="cell">
                               <button
                                 type="button"

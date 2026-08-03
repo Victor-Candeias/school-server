@@ -53,4 +53,5 @@ owner: victor
 | FE-36 | Agrupar avaliações por tipo com subtotais | done | 2026-07-29 | victor | high | 2026-07-29 |  | [FE-36](../specs/frontend/fe-36-spec.md) |
 | FE-37 | Calcular médias e ponderações nas avaliações | done | 2026-07-29 | victor | high | 2026-07-29 |  | [FE-37](../specs/frontend/fe-37-spec.md) |
 | FE-38 | Adicionar resultado final às avaliações | done | 2026-07-29 | victor | high | 2026-07-29 |  | [FE-38](../specs/frontend/fe-38-spec.md) |
+| FE-39 | Configurar cores por tipo de momento de avaliação | done | 2026-08-03 |  | high | 2026-08-03 |  | [FE-39](../specs/frontend/fe-39-spec.md) |
 <!-- /maestru:work-items-list -->

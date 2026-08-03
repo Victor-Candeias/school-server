@@ -18,6 +18,10 @@ def test_normalize_evaluation_moment_templates_preserves_valid_templates():
                 "id": "testes",
                 "type": " Teste ",
                 "weightPercentage": 60,
+                "backgroundColor": "#123ABC",
+                "averageBackgroundColor": "#234BCD",
+                "weightedBackgroundColor": "#345CDE",
+                "textColor": "#456DEF",
             },
             {
                 "id": "questoes-aula",
@@ -30,11 +34,19 @@ def test_normalize_evaluation_moment_templates_preserves_valid_templates():
             "id": "testes",
             "type": "Teste",
             "weightPercentage": 60,
+            "backgroundColor": "#123abc",
+            "averageBackgroundColor": "#234bcd",
+            "weightedBackgroundColor": "#345cde",
+            "textColor": "#456def",
         },
         {
             "id": "questoes-aula",
             "type": "Questão aula",
             "weightPercentage": 40,
+            "backgroundColor": "#5b21b6",
+            "averageBackgroundColor": "#6d28d9",
+            "weightedBackgroundColor": "#7c3aed",
+            "textColor": "#f5f3ff",
         },
     ]
 
@@ -46,8 +58,24 @@ def test_normalize_evaluation_moment_templates_limits_percentage():
             {"id": "above", "type": "Acima", "weightPercentage": 140},
         ]
     ) == [
-        {"id": "negative", "type": "Negativo", "weightPercentage": 0},
-        {"id": "above", "type": "Acima", "weightPercentage": 100},
+        {
+            "id": "negative",
+            "type": "Negativo",
+            "weightPercentage": 0,
+            "backgroundColor": "#1e40af",
+            "averageBackgroundColor": "#1d4ed8",
+            "weightedBackgroundColor": "#2563eb",
+            "textColor": "#eff6ff",
+        },
+        {
+            "id": "above",
+            "type": "Acima",
+            "weightPercentage": 100,
+            "backgroundColor": "#5b21b6",
+            "averageBackgroundColor": "#6d28d9",
+            "weightedBackgroundColor": "#7c3aed",
+            "textColor": "#f5f3ff",
+        },
     ]
 
 
