@@ -40,6 +40,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
   } = model
 
   const [visibleGroupMetrics, setVisibleGroupMetrics] = useState<Set<string>>(() => new Set())
+  const [hiddenGroupMoments, setHiddenGroupMoments] = useState<Set<string>>(() => new Set())
   const [hiddenAttitudeColumns, setHiddenAttitudeColumns] = useState<Set<string>>(
     () => new Set(attitudeTemplates.map((template) => template.id)),
   )
@@ -299,8 +300,35 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
       return nextHiddenColumns
     })
   }
+  const renderAttitudeVisibilityControls = (className = '') => {
+    if (!hasAttitudeTemplates) {
+      return null
+    }
+
+    return (
+      <div
+        className={`semester-assessments-visibility-controls ${className}`.trim()}
+        aria-label="Visibilidade das atitudes"
+      >
+        <button type="button" onClick={toggleAllAttitudeColumns}>
+          {hasVisibleAttitudeColumns ? 'Ocultar atitudes' : 'Mostrar atitudes'}
+        </button>
+        {attitudeTemplates.map((template) => (
+          <button
+            type="button"
+            key={template.id}
+            aria-pressed={!hiddenAttitudeColumns.has(template.id)}
+            onClick={() => toggleAttitudeColumn(template.id)}
+          >
+            {hiddenAttitudeColumns.has(template.id) ? 'Mostrar' : 'Ocultar'} {template.alias}
+          </button>
+        ))}
+      </div>
+    )
+  }
   const handleAssessmentSemesterChange = (semester: string) => {
     setAssessmentWeightOverrides({})
+    setHiddenGroupMoments(new Set())
     setSelectedAssessmentStudentId(ALL_STUDENTS_VALUE)
     void handleSelectAssessmentsSemester(semester)
   }
@@ -329,6 +357,9 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
     }
   }
   const isGroupMetricsHidden = (groupType: string) => !visibleGroupMetrics.has(groupType)
+  const areGroupMomentsHidden = (groupType: string) => hiddenGroupMoments.has(groupType)
+  const areGroupMetricsVisible = (groupType: string) =>
+    !isGroupMetricsHidden(groupType) || areGroupMomentsHidden(groupType)
   const toggleGroupMetrics = (groupType: string) => {
     setVisibleGroupMetrics((currentVisibleGroups) => {
       const nextVisibleGroups = new Set(currentVisibleGroups)
@@ -340,13 +371,25 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
       return nextVisibleGroups
     })
   }
+  const toggleGroupMoments = (groupType: string) => {
+    setHiddenGroupMoments((currentHiddenGroups) => {
+      const nextHiddenGroups = new Set(currentHiddenGroups)
+      if (nextHiddenGroups.has(groupType)) {
+        nextHiddenGroups.delete(groupType)
+      } else {
+        nextHiddenGroups.add(groupType)
+      }
+      return nextHiddenGroups
+    })
+  }
   const assessmentColumnCount = 2 + momentGroups.reduce(
     (columnCount, group) => columnCount
-      + group.moments.length
-      + (isGroupMetricsHidden(group.type) ? 0 : 2),
+      + (areGroupMomentsHidden(group.type) ? 0 : group.moments.length)
+      + (areGroupMetricsVisible(group.type) ? 2 : 0),
     0,
   ) + (hasVisibleAttitudeColumns ? visibleAttitudeTemplates.length + 1 : 0)
   const assessmentGridColumns = `minmax(140px, 1.3fr) repeat(${assessmentColumnCount}, minmax(60px, 1fr))`
+  const transposedGridColumns = `minmax(100px, 10%) repeat(${Math.max(visibleStudents.length, 1)}, minmax(92px, 1fr))`
 
   return (
     (
@@ -421,23 +464,238 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                       <p className="students-empty-state">Ainda não existem alunos nesta turma.</p>
                     ) : (
                       <>
-                      {hasAttitudeTemplates && (
-                        <div className="semester-assessments-visibility-controls" aria-label="Visibilidade das atitudes">
-                          <button type="button" onClick={toggleAllAttitudeColumns}>
-                            {hasVisibleAttitudeColumns ? 'Ocultar atitudes' : 'Mostrar atitudes'}
-                          </button>
-                          {attitudeTemplates.map((template) => (
-                            <button
-                              type="button"
-                              key={template.id}
-                              aria-pressed={!hiddenAttitudeColumns.has(template.id)}
-                              onClick={() => toggleAttitudeColumn(template.id)}
+                      <div className="semester-assessments-transposed-table" role="table" aria-label="Avaliações por semestre em tabela transposta">
+                        <div
+                          className="semester-assessments-transposed-row semester-assessments-transposed-head"
+                          role="row"
+                          style={{ gridTemplateColumns: transposedGridColumns }}
+                        >
+                          <span role="columnheader">Avaliação</span>
+                          {visibleStudents.map((student, studentIndex) => (
+                            <span
+                              role="columnheader"
+                              key={String(student._id ?? student.id ?? studentIndex)}
                             >
-                              {hiddenAttitudeColumns.has(template.id) ? 'Mostrar' : 'Ocultar'} {template.alias}
-                            </button>
+                              {getStringValue(student.name)}
+                            </span>
                           ))}
                         </div>
-                      )}
+                        {momentGroups.map((group, groupIndex) => {
+                          const groupStyle = getGroupStyle(group.type, groupIndex)
+                          const groupClassName = getGroupClassName(groupIndex)
+                          const groupMomentsHidden = areGroupMomentsHidden(group.type)
+
+                          return (
+                            <div className="semester-assessments-transposed-group" key={group.type}>
+                              <div
+                                className={`semester-assessments-transposed-row semester-assessments-transposed-group-head ${groupClassName}`}
+                                role="row"
+                                style={{
+                                  ...groupStyle,
+                                  gridTemplateColumns: transposedGridColumns,
+                                }}
+                              >
+                                <span role="rowheader">
+                                  <button
+                                    type="button"
+                                    className="semester-assessments-group-label"
+                                    aria-expanded={!groupMomentsHidden}
+                                    aria-label={`${groupMomentsHidden ? 'Mostrar' : 'Ocultar'} momentos de ${group.type}`}
+                                    onClick={() => toggleGroupMoments(group.type)}
+                                  >
+                                    {group.type}
+                                  </button>
+                                  <label className="semester-assessments-weight-field">
+                                    <input
+                                      type="text"
+                                      inputMode="decimal"
+                                      value={getAssessmentWeightInputValue(group.type, group.weightPercentage)}
+                                      onChange={(event) => updateAssessmentWeight(group.type, event.target.value)}
+                                      onFocus={(event) => event.currentTarget.select()}
+                                      aria-label={`Ponderação de ${group.type}`}
+                                    />
+                                    <span className="semester-assessments-weight-label">%</span>
+                                  </label>
+                                </span>
+                              </div>
+                              {!groupMomentsHidden && group.moments.map((moment) => (
+                                <div
+                                  className={`semester-assessments-transposed-row semester-assessments-transposed-moment-row ${groupClassName}`}
+                                  role="row"
+                                  key={getDocumentId(moment) ?? getStringValue(moment.name)}
+                                  style={{
+                                    ...groupStyle,
+                                    gridTemplateColumns: transposedGridColumns,
+                                  }}
+                                >
+                                  <span role="rowheader">
+                                    {getStringValue(moment.name)}{' '}
+                                    <strong className="question-max-value">
+                                      ({getEvaluationMomentMaxValue(moment)})
+                                    </strong>
+                                  </span>
+                                  {visibleStudents.map((student, studentIndex) => (
+                                    <strong
+                                      role="cell"
+                                      key={String(student._id ?? student.id ?? studentIndex)}
+                                    >
+                                      {getStudentSavedMomentTotal(student, moment)}
+                                    </strong>
+                                  ))}
+                                </div>
+                              ))}
+                              <div
+                                className={`semester-assessments-transposed-row semester-assessments-transposed-average-row ${groupClassName}`}
+                                role="row"
+                                style={{
+                                  ...groupStyle,
+                                  gridTemplateColumns: transposedGridColumns,
+                                }}
+                              >
+                                <span role="rowheader">Média</span>
+                                {visibleStudents.map((student, studentIndex) => (
+                                  <strong
+                                    role="cell"
+                                    key={String(student._id ?? student.id ?? studentIndex)}
+                                  >
+                                    {formatAssessmentValue(getStudentAssessmentGroupAverage(student, group))}
+                                  </strong>
+                                ))}
+                              </div>
+                              <div
+                                className={`semester-assessments-transposed-row semester-assessments-transposed-weighted-row ${groupClassName}`}
+                                role="row"
+                                style={{
+                                  ...groupStyle,
+                                  gridTemplateColumns: transposedGridColumns,
+                                }}
+                              >
+                                <span role="rowheader">
+                                  M*{formatAssessmentValue(group.weightPercentage)}%
+                                </span>
+                                {visibleStudents.map((student, studentIndex) => (
+                                  <strong
+                                    role="cell"
+                                    key={String(student._id ?? student.id ?? studentIndex)}
+                                  >
+                                    {formatAssessmentValue(getStudentAssessmentGroupWeightedValue(student, group))}
+                                  </strong>
+                                ))}
+                              </div>
+                            </div>
+                          )
+                        })}
+                        {renderAttitudeVisibilityControls('semester-assessments-transposed-visibility-controls')}
+                        {hasVisibleAttitudeColumns && (
+                          <div className="semester-assessments-transposed-group">
+                            <div
+                              className="semester-assessments-transposed-row semester-assessments-transposed-group-head"
+                              role="row"
+                              style={{
+                                ...getAttitudeTotalStyle(),
+                                gridTemplateColumns: transposedGridColumns,
+                              }}
+                            >
+                              <span role="rowheader">Atitudes</span>
+                            </div>
+                            {visibleAttitudeTemplates.map((template) => (
+                              <div
+                                className="semester-assessments-transposed-row semester-assessments-transposed-moment-row"
+                                role="row"
+                                key={template.id}
+                                style={{
+                                  ...getAttitudeStyle(template),
+                                  gridTemplateColumns: transposedGridColumns,
+                                }}
+                              >
+                                <span role="rowheader" title={template.text}>
+                                  {getAttitudeLabel(template)}
+                                </span>
+                                {visibleStudents.map((student, studentIndex) => (
+                                  <span
+                                    className="semester-assessments-attitude-cell"
+                                    role="cell"
+                                    key={String(student._id ?? student.id ?? studentIndex)}
+                                  >
+                                    <input
+                                      type="text"
+                                      inputMode="decimal"
+                                      value={getStudentAttitudeInputValue(student, template)}
+                                      onChange={(event) =>
+                                        updateStudentAttitudeDraft(student, template, event.target.value)
+                                      }
+                                      onFocus={(event) => event.currentTarget.select()}
+                                      onBlur={(event) =>
+                                        void saveStudentAttitudeCell(student, template, event.target.value)
+                                      }
+                                      onKeyDown={(event) => {
+                                        if (event.key === 'Enter') {
+                                          event.currentTarget.blur()
+                                        }
+                                      }}
+                                      aria-label={`Valor de ${getStringValue(student.name)} em ${template.alias}`}
+                                    />
+                                  </span>
+                                ))}
+                              </div>
+                            ))}
+                            <div
+                              className="semester-assessments-transposed-row semester-assessments-transposed-weighted-row"
+                              role="row"
+                              style={{
+                                ...getAttitudeTotalStyle(),
+                                gridTemplateColumns: transposedGridColumns,
+                              }}
+                            >
+                              <span role="rowheader">
+                                Total atitudes *{formatAssessmentValue(totalAttitudeWeightPercentage)}%
+                              </span>
+                              {visibleStudents.map((student, studentIndex) => (
+                                <strong
+                                  role="cell"
+                                  key={String(student._id ?? student.id ?? studentIndex)}
+                                >
+                                  {formatAssessmentValue(getStudentAttitudesWeightedValue(student))}
+                                </strong>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        <div className="semester-assessments-transposed-group">
+                          <div
+                            className="semester-assessments-transposed-row semester-assessments-transposed-final-row"
+                            role="row"
+                            style={{ gridTemplateColumns: transposedGridColumns }}
+                          >
+                            <span role="rowheader">Final</span>
+                            {visibleStudents.map((student, studentIndex) => (
+                              <strong
+                                role="cell"
+                                key={String(student._id ?? student.id ?? studentIndex)}
+                                style={getStudentAssessmentFinalStyle(student)}
+                              >
+                                {formatAssessmentValue(getStudentAssessmentFinalValue(student))}
+                              </strong>
+                            ))}
+                          </div>
+                          <div
+                            className="semester-assessments-transposed-row semester-assessments-transposed-final-row"
+                            role="row"
+                            style={{ gridTemplateColumns: transposedGridColumns }}
+                          >
+                            <span role="rowheader">Nota</span>
+                            {visibleStudents.map((student, studentIndex) => (
+                              <strong
+                                role="cell"
+                                key={String(student._id ?? student.id ?? studentIndex)}
+                                style={getStudentAssessmentFinalStyle(student)}
+                              >
+                                {getStudentAssessmentFinalGrade(student)}
+                              </strong>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
                       <div className="semester-assessments-table" role="table" aria-label="Avaliações por semestre">
                         <div className="semester-assessments-header" role="rowgroup">
                           <div
@@ -449,7 +707,9 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                               Aluno
                             </span>
                             {momentGroups.map((group, groupIndex) => {
+                              const momentsHidden = areGroupMomentsHidden(group.type)
                               const metricsHidden = isGroupMetricsHidden(group.type)
+                              const metricsVisible = areGroupMetricsVisible(group.type)
                               const groupClassName = getGroupClassName(groupIndex)
                               const groupStyle = getGroupStyle(group.type, groupIndex)
                               return (
@@ -459,10 +719,19 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 key={group.type}
                                 style={{
                                   ...groupStyle,
-                                  gridColumn: `span ${group.moments.length + (metricsHidden ? 0 : 2)}`,
+                                  gridColumn: `span ${(momentsHidden ? 0 : group.moments.length) + (metricsVisible ? 2 : 0)}`,
                                 }}
                               >
-                                <span>{group.type} -</span>
+                                <button
+                                  type="button"
+                                  className="semester-assessments-group-label"
+                                  aria-expanded={!momentsHidden}
+                                  aria-label={`${momentsHidden ? 'Mostrar' : 'Ocultar'} momentos de ${group.type}`}
+                                  onClick={() => toggleGroupMoments(group.type)}
+                                >
+                                  {group.type}
+                                </button>
+                                <span>-</span>
                                 <label className="semester-assessments-weight-field">
                                   <input
                                     type="text"
@@ -474,16 +743,18 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                   />
                                   <span className="semester-assessments-weight-label">%</span>
                                 </label>
-                                <button
-                                  className="semester-assessments-group-toggle"
-                                  type="button"
-                                  aria-label={`${metricsHidden ? 'Mostrar' : 'Ocultar'} média e ponderação de ${group.type}`}
-                                  aria-pressed={!metricsHidden}
-                                  title={`${metricsHidden ? 'Mostrar' : 'Ocultar'} média e ponderação`}
-                                  onClick={() => toggleGroupMetrics(group.type)}
-                                >
-                                  {metricsHidden ? '+' : '−'}
-                                </button>
+                                {!momentsHidden && (
+                                  <button
+                                    className="semester-assessments-group-toggle"
+                                    type="button"
+                                    aria-label={`${metricsHidden ? 'Mostrar' : 'Ocultar'} média e ponderação de ${group.type}`}
+                                    aria-pressed={!metricsHidden}
+                                    title={`${metricsHidden ? 'Mostrar' : 'Ocultar'} média e ponderação`}
+                                    onClick={() => toggleGroupMetrics(group.type)}
+                                  >
+                                    {metricsHidden ? '+' : '−'}
+                                  </button>
+                                )}
                               </span>
                               )
                             })}
@@ -516,7 +787,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                           >
                             <span className="semester-assessments-empty-subhead" aria-hidden="true" />
                             {momentGroups.flatMap((group, groupIndex) => [
-                              ...group.moments.map((moment) => (
+                              ...(areGroupMomentsHidden(group.type) ? [] : group.moments.map((moment) => (
                                 <span
                                   className={`semester-assessments-group-cell ${getGroupClassName(groupIndex)}`}
                                   role="columnheader"
@@ -530,8 +801,8 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                     </strong>
                                   </span>
                                 </span>
-                              )),
-                              ...(isGroupMetricsHidden(group.type) ? [] : [
+                              ))),
+                              ...(areGroupMetricsVisible(group.type) ? [
                               <span
                                 className={`semester-assessments-average-head semester-assessments-group-cell ${getGroupClassName(groupIndex)}`}
                                 role="columnheader"
@@ -549,7 +820,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                               >
                                 M*{formatAssessmentValue(group.weightPercentage)}%
                               </span>,
-                              ]),
+                              ] : []),
                             ])}
                             {visibleAttitudeTemplates.map((template) => (
                               <span
@@ -601,7 +872,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                           >
                             <span role="cell">{getStringValue(student.name)}</span>
                             {momentGroups.flatMap((group, groupIndex) => [
-                              ...group.moments.map((moment) => (
+                              ...(areGroupMomentsHidden(group.type) ? [] : group.moments.map((moment) => (
                                 <strong
                                   className={`semester-assessments-group-cell ${getGroupClassName(groupIndex)}`}
                                   role="cell"
@@ -610,8 +881,8 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 >
                                   {getStudentSavedMomentTotal(student, moment)}
                                 </strong>
-                              )),
-                              ...(isGroupMetricsHidden(group.type) ? [] : [
+                              ))),
+                              ...(areGroupMetricsVisible(group.type) ? [
                               <strong
                                 className={`semester-assessments-average-cell semester-assessments-group-cell ${getGroupClassName(groupIndex)}`}
                                 role="cell"
@@ -628,7 +899,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                               >
                                 {formatAssessmentValue(getStudentAssessmentGroupWeightedValue(student, group))}
                               </strong>,
-                              ]),
+                              ] : []),
                             ])}
                             {visibleAttitudeTemplates.map((template) => (
                               <span
@@ -684,7 +955,8 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                           )
                         })}
                       </div>
-                      <div className="semester-assessments-mobile-list" aria-label="Avaliações por semestre em mobile">
+                      {renderAttitudeVisibilityControls('semester-assessments-mobile-visibility-controls')}
+                      <div className="semester-assessments-mobile-list" aria-label="Avaliações por semestre em cartões">
                         {visibleStudents.map((student, studentIndex) => {
                           const finalValue = getStudentAssessmentFinalValue(student)
                           const finalStyle = getStudentAssessmentFinalStyle(student)
@@ -700,6 +972,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                             </h3>
                             {momentGroups.map((group, groupIndex) => {
                               const metricsHidden = isGroupMetricsHidden(group.type)
+                              const momentsHidden = areGroupMomentsHidden(group.type)
                               const groupClassName = getGroupClassName(groupIndex)
                               const groupStyle = getGroupStyle(group.type, groupIndex)
                               return (
@@ -710,7 +983,15 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                   style={groupStyle}
                                 >
                                   <div className="semester-assessments-mobile-group-heading">
-                                    <span>{group.type}</span>
+                                    <button
+                                      type="button"
+                                      className="semester-assessments-mobile-group-label"
+                                      aria-expanded={!momentsHidden}
+                                      aria-label={`${momentsHidden ? 'Mostrar' : 'Ocultar'} momentos de ${group.type}`}
+                                      onClick={() => toggleGroupMoments(group.type)}
+                                    >
+                                      {group.type}
+                                    </button>
                                     <label className="semester-assessments-mobile-weight-field">
                                       <input
                                         type="text"
@@ -722,27 +1003,31 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                       />
                                       <span>%</span>
                                     </label>
-                                    <button
-                                      className="semester-assessments-mobile-group-toggle"
-                                      type="button"
-                                      aria-expanded={!metricsHidden}
-                                      aria-label={`${metricsHidden ? 'Mostrar' : 'Ocultar'} média e ponderação de ${group.type}`}
-                                      onClick={() => toggleGroupMetrics(group.type)}
-                                    >
-                                      {metricsHidden ? '+' : '−'}
-                                    </button>
+                                    {!momentsHidden && (
+                                      <button
+                                        className="semester-assessments-mobile-group-toggle"
+                                        type="button"
+                                        aria-expanded={!metricsHidden}
+                                        aria-label={`${metricsHidden ? 'Mostrar' : 'Ocultar'} média e ponderação de ${group.type}`}
+                                        onClick={() => toggleGroupMetrics(group.type)}
+                                      >
+                                        {metricsHidden ? '+' : '−'}
+                                      </button>
+                                    )}
                                   </div>
-                                  <div className="semester-assessments-mobile-moments">
-                                    {group.moments.map((moment) => (
-                                      <p key={getDocumentId(moment) ?? getStringValue(moment.name)}>
-                                        <span>
-                                          {getStringValue(moment.name)} - Valor:
-                                        </span>
-                                        <strong>{getStudentSavedMomentTotal(student, moment)}</strong>
-                                      </p>
-                                    ))}
-                                  </div>
-                                  {!metricsHidden && (
+                                  {!momentsHidden && (
+                                    <div className="semester-assessments-mobile-moments">
+                                      {group.moments.map((moment) => (
+                                        <p key={getDocumentId(moment) ?? getStringValue(moment.name)}>
+                                          <span>
+                                            {getStringValue(moment.name)} - Valor:
+                                          </span>
+                                          <strong>{getStudentSavedMomentTotal(student, moment)}</strong>
+                                        </p>
+                                      ))}
+                                    </div>
+                                  )}
+                                  {(!metricsHidden || momentsHidden) && (
                                     <div className="semester-assessments-mobile-metrics">
                                       <p>
                                         <span>Média:</span>

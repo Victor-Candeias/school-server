@@ -215,7 +215,7 @@
 /* ── Toast (always on top) ───────────────────────────── */
 .toast-container {
   position: fixed;
-  top: max(20px, env(safe-area-inset-top));
+  top: max(84px, calc(env(safe-area-inset-top) + 84px));
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
@@ -223,13 +223,15 @@
   flex-direction: column;
   gap: 8px;
   pointer-events: none;
-  min-width: 300px;
-  width: max-content;
-  max-width: min(560px, calc(100vw - 40px));
+  width: 50vw;
+  min-width: 0;
+  max-width: 50vw;
 }
 
 .toast {
   pointer-events: auto;
+  box-sizing: border-box;
+  width: 100%;
   padding: 13px 16px;
   border-radius: var(--radius-lg);
   font-size: 0.833rem;

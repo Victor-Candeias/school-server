@@ -1,0 +1,179 @@
+/* ── Semester assessments mobile ─────────────────────── */
+.semester-assessments-mobile-visibility-controls {
+  display: none;
+}
+
+.semester-assessments-mobile-card {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.semester-assessments-mobile-card h3 {
+  display: grid;
+  gap: 3px;
+  margin: 0;
+  color: var(--text-2);
+  font-size: 0.769rem;
+}
+
+.semester-assessments-mobile-card h3 span {
+  color: var(--text);
+  font-size: 0.889rem;
+}
+
+.semester-assessments-mobile-group {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.semester-assessments-mobile-group-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  border-color: transparent;
+  color: var(--assessment-group-text);
+  background: var(--assessment-group-background);
+  font-size: 0.846rem;
+  font-weight: 800;
+}
+
+.semester-assessments-mobile-group-heading > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.semester-assessments-mobile-group-label {
+  width: auto;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  font-weight: 800;
+  line-height: 1.15;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: normal;
+  cursor: pointer;
+}
+
+.semester-assessments-mobile-group-label:hover,
+.semester-assessments-mobile-group-label:focus-visible {
+  text-decoration: underline;
+}
+
+.semester-assessments-mobile-group-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  line-height: 1;
+}
+
+.semester-assessments-mobile-moments,
+.semester-assessments-mobile-metrics,
+.semester-assessments-mobile-final {
+  display: grid;
+  gap: 7px;
+}
+
+.semester-assessments-mobile-moments p,
+.semester-assessments-mobile-metrics p,
+.semester-assessments-mobile-final p {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--table-border);
+  border-radius: 6px;
+  color: var(--table-text);
+  background: var(--table-cell);
+  font-size: 0.769rem;
+}
+
+.semester-assessments-mobile-moments p:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgb(37 99 235 / 16%);
+}
+
+.semester-assessments-mobile-metrics p:first-child {
+  color: var(--assessment-group-text);
+  background: var(--assessment-group-average-background);
+}
+
+.semester-assessments-mobile-metrics p:last-child {
+  color: var(--assessment-group-text);
+  background: var(--assessment-group-weighted-background);
+}
+
+.semester-assessments-mobile-weight-field {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 3px;
+  align-items: center;
+}
+
+.semester-assessments-mobile-weight-field input {
+  width: 50px;
+  padding: 4px 6px;
+  border: 1px solid color-mix(in srgb, currentColor 45%, transparent);
+  border-radius: 6px;
+  color: var(--text);
+  background: var(--surface);
+  font: inherit;
+  font-size: 0.846rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.semester-assessments-mobile-attitudes input {
+  width: 76px;
+  min-height: 34px;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  font-weight: 800;
+  text-align: center;
+}
+
+.semester-assessments-mobile-attitudes input:focus {
+  outline: 0;
+}
+
+.semester-assessments-mobile-final {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}

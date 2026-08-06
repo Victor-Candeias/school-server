@@ -202,13 +202,13 @@
   }
 
   .toast-container {
-    top: max(12px, env(safe-area-inset-top));
-    left: max(10px, env(safe-area-inset-left));
-    right: max(10px, env(safe-area-inset-right));
-    width: auto;
+    top: max(72px, calc(env(safe-area-inset-top) + 72px));
+    left: 50%;
+    right: auto;
+    width: 50vw;
     min-width: 0;
-    max-width: none;
-    transform: none;
+    max-width: 50vw;
+    transform: translateX(-50%);
   }
 
   .toast {
@@ -455,8 +455,17 @@
     display: none;
   }
 
+  .semester-assessments-transposed-table {
+    display: none;
+  }
+
+  .semester-assessments-visibility-controls {
+    display: flex;
+  }
+
   .semester-assessments-mobile-list {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 12px;
   }
 
@@ -554,6 +563,11 @@
     font-size: 0.769rem;
   }
 
+  .semester-assessments-mobile-moments p:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgb(37 99 235 / 16%);
+  }
+
   .semester-assessments-mobile-metrics p:first-child {
     color: var(--assessment-group-text);
     background: var(--assessment-group-average-background);
@@ -587,14 +601,17 @@
   .semester-assessments-mobile-attitudes input {
     width: 76px;
     min-height: 34px;
-    padding: 4px 6px;
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-sm);
-    color: var(--text);
-    background: var(--surface);
+    padding: 0;
+    border: 0;
+    color: inherit;
+    background: transparent;
     font: inherit;
     font-weight: 800;
     text-align: center;
+  }
+
+  .semester-assessments-mobile-attitudes input:focus {
+    outline: 0;
   }
 
   .semester-assessments-mobile-final {

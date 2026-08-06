@@ -7,6 +7,8 @@
 @import './styles/evaluation-questions.css';
 @import './styles/students.css';
 @import './styles/assessments.css';
+@import './styles/semester-assessments.css';
+@import './styles/semester-assessments-mobile.css';
 @import './styles/calendar.css';
 @import './styles/student-tables.css';
 @import './styles/modal-controls.css';

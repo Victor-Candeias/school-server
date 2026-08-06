@@ -145,9 +145,13 @@ export function DashboardPage({ model }: DashboardPageProps) {
               )}
             </Suspense>
 
-            {message && <p className="dashboard-feedback success">{message}</p>}
-            {isLoadingYears && <p className="dashboard-feedback info">A carregar anos letivos...</p>}
-            {isLoadingClasses && <p className="dashboard-feedback info">A guardar turma...</p>}
+            {(message || isLoadingYears || isLoadingClasses) && (
+              <div className="toast-container dashboard-toast-container" role="status" aria-live="polite">
+                {message && <p className="toast success">{message}</p>}
+                {isLoadingYears && <p className="toast info">A carregar anos letivos...</p>}
+                {isLoadingClasses && <p className="toast info">A guardar turma...</p>}
+              </div>
+            )}
 
             {dashboardError && (
               <div className="modal-backdrop dashboard-error-backdrop" role="presentation">

@@ -311,3 +311,18 @@ html.dark select option {
   background: #1e293b;
   color: #f1f5f9;
 }
+
+html.dark .semester-assessments-transposed-moment-row > strong,
+html.dark .semester-assessments-transposed-moment-row > .semester-assessments-attitude-cell,
+html.dark .semester-assessments-mobile-moments p {
+  color: #f8fafc;
+  background: #334155;
+  border-color: #475569;
+}
+
+html.dark .semester-assessments-attitude-cell input,
+html.dark .semester-assessments-mobile-attitudes input {
+  color: inherit !important;
+  background: transparent !important;
+  border-color: transparent !important;
+}
