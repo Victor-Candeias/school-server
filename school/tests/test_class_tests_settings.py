@@ -80,6 +80,34 @@ def test_normalize_evaluation_moment_templates_limits_percentage():
     ]
 
 
+def test_normalize_evaluation_moment_templates_accepts_decimal_percentage():
+    assert normalize_evaluation_moment_templates(
+        [
+            {"id": "decimal-point", "type": "Decimal ponto", "weightPercentage": "12.345"},
+            {"id": "decimal-comma", "type": "Decimal vírgula", "weightPercentage": "12,34"},
+        ]
+    ) == [
+        {
+            "id": "decimal-point",
+            "type": "Decimal ponto",
+            "weightPercentage": 12.35,
+            "backgroundColor": "#1e40af",
+            "averageBackgroundColor": "#1d4ed8",
+            "weightedBackgroundColor": "#2563eb",
+            "textColor": "#eff6ff",
+        },
+        {
+            "id": "decimal-comma",
+            "type": "Decimal vírgula",
+            "weightPercentage": 12.34,
+            "backgroundColor": "#5b21b6",
+            "averageBackgroundColor": "#6d28d9",
+            "weightedBackgroundColor": "#7c3aed",
+            "textColor": "#f5f3ff",
+        },
+    ]
+
+
 def test_normalize_evaluation_moment_templates_discards_invalid_rows():
     assert normalize_evaluation_moment_templates(
         [
@@ -156,6 +184,34 @@ def test_normalize_attitude_templates_limits_percentage_and_discards_invalid_row
             "text": "Acima",
             "alias": "Ac.",
             "weightPercentage": 100,
+            "backgroundColor": "#5b21b6",
+            "weightedBackgroundColor": "#7c3aed",
+            "textColor": "#f5f3ff",
+        },
+    ]
+
+
+def test_normalize_attitude_templates_accepts_decimal_percentage():
+    assert normalize_attitude_templates(
+        [
+            {"id": "decimal-point", "text": "Decimal ponto", "alias": "P.", "weightPercentage": "7.899"},
+            {"id": "decimal-comma", "text": "Decimal vírgula", "alias": "V.", "weightPercentage": "7,89"},
+        ]
+    ) == [
+        {
+            "id": "decimal-point",
+            "text": "Decimal ponto",
+            "alias": "P.",
+            "weightPercentage": 7.9,
+            "backgroundColor": "#1e40af",
+            "weightedBackgroundColor": "#2563eb",
+            "textColor": "#eff6ff",
+        },
+        {
+            "id": "decimal-comma",
+            "text": "Decimal vírgula",
+            "alias": "V.",
+            "weightPercentage": 7.89,
             "backgroundColor": "#5b21b6",
             "weightedBackgroundColor": "#7c3aed",
             "textColor": "#f5f3ff",

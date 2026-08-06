@@ -19,6 +19,7 @@ import { DEFAULT_POPUP_BACKGROUND_COLOR } from '../utils/constants'
 import { DEFAULT_POPUP_TEXT_COLOR } from '../utils/constants'
 import { DEFAULT_PERCENTAGE_RANGES } from '../utils/constants'
 import { normalizeNonNegativeInteger } from '../utils/validation'
+import { normalizeDecimalInput } from '../utils/validation'
 import { normalizePercentageRanges } from '../utils/validation'
 import { normalizePositiveInteger } from '../utils/validation'
 import type { ApplicationActions, ApplicationRuntime } from './applicationRuntime'
@@ -192,7 +193,7 @@ function updateEvaluationMomentTemplate(
           ? {
               ...template,
               [field]: field === 'weightPercentage'
-                ? Math.min(100, normalizeNonNegativeInteger(value, template.weightPercentage))
+                ? normalizeWeightPercentage(value, template.weightPercentage)
                 : value,
             }
           : template,
@@ -239,7 +240,7 @@ function updateAttitudeTemplate(
           ? {
               ...template,
               [field]: field === 'weightPercentage'
-                ? Math.min(100, normalizeNonNegativeInteger(value, template.weightPercentage))
+                ? normalizeWeightPercentage(value, template.weightPercentage)
                 : value,
             }
           : template,
@@ -450,7 +451,7 @@ function normalizeEvaluationMomentTemplates(value: unknown): EvaluationMomentTem
 
     const record = template as Record<string, unknown>
     const type = typeof record.type === 'string' ? record.type.trim() : ''
-    const weightPercentage = Number(record.weightPercentage)
+    const weightPercentage = parseWeightPercentage(record.weightPercentage)
     const defaultColors = getDefaultEvaluationMomentTemplateColors(templateIndex)
 
     if (!type || !Number.isFinite(weightPercentage)) {
@@ -462,7 +463,7 @@ function normalizeEvaluationMomentTemplates(value: unknown): EvaluationMomentTem
         ? record.id
         : `evaluation-template-${templateIndex + 1}`,
       type,
-      weightPercentage: Math.min(100, Math.max(0, Math.round(weightPercentage))),
+      weightPercentage: weightPercentage ?? 0,
       backgroundColor: normalizeHexColor(record.backgroundColor, defaultColors.backgroundColor),
       averageBackgroundColor: normalizeHexColor(
         record.averageBackgroundColor,
@@ -490,7 +491,7 @@ function normalizeAttitudeTemplates(value: unknown): AttitudeTemplate[] {
     const record = template as Record<string, unknown>
     const text = typeof record.text === 'string' ? record.text.trim() : ''
     const alias = typeof record.alias === 'string' ? record.alias.trim() : ''
-    const weightPercentage = Number(record.weightPercentage)
+    const weightPercentage = parseWeightPercentage(record.weightPercentage)
     const defaultColors = getDefaultEvaluationMomentTemplateColors(templateIndex)
 
     if (!text || !alias || !Number.isFinite(weightPercentage)) {
@@ -503,7 +504,7 @@ function normalizeAttitudeTemplates(value: unknown): AttitudeTemplate[] {
         : `attitude-template-${templateIndex + 1}`,
       text,
       alias,
-      weightPercentage: Math.min(100, Math.max(0, Math.round(weightPercentage))),
+      weightPercentage: weightPercentage ?? 0,
       backgroundColor: normalizeHexColor(record.backgroundColor, defaultColors.backgroundColor),
       weightedBackgroundColor: normalizeHexColor(
         record.weightedBackgroundColor,
@@ -512,4 +513,25 @@ function normalizeAttitudeTemplates(value: unknown): AttitudeTemplate[] {
       textColor: normalizeHexColor(record.textColor, defaultColors.textColor),
     }]
   })
+}
+
+function parseWeightPercentage(value: unknown) {
+  if (typeof value === 'boolean') {
+    return null
+  }
+
+  const normalizedValue = typeof value === 'string'
+    ? normalizeDecimalInput(value, 2)
+    : String(value)
+  const numericValue = Number(normalizedValue)
+
+  if (!Number.isFinite(numericValue)) {
+    return null
+  }
+
+  return Number(Math.min(100, Math.max(0, numericValue)).toFixed(2))
+}
+
+function normalizeWeightPercentage(value: string, fallback: number) {
+  return parseWeightPercentage(value) ?? fallback
 }

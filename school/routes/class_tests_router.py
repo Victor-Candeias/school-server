@@ -159,6 +159,21 @@ def normalize_hex_color(value, default):
     return value.lower()
 
 
+def normalize_weight_percentage(value):
+    if isinstance(value, bool):
+        return None
+
+    if isinstance(value, str):
+        value = value.strip().replace(",", ".")
+
+    try:
+        numeric_value = float(value)
+    except (TypeError, ValueError):
+        return None
+
+    return format_number(min(100, max(0, round(numeric_value, 2))))
+
+
 def normalize_evaluation_moment_templates(value):
     if not isinstance(value, list):
         return DEFAULT_APP_SETTINGS["evaluationMomentTemplates"]
@@ -176,9 +191,8 @@ def normalize_evaluation_moment_templates(value):
         if isinstance(weight_percentage, bool):
             continue
 
-        try:
-            normalized_weight = round(float(weight_percentage))
-        except (TypeError, ValueError):
+        normalized_weight = normalize_weight_percentage(weight_percentage)
+        if normalized_weight is None:
             continue
         default_colors = DEFAULT_EVALUATION_MOMENT_TEMPLATE_COLORS[
             template_index % len(DEFAULT_EVALUATION_MOMENT_TEMPLATE_COLORS)
@@ -188,7 +202,7 @@ def normalize_evaluation_moment_templates(value):
             {
                 "id": str(template.get("id") or f"evaluation-template-{template_index + 1}"),
                 "type": moment_type.strip(),
-                "weightPercentage": min(100, max(0, normalized_weight)),
+                "weightPercentage": normalized_weight,
                 "backgroundColor": normalize_hex_color(
                     template.get("backgroundColor"),
                     default_colors["backgroundColor"],
@@ -231,9 +245,8 @@ def normalize_attitude_templates(value):
         if isinstance(weight_percentage, bool):
             continue
 
-        try:
-            normalized_weight = round(float(weight_percentage))
-        except (TypeError, ValueError):
+        normalized_weight = normalize_weight_percentage(weight_percentage)
+        if normalized_weight is None:
             continue
         default_colors = DEFAULT_EVALUATION_MOMENT_TEMPLATE_COLORS[
             template_index % len(DEFAULT_EVALUATION_MOMENT_TEMPLATE_COLORS)
@@ -244,7 +257,7 @@ def normalize_attitude_templates(value):
                 "id": str(template.get("id") or f"attitude-template-{template_index + 1}"),
                 "text": text.strip(),
                 "alias": alias.strip(),
-                "weightPercentage": min(100, max(0, normalized_weight)),
+                "weightPercentage": normalized_weight,
                 "backgroundColor": normalize_hex_color(
                     template.get("backgroundColor"),
                     default_colors["backgroundColor"],

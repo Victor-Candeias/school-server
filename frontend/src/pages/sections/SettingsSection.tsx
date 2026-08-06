@@ -1,8 +1,11 @@
+import { useState } from 'react'
 import { useAppSettingsContext } from '../../hooks/useAppSettingsContext'
 import type { AcademicPeriodType } from '../../hooks/useSchoolApplication'
+import { normalizeDecimalInput } from '../../utils/validation'
 import { normalizeIntegerInput } from '../../utils/validation'
 
 export function SettingsSection() {
+  const [weightInputDrafts, setWeightInputDrafts] = useState<Record<string, string>>({})
   const {
     hasUnsavedAppSettingsChanges,
     handleSettingsAction,
@@ -39,6 +42,32 @@ export function SettingsSection() {
     updatePercentageRange,
   } = useAppSettingsContext()
   const hasUnsavedChanges = hasUnsavedAppSettingsChanges()
+  const getWeightInputValue = (templateId: string, weightPercentage: number) =>
+    weightInputDrafts[templateId] ?? String(weightPercentage)
+  const updateWeightInputDraft = (
+    templateId: string,
+    updateTemplate: (value: string) => void,
+    value: string,
+  ) => {
+    const normalizedValue = normalizeDecimalInput(value, 2)
+    setWeightInputDrafts((currentDrafts) => ({
+      ...currentDrafts,
+      [templateId]: normalizedValue,
+    }))
+
+    if (normalizedValue === '' || normalizedValue.endsWith('.')) {
+      return
+    }
+
+    updateTemplate(normalizedValue)
+  }
+  const clearWeightInputDraft = (templateId: string) => {
+    setWeightInputDrafts((currentDrafts) => {
+      const nextDrafts = { ...currentDrafts }
+      delete nextDrafts[templateId]
+      return nextDrafts
+    })
+  }
 
   return (
     (
@@ -265,17 +294,21 @@ export function SettingsSection() {
                               <span>Ponderação (%)</span>
                               <input
                                 type="text"
-                                inputMode="numeric"
-                                value={template.weightPercentage}
+                                inputMode="decimal"
+                                value={getWeightInputValue(template.id, template.weightPercentage)}
                                 required
                                 onFocus={(event) => event.currentTarget.select()}
-                                onChange={(event) =>
-                                  updateEvaluationMomentTemplate(
-                                    template.id,
-                                    'weightPercentage',
-                                    normalizeIntegerInput(event.target.value),
-                                  )
-                                }
+                                onBlur={() => clearWeightInputDraft(template.id)}
+                                onChange={(event) => updateWeightInputDraft(
+                                  template.id,
+                                  (value) =>
+                                    updateEvaluationMomentTemplate(
+                                      template.id,
+                                      'weightPercentage',
+                                      value,
+                                    ),
+                                  event.target.value,
+                                )}
                               />
                             </label>
                             <label role="cell">
@@ -453,17 +486,21 @@ export function SettingsSection() {
                               <span>Ponderação (%)</span>
                               <input
                                 type="text"
-                                inputMode="numeric"
-                                value={template.weightPercentage}
+                                inputMode="decimal"
+                                value={getWeightInputValue(template.id, template.weightPercentage)}
                                 required
                                 onFocus={(event) => event.currentTarget.select()}
-                                onChange={(event) =>
-                                  updateAttitudeTemplate(
-                                    template.id,
-                                    'weightPercentage',
-                                    normalizeIntegerInput(event.target.value),
-                                  )
-                                }
+                                onBlur={() => clearWeightInputDraft(template.id)}
+                                onChange={(event) => updateWeightInputDraft(
+                                  template.id,
+                                  (value) =>
+                                    updateAttitudeTemplate(
+                                      template.id,
+                                      'weightPercentage',
+                                      value,
+                                    ),
+                                  event.target.value,
+                                )}
                               />
                             </label>
                             <label role="cell">

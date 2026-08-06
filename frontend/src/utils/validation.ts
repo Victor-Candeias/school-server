@@ -78,7 +78,7 @@ export function normalizeNonNegativeInteger(value: unknown, fallback: number) {
   return Number.isFinite(numericValue) && numericValue >= 0 ? Math.trunc(numericValue) : fallback
 }
 
-export function normalizeDecimalInput(value: string) {
+export function normalizeDecimalInput(value: string, maxDecimalPlaces?: number) {
   const normalizedSeparatorValue = value.replace(',', '.')
   const [integerPart = '', ...decimalParts] = normalizedSeparatorValue
     .replace(/[^\d.]/g, '')
@@ -89,7 +89,12 @@ export function normalizeDecimalInput(value: string) {
     return normalizedIntegerPart
   }
 
-  return `${normalizedIntegerPart || '0'}.${decimalParts.join('')}`
+  const decimalPart = decimalParts.join('')
+  const limitedDecimalPart = maxDecimalPlaces === undefined
+    ? decimalPart
+    : decimalPart.slice(0, maxDecimalPlaces)
+
+  return `${normalizedIntegerPart || '0'}.${limitedDecimalPart}`
 }
 
 export function normalizeIntegerInput(value: string) {

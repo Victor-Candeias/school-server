@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { CSSProperties } from 'react'
 import type { SchoolDocument } from '../../api/school'
 import type { SchoolApplicationModel } from '../../hooks/useSchoolApplication'
@@ -40,7 +40,9 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
   } = model
 
   const [visibleGroupMetrics, setVisibleGroupMetrics] = useState<Set<string>>(() => new Set())
-  const [hiddenAttitudeColumns, setHiddenAttitudeColumns] = useState<Set<string>>(() => new Set())
+  const [hiddenAttitudeColumns, setHiddenAttitudeColumns] = useState<Set<string>>(
+    () => new Set(attitudeTemplates.map((template) => template.id)),
+  )
   const [selectedAssessmentStudentId, setSelectedAssessmentStudentId] = useState(ALL_STUDENTS_VALUE)
   const [assessmentWeightOverrides, setAssessmentWeightOverrides] = useState<Record<string, string>>({})
 
@@ -63,12 +65,12 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
   }))
   const hasAssessmentWeightOverrides = Object.keys(assessmentWeightOverrides).length > 0
   const updateAssessmentWeight = (groupType: string, value: string) => {
-    const normalizedValue = normalizeDecimalInput(value)
+    const normalizedValue = normalizeDecimalInput(value, 2)
     const parsedValue = Number(normalizedValue)
 
     setAssessmentWeightOverrides((currentOverrides) => ({
       ...currentOverrides,
-      [groupType]: normalizedValue === '' || !Number.isFinite(parsedValue)
+      [groupType]: normalizedValue === '' || normalizedValue.endsWith('.') || !Number.isFinite(parsedValue)
         ? normalizedValue
         : String(Math.min(100, Math.max(0, parsedValue))),
     }))
@@ -131,6 +133,10 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
   )
   const hasAttitudeTemplates = attitudeTemplates.length > 0
   const hasVisibleAttitudeColumns = visibleAttitudeTemplates.length > 0
+
+  useEffect(() => {
+    setHiddenAttitudeColumns(new Set(attitudeTemplates.map((template) => template.id)))
+  }, [selectedAssessmentsSemester, attitudeTemplates])
   const getStudentSummaryRecord = (student: SchoolDocument) => {
     const summaryStudents = model.semesterAssessmentSummary?.students
     const studentId = getDocumentId(student)
