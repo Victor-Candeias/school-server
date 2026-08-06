@@ -326,6 +326,13 @@
   gap: 5px;
 }
 
+.semester-assessments-attitude-head > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .semester-assessments-attitude-cell input {
   width: 100%;
   box-sizing: border-box;
@@ -471,6 +478,29 @@
 
 .semester-assessments-mobile-list {
   display: none;
+}
+
+.semester-assessments-attitudes-legend {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--table-border);
+  border-radius: var(--radius);
+  color: var(--text-2);
+  background: var(--table-surface);
+  font-size: 0.769rem;
+}
+
+.semester-assessments-attitudes-legend p {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+}
+
+.semester-assessments-attitudes-legend strong {
+  flex: 0 0 auto;
+  color: var(--text);
 }
 
 .assessment-percentage {

@@ -133,6 +133,10 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
   )
   const hasAttitudeTemplates = attitudeTemplates.length > 0
   const hasVisibleAttitudeColumns = visibleAttitudeTemplates.length > 0
+  const formatAttitudeWeightPercentage = (weightPercentage: number) =>
+    `${formatAssessmentValue(weightPercentage).replace('.', ',')}%`
+  const getAttitudeLabel = (template: AttitudeTemplate) =>
+    `${template.alias} ${formatAttitudeWeightPercentage(template.weightPercentage)}`
 
   useEffect(() => {
     setHiddenAttitudeColumns(new Set(attitudeTemplates.map((template) => template.id)))
@@ -555,7 +559,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 title={template.text}
                                 style={getAttitudeStyle(template)}
                               >
-                                <span>{template.alias}</span>
+                                <span>{getAttitudeLabel(template)}</span>
                                 <button
                                   className="semester-assessments-group-toggle"
                                   type="button"
@@ -766,7 +770,7 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                                 <div className="semester-assessments-mobile-moments">
                                   {visibleAttitudeTemplates.map((template) => (
                                     <p key={template.id}>
-                                      <span>{template.alias}:</span>
+                                      <span>{getAttitudeLabel(template)}:</span>
                                       <input
                                         type="text"
                                         inputMode="decimal"
@@ -810,6 +814,16 @@ export function SemesterAssessments({ model }: SemesterAssessmentsProps) {
                           )
                         })}
                       </div>
+                      {hasVisibleAttitudeColumns && (
+                        <div className="semester-assessments-attitudes-legend" aria-label="Legenda das atitudes">
+                          {visibleAttitudeTemplates.map((template) => (
+                            <p key={template.id}>
+                              <strong>{template.alias}:</strong>
+                              <span>{template.text}</span>
+                            </p>
+                          ))}
+                        </div>
+                      )}
                       </>
                     )}
                   </section>
